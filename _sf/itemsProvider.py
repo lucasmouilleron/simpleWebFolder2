@@ -23,8 +23,9 @@ class itemsProvider():
     def getItems(self, path):
         fullPath = self.getFullPath(path)
         items = h.listDirectoryItems(fullPath, forbbidenItems=self.forbiddenItems)
-        items = [item.replace(self.basePath, "") for item in items]
-        return items
+        itemsContainers = [item.replace(self.basePath, "") for item in items if os.path.isdir(item)]
+        itemsLeafs = [item.replace(self.basePath, "") for item in items if os.path.isfile(item)]
+        return itemsContainers, itemsLeafs
 
     ###################################################################################
     def doesItemExists(self, path):

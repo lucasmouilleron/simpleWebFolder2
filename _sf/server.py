@@ -73,8 +73,8 @@ class Server(Thread):
                 if ip.isItemLeaf(path):
                     return send_from_directory(h.DATA_FOLDER, path)
                 else:
-                    items = ip.getItems(path)
-                    return Template(filename=h.makePath(h.ROOT_FOLDER, "templates", "items.html")).render(items=items)
+                    containers, leafs = ip.getItems(path)
+                    return Template(filename=h.makePath(h.ROOT_FOLDER, "templates", "items.html")).render(containers=containers, leafs=leafs)
             else:
                 return "not authorized"
         else:
