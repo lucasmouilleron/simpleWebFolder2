@@ -23,17 +23,10 @@
 <div class="name"><a href="${baseURL}/">${h.NAME}</a></div>
 
 <div class="error section">
-    <h2>An error occured</h2>
-    <p>${e}</p>
-    % if h.DEBUG:
-        <p>${le}</p>
-        <p>
-            % for lto in lt:
-            ${lto}<br/>
-            % endfor
-        </p>
-    % endif
-    <p>We are sorry for this.<br/>Please send us an email @ <a href="mailto:${h.MAIL}">${h.MAIL}</a> if the problem persits.</p>
+    <h2>Item not found</h2>
+    <p>The item ${path} was not found.</p>
+
+    <p>If this is not normal, please send us an email @ <a href="mailto:${h.MAIL}">${h.MAIL}</a> if the problem persits.</p>
 
 </div>
 

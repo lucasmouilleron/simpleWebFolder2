@@ -22,19 +22,23 @@
 
 <div class="name"><a href="${baseURL}/">${h.NAME}</a></div>
 
-<div class="error section">
-    <h2>An error occured</h2>
-    <p>${e}</p>
-    % if h.DEBUG:
-        <p>${le}</p>
-        <p>
-            % for lto in lt:
-            ${lto}<br/>
-            % endfor
-        </p>
-    % endif
-    <p>We are sorry for this.<br/>Please send us an email @ <a href="mailto:${h.MAIL}">${h.MAIL}</a> if the problem persits.</p>
+<div class="navigation section">
+    <div class="parent" data-toggle="tooltip" title="Go to parent folder">
+        %if path != "":
+            <a href="${baseURL}/${path}/.."><i class="icon fas fa-long-arrow-alt-up"></i></a>
+        %else:
+            .
+        % endif
+    </div>
+    <div class="page">${path}</div>
+</div>
 
+<div class="authenticate section">
+    <div class="section-title">Protected area, please authenticate</div>
+    <form method="post">
+        <input type="password" name="password" placeholder="Password"/>
+        <input type="submit" name="password-submit" value="Login"/>
+    </form>
 </div>
 
 <div class="footer">${h.NAME} - ${h.CREDITS}</div>

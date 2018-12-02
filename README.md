@@ -2,8 +2,7 @@
 
 todo
 
-exception page
-login section
+download
 admin section
 tracking
 shares

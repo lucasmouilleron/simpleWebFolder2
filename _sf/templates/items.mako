@@ -36,6 +36,20 @@
     <div class="page">${path}</div>
 </div>
 
+    %for alert in alerts:
+        <div class="alert">
+            <h2>${alert[0]}</h2>
+            <p>${alert[1]}</p>
+        </div>
+    %endfor
+
+    % if readme is not None:
+        <div class="readme section">
+            <div class="readme-content">${readme}</div>
+        </div>
+    % endif
+
+
     % if len(containers)>0:
         <div class="folders section">
             <div class="section-title">Folders</div>

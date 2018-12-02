@@ -85,27 +85,36 @@ class Server(Thread):
     ###################################################################################
     def _routeUser(self, path="/"):
         path = path.rstrip("/")
+        if ap.isAdmin(request): self._routeAdmin(path)
+
+        alerts = []
+
         if ip.doesItemExists(path):
+            if request.form.get("password-submit", False): ap.setUserPassword(path, request.form.get("password", ""), request)
             isProtected, requiredPasswords, savedPassword, isAuthorized = ap.isAuthorized(path, request)
             if isAuthorized:
                 if ip.isItemLeaf(path):
-                    return send_from_directory(h.DATA_FOLDER, path)
+                    response = make_response(send_from_directory(h.DATA_FOLDER, path))
                 else:
+                    if ap.listingForbidden(path): alerts.append(["Can't list folder", "This folder's content is not listable."])
                     containers, leafs = ip.getItems(path, request)
-                    # todo check listing allowed
-                    # hide not show
+                    readme = ip.getReadme(path)
                     downloadAllowed = True
                     currentURLWithoutURI = path
-
-                    return Template(filename=h.makePath(h.ROOT_FOLDER, "templates", "items.mako"), lookup=self.tplLookup).render(containers=containers, leafs=leafs, path=path, downloadAllowed=downloadAllowed, currentURLWithoutURI=currentURLWithoutURI, **self._makeBaseNamspace())
+                    response = make_response(Template(filename=h.makePath(h.ROOT_FOLDER, "templates", "items.mako"), lookup=self.tplLookup).render(containers=containers, leafs=leafs, path=path, readme=readme, downloadAllowed=downloadAllowed, currentURLWithoutURI=currentURLWithoutURI, alerts=alerts, **self._makeBaseNamspace()))
+                if request.form.get("password-submit", False): ap.setUserPassword(path, request.form.get("password", ""), request, response)
+                return response
             else:
-                return "not authorized"
+                return Template(filename=h.makePath(h.ROOT_FOLDER, "templates", "password.mako"), lookup=self.tplLookup).render(path=path, **self._makeBaseNamspace())
         else:
-            return "does not exist"
+            return Template(filename=h.makePath(h.ROOT_FOLDER, "templates", "not-found.mako"), lookup=self.tplLookup).render(path=path, **self._makeBaseNamspace())
 
-        # response = make_response("")
-        # response.set_cookie("test","test2")
-        # return response
+        return response
+
+    ###################################################################################
+    def _routeAdmin(self, path="/"):
+        path = path.rstrip("/")
+        return "admin"
 
     ###################################################################################
     def _makeBaseNamspace(self):
@@ -117,7 +126,7 @@ class Server(Thread):
 ###################################################################################
 h.displaySplash()
 
-ap = ap.authProvider(h.DATA_FOLDER)
+ap = ap.authProvider(h.DATA_FOLDER, h.CONFIG.get("admin password", ""))
 h.logInfo("Auth provider built")
 
 ip = ip.itemsProvider(ap, h.DATA_FOLDER, h.FORBIDEN_ITEMS)
