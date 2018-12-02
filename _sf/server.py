@@ -7,6 +7,7 @@ from gevent.wsgi import WSGIServer
 from flask import Flask, request, jsonify, send_from_directory, redirect, make_response
 from flask_cors import CORS
 from mako.template import Template
+from mako.lookup import TemplateLookup
 import helper as h
 import itemsProvider as ip
 import authProvider as ap
@@ -31,8 +32,11 @@ class Server(Thread):
         self.httpServer = None
 
         self._addRoute("/hello", self._routeHello, ["GET"])
-        self._addRouteRaw("/", self._routeDefault, ["GET", "POST"])
-        self._addRouteRaw("/<path:path>", self._routeDefault, ["GET", "POST"])
+        self._addRouteRaw("/", self._routeUser, ["GET", "POST"])
+        self._addRouteRaw("/<path:path>", self._routeUser, ["GET", "POST"])
+        self._addRouteRaw("/sf_assets/<path:path>", self._routeAssets, ["GET", "POST"])
+
+        self.tplLookup = TemplateLookup(directories=[h.makePath(h.ROOT_FOLDER, "templates")])
 
     ###################################################################################
     def run(self):
@@ -66,15 +70,25 @@ class Server(Thread):
         return {"result": 200, "world": h.now(), "version": h.dictionnaryDeepGet(h.CONFIG, "version", default=0)}
 
     ###################################################################################
-    def _routeDefault(self, path="/"):
+    def _routeAssets(self, path):
+        return send_from_directory(h.makePath(h.DATA_FOLDER, "_sf_assets"), path)
+
+    ###################################################################################
+    def _routeUser(self, path="/"):
+        path = path.rstrip("/")
         if ip.doesItemExists(path):
             isProtected, requiredPasswords, savedPassword, isAuthorized = ap.isAuthorized(path, request)
             if isAuthorized:
                 if ip.isItemLeaf(path):
                     return send_from_directory(h.DATA_FOLDER, path)
                 else:
-                    containers, leafs = ip.getItems(path)
-                    return Template(filename=h.makePath(h.ROOT_FOLDER, "templates", "items.html")).render(containers=containers, leafs=leafs)
+                    containers, leafs = ip.getItems(path, request)
+                    # todo check listing allowed
+                    # hide not show
+                    downloadAllowed = True
+                    currentURLWithoutURI = path
+
+                    return Template(filename=h.makePath(h.ROOT_FOLDER, "templates", "items.mako"), lookup=self.tplLookup).render(containers=containers, leafs=leafs, path=path, downloadAllowed=downloadAllowed, currentURLWithoutURI=currentURLWithoutURI, **self._makeBaseNamspace())
             else:
                 return "not authorized"
         else:
@@ -84,17 +98,21 @@ class Server(Thread):
         # response.set_cookie("test","test2")
         # return response
 
+    ###################################################################################
+    def _makeBaseNamspace(self):
+        return {"baseURL": "", "globalName": h.CONFIG.get("name", "SWF2"), "credits": h.CONFIG.get("credits", "Lucas Mouilleron"), "extensionClasses": h.EXTENSIONS_CLASSES, "h": h}
+
 
 ###################################################################################
 # MAIN
 ###################################################################################
 h.displaySplash()
 
-ip = ip.itemsProvider(h.DATA_FOLDER, h.FORBIDEN_ITEMS)
-h.logInfo("Items provider built")
-
 ap = ap.authProvider(h.DATA_FOLDER)
 h.logInfo("Auth provider built")
+
+ip = ip.itemsProvider(ap, h.DATA_FOLDER, h.FORBIDEN_ITEMS)
+h.logInfo("Items provider built")
 
 server = Server(ip, ap, h.dictionnaryDeepGet(h.CONFIG, "server", "port", default=5000), h.dictionnaryDeepGet(h.CONFIG, "server", "ssl", default=False), h.CERTIFICATE_KEY_FILE, h.CERTIFICATE_CRT_FILE, h.FULLCHAIN_CRT_FILE)
 server.start()
