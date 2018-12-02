@@ -1,4 +1,6 @@
 {
+  "debug":true,
   "name": "Simple Web Folder",
-  "credits": "Lucas Mouilleron"
+  "credits": "Lucas Mouilleron",
+  "mail":"lucas.mouilleron@me.com"
 }

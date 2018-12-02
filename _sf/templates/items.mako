@@ -20,7 +20,7 @@
     </a>
 </div>
 
-<div class="name"><a href="${baseURL}/">${globalName}</a></div>
+<div class="name"><a href="${baseURL}/">${h.NAME}</a></div>
 
 <div class="navigation section">
     <div class="parent" data-toggle="tooltip" title="Go to parent folder">
@@ -88,7 +88,7 @@
                         <% sizeMB = h.floatFormat(item["size"]/1048576,1)%>
                         <% urlEncodedURL = h.urlEncode(item["path"])%>
                         <tr onclick="window.open('${urlEncodedURL}')" class="${evenClass}">
-                            <td><i class="icon ${extensionClasses.get(item["extension"], extensionClasses["default"])}"></i></td>
+                            <td><i class="icon ${h.EXTENSIONS_CLASSES.get(item["extension"], h.EXTENSIONS_CLASSES["default"])}"></i></td>
                             <td>${item["name"]}</td>
                             <td>${h.formatTimestamp(item["lastModified"], "YYYY/MM/DD HH:mm")}</td>
                             <td>${sizeMB}</td>
@@ -100,6 +100,6 @@
         </div>
     % endif
 
-<div class="footer">${globalName} - ${credits}</div>
+<div class="footer">${h.NAME} - ${h.CREDITS}</div>
 </body>
 </html>

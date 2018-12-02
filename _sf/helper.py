@@ -16,6 +16,7 @@ from os import listdir
 from os.path import isfile
 import re
 import urllib.parse
+import traceback
 
 ###################################################################################
 SERVER_TIMEZONE = "Europe/Paris"
@@ -36,10 +37,14 @@ LOG_LOGGER = "main"
 LOG_FOLDER = ROOT_FOLDER + "/log"
 LOG_FILENAME = LOG_FOLDER + "/all.log"
 SPLASH_FILE = ROOT_FOLDER + "/config/splash.txt"
-
 ###################################################################################
 if os.path.exists(CONFIG_FILE): CONFIG = json.load(open(CONFIG_FILE))
 else: CONFIG = {}
+###################################################################################
+DEBUG = CONFIG.get("debug", False)
+NAME = CONFIG.get("name", "SWF2")
+CREDITS = CONFIG.get("credits", "Lucas Mouilleron")
+MAIL = CONFIG.get("mail", "lucas.mouilleron@me.com")
 
 ###################################################################################
 consoleHandler = logging.StreamHandler()
@@ -316,4 +321,9 @@ def floatFormat(number, decimals=2, fast=True):
 
 ################################################################################
 def urlEncode(path):
-    return urllib.parse.quote(path).replace("%3D","=").replace("%3A",":").replace("%2F","/")
+    return urllib.parse.quote(path).replace("%3D", "=").replace("%3A", ":").replace("%2F", "/")
+
+
+################################################################################
+def getLastExceptionAndTrace():
+    return traceback.format_exc(), traceback.format_stack()

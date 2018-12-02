@@ -62,8 +62,17 @@ class Server(Thread):
 
     ###################################################################################
     def _addRouteRaw(self, rule, callback, methods, endpoint=None):
+        def callbackReal(*args, **kwargs):
+            try: return callback(*args, **kwargs)
+            except Exception as e:
+                le, lt = h.getLastExceptionAndTrace()
+                print(le)
+                print(lt)
+                h.logWarning("Error processing request", request.data.decode("utf-8"), request.endpoint, h.formatException(e))
+                return Template(filename=h.makePath(h.ROOT_FOLDER, "templates", "error.mako"), lookup=self.tplLookup).render(e=e, **self._makeBaseNamspace(), le=le, lt=lt)
+
         if endpoint is None: endpoint = h.uniqueID()
-        self.app.add_url_rule(rule, endpoint, callback, methods=methods)
+        self.app.add_url_rule(rule, endpoint, callbackReal, methods=methods)
 
     ###################################################################################
     def _routeHello(self):
@@ -100,7 +109,7 @@ class Server(Thread):
 
     ###################################################################################
     def _makeBaseNamspace(self):
-        return {"baseURL": "", "globalName": h.CONFIG.get("name", "SWF2"), "credits": h.CONFIG.get("credits", "Lucas Mouilleron"), "extensionClasses": h.EXTENSIONS_CLASSES, "h": h}
+        return {"baseURL": "", "h": h}
 
 
 ###################################################################################
