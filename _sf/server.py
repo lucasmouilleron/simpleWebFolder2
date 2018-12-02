@@ -4,13 +4,15 @@
 import signal
 from threading import Thread
 from gevent.wsgi import WSGIServer
-from flask import Flask, request, jsonify, send_from_directory, redirect, make_response
+from flask import Flask, request, jsonify, send_from_directory, redirect, make_response, send_file
 from flask_cors import CORS
 from mako.template import Template
 from mako.lookup import TemplateLookup
 import helper as h
 import itemsProvider as ip
 import authProvider as ap
+import os
+import mimetypes
 
 
 ###################################################################################
@@ -88,7 +90,6 @@ class Server(Thread):
         if ap.isAdmin(request): self._routeAdmin(path)
 
         alerts = []
-
         if ip.doesItemExists(path):
             if request.form.get("password-submit", False): ap.setUserPassword(path, request.form.get("password", ""), request)
             isProtected, requiredPasswords, savedPassword, isAuthorized = ap.isAuthorized(path, request)
@@ -96,6 +97,11 @@ class Server(Thread):
                 if ip.isItemLeaf(path):
                     response = make_response(send_from_directory(h.DATA_FOLDER, path))
                 else:
+                    if "download" in request.args and not ap.listingForbidden(path):
+                        zipFile = ip.getZipFile(path, request)
+                        result = send_file(zipFile, as_attachment=True, attachment_filename="%s.zip" % os.path.basename(path))
+                        os.remove(zipFile)
+                        return result
                     if ap.listingForbidden(path): alerts.append(["Can't list folder", "This folder's content is not listable."])
                     containers, leafs = ip.getItems(path, request)
                     readme = ip.getReadme(path)
@@ -119,6 +125,16 @@ class Server(Thread):
     ###################################################################################
     def _makeBaseNamspace(self):
         return {"baseURL": "", "h": h}
+
+    ###################################################################################
+    def _downloadAndDeleteFile(self, path):
+        def generate():
+            with open(path) as f: yield from f
+            os.remove(path)
+
+        r = self.app.response_class(generate(), mimetype=mimetypes.MimeTypes().guess_type(path)[0])
+        r.headers.set("Content-Disposition", "attachment", filename=path)
+        return r
 
 
 ###################################################################################

@@ -5,6 +5,7 @@ import os
 import helper as h
 import authProvider as ap
 import markdown2
+import zipfile
 
 
 ###################################################################################
@@ -15,7 +16,7 @@ class itemsProvider():
     ###################################################################################
     def __init__(self, ap: ap.authProvider, basePath, forbiddenItems):
         self.basePath = os.path.abspath(basePath)
-        self.forbiddenItems = forbiddenItems
+        self.forbiddenItems = set(forbiddenItems)
         self.ap = ap
 
     ###################################################################################
@@ -27,6 +28,20 @@ class itemsProvider():
         readmeFile = h.makePath(self.getFullPath(path), "README.md")
         if not os.path.exists(readmeFile): return None
         return markdown2.markdown(h.readFromFile(readmeFile))
+
+    ###################################################################################
+    def getZipFile(self, path, r):
+        if not self.doesItemExists(path): return None
+        fullPath = self.getFullPath(path)
+        zipFilePath = h.makePath(h.TMP_FOLDER, h.uniqueID())
+        zipf = zipfile.ZipFile(zipFilePath, "w", zipfile.ZIP_DEFLATED)
+        for root, dirs, files in os.walk(fullPath):
+            dirs[:] = [d for d in dirs if not d in self.forbiddenItems]
+            dirs[:] = [d for d in dirs if self.ap.isAuthorized(d.replace(self.basePath, ""), r)[3]]
+            for f in files:
+                if f in self.forbiddenItems: continue
+                zipf.write(os.path.join(root, f))
+        return zipFilePath
 
     ###################################################################################
     def getItems(self, path, r):

@@ -20,7 +20,7 @@ import traceback
 
 ###################################################################################
 SERVER_TIMEZONE = "Europe/Paris"
-FORBIDEN_ITEMS = [".", "..", "_sf", "_sf_assets", "_sf_overrides", "_sf_shares", ".tracking", ".password", ".nopassword", ".nolist", ".noshow", ".nodownload", ".DS_Store", "Icon\r", ".htaccess", "README.md"]
+FORBIDEN_ITEMS = [".", "..", "_sf", "_sf_assets", "_sf_overrides", "_sf_shares", ".tracking", ".password", ".nopassword", ".nolist", ".noshow", ".nodownload", ".DS_Store", "Icon\r", ".htaccess", "README.md", ".git", ".idea", ".gitignore"]
 EXTENSIONS_CLASSES = {"default": "fas fa-file", "html": "fas fa-file-code", "jpg": "fas fa-file-image", "gif": "fas fa-file-image", "png": "fas fa-file-image", "pdf": "fas fa-file-pdf", "ppt": "fas fa-file-powerpoint", "pptx": "fas fa-file-powerpoint", "doc": "fas fa-file-word", "docx": "fas fa-file-word", "xls": "fas fa-file-excel", "xlsx": "fas fa-file-excel", "avi": "fas fa-file-video", "mov": "fas fa-file-video", "mp4": "fas fa-file-video", "wav": "fas fa-file-audio", "mp3": "fas fa-file-audio", "zip": "fas fa-file-archive", "tgz": "fas fa-file-archive"}
 ###################################################################################
 ROOT_FOLDER = os.path.dirname(os.path.realpath(__file__))
@@ -45,6 +45,7 @@ DEBUG = CONFIG.get("debug", False)
 NAME = CONFIG.get("name", "SWF2")
 CREDITS = CONFIG.get("credits", "Lucas Mouilleron")
 MAIL = CONFIG.get("mail", "lucas.mouilleron@me.com")
+TMP_FOLDER = CONFIG.get("tmp folder", "/tmp")
 
 ###################################################################################
 consoleHandler = logging.StreamHandler()
