@@ -40,7 +40,8 @@ class itemsProvider():
             dirs[:] = [d for d in dirs if self.ap.isAuthorized(d.replace(self.basePath, ""), r)[3]]
             for f in files:
                 if f in self.forbiddenItems: continue
-                zipf.write(os.path.join(root, f))
+                fpath = h.makePath(root, f)
+                zipf.write(fpath, arcname=fpath.replace(self.basePath, ""))
         return zipFilePath
 
     ###################################################################################

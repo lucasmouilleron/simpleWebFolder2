@@ -98,8 +98,9 @@ class Server(Thread):
                     response = make_response(send_from_directory(h.DATA_FOLDER, path))
                 else:
                     if "download" in request.args and not ap.listingForbidden(path):
-                        zipFile = ip.getZipFile(path, request)
-                        result = send_file(zipFile, as_attachment=True, attachment_filename="%s.zip" % os.path.basename(path))
+                        zipFile, zipName = ip.getZipFile(path, request), os.path.basename(path)
+                        if zipName == "": zipName = "root"
+                        result = send_file(zipFile, as_attachment=True, attachment_filename="%s.zip" % zipName)
                         os.remove(zipFile)
                         return result
                     if ap.listingForbidden(path): alerts.append(["Can't list folder", "This folder's content is not listable."])
