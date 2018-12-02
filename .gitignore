@@ -1,0 +1,11 @@
+.idea
+*.iml
+.DS_Store
+_sf/vendors
+_sf_overrides
+_sf_shares
+.tracking
+
+### demo files
+docs
+portraits
