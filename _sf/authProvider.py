@@ -93,7 +93,7 @@ class authProvider():
     ###################################################################################
     def isAuthorized(self, path, r: request):
         lowerProtectedPath = self.getLowerProtectedPath(path)
-        if (lowerProtectedPath == False): return (False, "", "", True)
+        if (lowerProtectedPath == False): return (False, [], "", True)
         requiredPasswords = h.readFromFile(h.makePath(self.basePath, lowerProtectedPath, ".password")).split("\n")
         requiredPasswords = [p for p in requiredPasswords if p != ""]
         savedPassword = self.getUserPassword(lowerProtectedPath, r)

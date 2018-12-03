@@ -44,6 +44,22 @@
         </div>
     %endfor
 
+    %if len(passwords)>1:
+        <div class="passwords section">
+            <div class="section-title">Passwords</div>
+            <form method="post" class="inline">
+                <input type="text" id="search-password" placeholder="search for (partial) password"/>
+            </form>
+            <div id="passwords">
+                <% currentURL = h.urlEncode(h.makePath(rootURL, path))%>
+                %for password in passwords:
+                    <span data-password="${password}">${password} <a data-toggle="tooltip" title="Copy link + password" class="link" data-clipboard-text="${currentURL} (password: ${password})"><i class="icon fas fa-link"></i></a></span>
+                %endfor
+                <div id="no-found-passwords" style="display:none">No password found</div>
+            </div>
+        </div>
+    %endif
+
     % if readme is not None:
         <div class="readme section">
             <div class="readme-content">${readme}</div>
@@ -151,6 +167,22 @@
             tableElt.find("tr:even").addClass("even");
             tableElt.find("tr:odd").removeClass("even");
         });
+
+        $("#search-password").keyup(function () {
+            var passwordSearch = this.value;
+            $("#passwords span").hide();
+            $("#no-found-passwords").hide();
+            var found = 0;
+            $("#passwords span").each(function (i, a) {
+                var potentialPassword = $(this).attr("data-password");
+                if (potentialPassword.indexOf(passwordSearch) !== -1) {
+                    $(this).show();
+                    found++;
+                }
+            });
+            if (found == 0) {$("#no-found-passwords").show();}
+        });
+
     });
 </script>
 
