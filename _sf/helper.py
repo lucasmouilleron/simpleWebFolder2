@@ -52,7 +52,7 @@ LOCKS_FOLDER = CONFIG.get("locks folder", TMP_FOLDER)
 ###################################################################################
 LOG_FORMAT = "%(asctime)-15s - %(levelname)-7s - %(message)s"
 LOG_LOGGER = "main"
-LOG_FOLDER = ROOT_FOLDER + "/log"
+LOG_FOLDER = DATA_FOLDER + "/_sf_log"
 LOG_FILENAME = LOG_FOLDER + "/all.log"
 SPLASH_FILE = ROOT_FOLDER + "/config/splash.txt"
 STORE_LOG = CONFIG.get("store log", False)
