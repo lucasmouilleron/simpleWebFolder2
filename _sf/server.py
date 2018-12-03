@@ -12,8 +12,8 @@ import helper as h
 import itemsProvider as ip
 import authProvider as ap
 import trackingProvider as tp
+import sharesProvider as sp
 import os
-import mimetypes
 
 
 ###################################################################################
@@ -157,7 +157,7 @@ class Server(Thread):
     ###################################################################################
     def _routeSharesAdmin(self):
         if not self.ap.isAdmin(request): return self._redirect("/admin")
-        return "shares"
+        return self._makeTemplate("shares", shares=sp.listShares(request.form.get("shareID", None)))
 
     ###################################################################################
     def _routeShare(self):
@@ -200,6 +200,9 @@ h.logInfo("Auth provider built")
 
 tp = tp.trackingProvider(h.DATA_FOLDER)
 h.logInfo("Tracking provider built")
+
+sp = sp.sharesProvider(ap, h.makeDirPath(h.DATA_FOLDER, "_sf_shares"))
+h.logInfo("Shares provider built")
 
 ip = ip.itemsProvider(ap, h.DATA_FOLDER)
 h.logInfo("Items provider built")

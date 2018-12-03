@@ -396,3 +396,23 @@ def getLockExclusive(filePath, waitForUnlockInSecs=None):
 def releaseLock(lockHandler):
     if lockHandler is None: return
     portalocker.unlock(lockHandler)
+
+
+################################################################################
+def loadJsonFile(filePath):
+    if not os.path.exists(filePath): raise Exception("The json file does not exists", filePath)
+    try:
+        return json.loads(open(filePath).read())
+    except: raise Exception("The json file syntax is not valid", filePath)
+
+
+################################################################################
+def writeJsonFile(filePath, dictionnary, sortKeys=False, indent=4, compact=False):
+    try:
+        fp = open(filePath, "w")
+        if compact: separators = (",", ":")
+        else: separators = None
+        json.dump(dictionnary, fp, sort_keys=sortKeys, indent=indent, separators=separators)
+        fp.close()
+    except:
+        raise Exception("The json object could not be saved to file", filePath)

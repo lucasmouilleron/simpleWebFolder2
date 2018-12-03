@@ -115,5 +115,20 @@
     % endif
 
 <div class="footer">${h.NAME} - ${h.CREDITS}</div>
+
+<script>
+    $(document).ready(function () {
+        window.name = "_files";
+
+        $('[data-toggle="tooltip"]').tooltipster({theme: "tooltipster-borderless", animationDuration: 200, delay: 20, side: "bottom"});
+        var table = $("table").stupidtable();
+        table.bind("aftertablesort", function (event, data) {
+            var tableElt = data.$th.parent().parent().parent();
+            tableElt.find("tr:even").addClass("even");
+            tableElt.find("tr:odd").removeClass("even");
+        });
+    });
+</script>
+
 </body>
 </html>

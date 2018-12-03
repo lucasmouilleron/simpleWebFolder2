@@ -29,8 +29,69 @@
         <div class="tracking" data-toggle="tooltip" title="Tracking"><a href="/tracking" target="_tracking"><i class="icon fas fa-glasses"></i></a></div>
     %endif
 </div>
+<div class="shares section">
+    %if filterShareID is not None:
+        <div class="section-title">Shares found</div>
+    %else:
+        <div class="section-title">Latest ${maxShares} shares</div>
+    %endif
+
+    <table>
+        <thead>
+        <tr>
+            <th data-sort="string-ins">ID</th>
+            <th data-sort="string-ins">File</th>
+            <th data-sort="string-ins" width="160">Expiration</th>
+            <th data-sort="string-ins">Password</th>
+            <th data-sort="int" width="50"># views</th>
+            <th data-sort="string-ins" width="160">Latest</th>
+            <th width="70">Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+            <% i = 0%>
+            %for share in shares:
+                <% shareURL = "ok"%>
+                <% evenClass = "even" if i % 2 == 1 else "odd"%>
+                <tr class="${evenClass}">
+                    <td>${share["ID"]}</td>
+                    <td onclick="window.open('todo')"><a>${share["file"]}</a></td>
+                    <td>exp</td>
+                    <td>password</td>
+                    <td>view</td>
+                    <td>
+                        todo
+                    </td>
+                    <td>
+                        todo
+                    </td>
+                </tr>
+                <% i = 0%>
+            %endfor
+        </tbody>
+    </table>
+
+</div>
 
 
+<script>
+    $(document).ready(function () {
+        window.name = "_shares";
+
+        var clipboard = new ClipboardJS(".link");
+        clipboard.on('success', function (e) {
+            alert("Link " + e.text + " copied to clipboard")
+        });
+
+        $('[data-toggle="tooltip"]').tooltipster({theme: "tooltipster-borderless", animationDuration: 200, delay: 20, side: "bottom"});
+        var table = $("table").stupidtable();
+        table.bind("aftertablesort", function (event, data) {
+            var tableElt = data.$th.parent().parent().parent();
+            tableElt.find("tr:even").addClass("even");
+            tableElt.find("tr:odd").removeClass("even");
+        });
+    });
+</script>
 
 
 <div class="footer">${h.NAME} - ${h.CREDITS}</div>
