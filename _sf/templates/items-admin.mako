@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="${baseURL}/_sf_assets/tooltipster.css">
     <link rel="stylesheet" href="${baseURL}/_sf_assets/tooltipster-theme.css">
     <link rel="stylesheet" href="${baseURL}/_sf_assets/style.css">
-    <title>${h.NAME} - admin - ${path}</title>
+    <title>${h.NAME} - admin - /${path}</title>
 </head>
 
 <body>
@@ -93,6 +93,7 @@
                     <th data-sort="string-ins">Name</th>
                     <th data-sort="string-ins" style="width:20%;">Last modified</th>
                     <th data-sort="float" style="width:10%;">Size (mb)</th>
+                    <th width="70">Actions</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -107,6 +108,11 @@
                             <td>${item["name"]}</td>
                             <td>${h.formatTimestamp(item["lastModified"], "YYYY/MM/DD HH:mm")}</td>
                             <td>${sizeMB}</td>
+                            <td>
+                                <a data-toggle="tooltip" title="Copy link" class="link" data-clipboard-text="todo"><i class="icon fas fa-link"></i></a>
+                                <a data-toggle="tooltip" title="Copy link + password" class="link" data-clipboard-text="todo"><i class="icon fas fa-link"></i></a>
+                                <a data-toggle="tooltip" title="Create share" href="todo" target="_shares"><i class="icon fas fa-share-alt-square"></i></a>
+                            </td>
                         </tr>
                         <% i+=1 %>
                     % endfor
