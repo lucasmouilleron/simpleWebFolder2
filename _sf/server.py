@@ -141,7 +141,7 @@ h.logInfo("Auth provider built")
 ip = ip.itemsProvider(ap, h.DATA_FOLDER)
 h.logInfo("Items provider built")
 
-server = Server(ip, ap, h.dictionnaryDeepGet(h.CONFIG, "server", "port", default=5000), h.dictionnaryDeepGet(h.CONFIG, "server", "ssl", default=False), h.CERTIFICATE_KEY_FILE, h.CERTIFICATE_CRT_FILE, h.FULLCHAIN_CRT_FILE)
+server = Server(ip, ap, h.PORT, h.SSL, h.CERTIFICATE_KEY_FILE, h.CERTIFICATE_CRT_FILE, h.FULLCHAIN_CRT_FILE)
 server.start()
 h.logInfo("Server started", server.port, server.ssl)
 

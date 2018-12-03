@@ -3,5 +3,7 @@
   "name": "Simple Web Folder",
   "credits": "Lucas Mouilleron",
   "mail": "lucas.mouilleron@me.com",
+  "port":5000,
+  "ssl":false,
   "admin password": "pass1234"
 }

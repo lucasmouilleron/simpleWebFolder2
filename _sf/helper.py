@@ -28,24 +28,26 @@ DATA_FOLDER = ROOT_FOLDER + "/../"
 CONFIG_FOLDER = ROOT_FOLDER + "/config"
 CONFIG_FILE = CONFIG_FOLDER + "/config.json"
 ###################################################################################
+if os.path.exists(CONFIG_FILE): CONFIG = json.load(open(CONFIG_FILE))
+else: CONFIG = {}
+###################################################################################
+PORT = CONFIG.get("port", 5000)
+SSL = CONFIG.get("ssl", False)
 CERTIFICATE_KEY_FILE = CONFIG_FOLDER + "/server.key"
 CERTIFICATE_CRT_FILE = CONFIG_FOLDER + "/server.crt"
 FULLCHAIN_CRT_FILE = CONFIG_FOLDER + "/fullchain.crt"
-###################################################################################
-LOG_FORMAT = "%(asctime)-15s - %(levelname)-7s - %(message)s"
-LOG_LOGGER = "main"
-LOG_FOLDER = ROOT_FOLDER + "/log"
-LOG_FILENAME = LOG_FOLDER + "/all.log"
-SPLASH_FILE = ROOT_FOLDER + "/config/splash.txt"
-###################################################################################
-if os.path.exists(CONFIG_FILE): CONFIG = json.load(open(CONFIG_FILE))
-else: CONFIG = {}
 ###################################################################################
 DEBUG = CONFIG.get("debug", False)
 NAME = CONFIG.get("name", "SWF2")
 CREDITS = CONFIG.get("credits", "Lucas Mouilleron")
 MAIL = CONFIG.get("mail", "lucas.mouilleron@me.com")
 TMP_FOLDER = CONFIG.get("tmp folder", "/tmp")
+###################################################################################
+LOG_FORMAT = "%(asctime)-15s - %(levelname)-7s - %(message)s"
+LOG_LOGGER = "main"
+LOG_FOLDER = ROOT_FOLDER + "/log"
+LOG_FILENAME = LOG_FOLDER + "/all.log"
+SPLASH_FILE = ROOT_FOLDER + "/config/splash.txt"
 
 ###################################################################################
 consoleHandler = logging.StreamHandler()
