@@ -44,14 +44,14 @@
     %endfor
 
     % if readme is not None:
-        <div class="readme section">
+        <div class="block section">
             <div class="readme-content">${readme}</div>
         </div>
     % endif
 
 
     % if len(containers)>0:
-        <div class="folders section">
+        <div class="containers section">
             <div class="section-title">Folders</div>
             <table class="noselect">
                 <thead>
@@ -83,7 +83,7 @@
     % endif
 
     % if len(leafs)>0:
-        <div class="files section">
+        <div class="leafs section">
             <div class="section-title">Files</div>
             <table class="noselect">
                 <thead>

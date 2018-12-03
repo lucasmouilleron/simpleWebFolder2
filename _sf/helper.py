@@ -264,6 +264,15 @@ def parseDate(dateString, dateFormat, timezone):
 
 
 ################################################################################
+def parseBool(theBool, defaultValue=False, trueValue="true"):
+    try:
+        if theBool == trueValue: return True
+        else: return False
+    except:
+        return defaultValue
+
+
+################################################################################
 def formatTimestamp(timestamp, dateFormat, timezone=SERVER_TIMEZONE):
     if dateFormat == "iso": return arrow.get(timestamp).to(timezone).isoformat()
     return arrow.get(timestamp).to(timezone).format(dateFormat)

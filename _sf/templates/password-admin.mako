@@ -22,7 +22,7 @@
 
 <div class="name"><a href="${baseURL}/">${h.NAME}</a></div>
 
-<div class="authenticate section">
+<div class="block section">
     <div class="section-title">Admin area, please authenticate</div>
     <form method="post">
         <input id="password" type="password" name="password" placeholder="Password"/>

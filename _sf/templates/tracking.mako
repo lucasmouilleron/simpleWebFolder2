@@ -30,14 +30,21 @@
     %endif
 </div>
 
-<div class="trackings-filter section">
+<div class="block section">
     <div class="section-title">Filter</div>
     <form method="post" class="inline">
-        <label>Limit</label><select name="maxItems">
-        <option ${"SELECTED" if maxItems == "500" else ""}>500</option>
-        <option ${"SELECTED" if maxItems == "1000" else ""}>1000</option>
-        <option ${"SELECTED" if maxItems == "all" else ""}>all</option>
-    </select>
+        <label>Limit</label>
+        <select name="maxItems">
+            <option ${"SELECTED" if maxItems == "500" else ""}>500</option>
+            <option ${"SELECTED" if maxItems == "1000" else ""}>1000</option>
+            <option ${"SELECTED" if maxItems == "all" else ""}>all</option>
+        </select>
+        <label>Protected</label>
+        <select name="protected">
+            <option ${"SELECTED" if protected == "yes" else ""}>yes</option>
+            <option ${"SELECTED" if protected == "no" else ""}>no</option>
+            <option ${"SELECTED" if protected == "all" else ""}>all</option>
+        </select>
         <label></label><input type="text" name="password" value="${password}" placeholder="Password" style="width:200px;"/>
         <label></label><input type="text" name="item" value="${item}" placeholder="Item" style="width:200px;"/>
         <label></label><input type="submit" name="filter" value="Filter" style="width:100px;"/>

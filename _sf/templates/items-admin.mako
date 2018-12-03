@@ -52,7 +52,7 @@
     %endfor
 
     %if len(passwords)>1:
-        <div class="passwords section">
+        <div class="block section">
             <div class="section-title">Passwords</div>
             <form method="post" class="inline">
                 <input type="text" id="search-password" placeholder="search for (partial) password"/>
@@ -67,15 +67,23 @@
         </div>
     %endif
 
+    %if len(containers)+len(leafs)>10:
+        <div class="block section">
+            <div class="section-title">Filter items</div>
+            <form method="post" class="inline">
+                <input type="text" id="search-item" placeholder="search for (partial) item"/>
+            </form>
+        </div>
+    %endif
+
     % if readme is not None:
-        <div class="readme section">
+        <div class="block section">
             <div class="readme-content">${readme}</div>
         </div>
     % endif
 
-
     % if len(containers)>0:
-        <div class="folders section">
+        <div class="containers section">
             <div class="section-title">Folders</div>
             <table class="noselect">
                 <thead>
@@ -95,7 +103,7 @@
                         <% urlEncodedPath = h.urlEncode(item["path"])%>
                         <% isAllowedClass = "disabled" if item["protected"] else ""%>
                         <% itemURL = h.urlEncode(h.makePath(rootURL , item["path"].lstrip("/"))) %>
-                        <tr class="${evenClass}">
+                        <tr class="item ${evenClass}" data-item="${item["name"]}">
                             <td onclick="location.href='${urlEncodedPath}'"><i class="icon fas fa-folder ${isAllowedClass}"></i></td>
                             <td onclick="location.href='${urlEncodedPath}'">${item["name"]}</td>
                             <td onclick="location.href='${urlEncodedPath}'">${h.formatTimestamp(item["lastModified"], "YYYY/MM/DD HH:mm")}</td>
@@ -116,7 +124,7 @@
     % endif
 
     % if len(leafs)>0:
-        <div class="files section">
+        <div class="leafs section">
             <div class="section-title">Files</div>
             <table class="noselect">
                 <thead>
@@ -136,7 +144,7 @@
                         <% sizeMB = h.floatFormat(item["size"]/1048576,1)%>
                         <% urlEncodedPath = h.urlEncode(item["path"])%>
                         <% itemURL = h.urlEncode(h.makePath(rootURL , item["path"].lstrip("/"))) %>
-                        <tr class="${evenClass}">
+                        <tr class="item ${evenClass}" data-item="${item["name"]}">
                             <td onclick="window.open('${urlEncodedPath}')"><i class="icon ${h.EXTENSIONS_CLASSES.get(item["extension"], h.EXTENSIONS_CLASSES["default"])}"></i></td>
                             <td onclick="window.open('${urlEncodedPath}')">${item["name"]}</td>
                             <td onclick="window.open('${urlEncodedPath}')">${h.formatTimestamp(item["lastModified"], "YYYY/MM/DD HH:mm")}</td>
@@ -173,6 +181,28 @@
             var tableElt = data.$th.parent().parent().parent();
             tableElt.find("tr:even").addClass("even");
             tableElt.find("tr:odd").removeClass("even");
+        });
+
+        $("#search-item").keyup(function () {
+            var itemSearch = this.value;
+            $(".leafs").hide();
+            $(".containers").hide();
+            $(".leafs tr.item").hide();
+            $(".containers tr.item").hide();
+            $(".leafs tr.item").each(function (i, a) {
+                var potentialItem = $(this).attr("data-item");
+                if (potentialItem.indexOf(itemSearch) !== -1) {
+                    $(this).show();
+                    $(".leafs").show();
+                }
+            });
+            $(".containers tr.item").each(function (i, a) {
+                var potentialItem = $(this).attr("data-item");
+                if (potentialItem.indexOf(itemSearch) !== -1) {
+                    $(this).show();
+                    $(".containers").show();
+                }
+            });
         });
 
         $("#search-password").keyup(function () {

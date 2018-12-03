@@ -43,13 +43,7 @@ a:hover {
     margin-bottom: 30px;
 }
 
-.readme, .passwords, .exception {
-    background-color: #eee;
-    padding: 15px 25px;
-    border-bottom: 3px solid #ccc;
-}
-
-.authenticate, .create-share, .trackings-filter {
+.block {
     background-color: #eee;
     padding: 15px 25px;
     border-bottom: 3px solid #ccc;

@@ -28,7 +28,7 @@
     <p>We are sorry for this.<br/>Please send us an email @ <a href="mailto:${h.MAIL}">${h.MAIL}</a> if the problem persits.</p>
 
     % if h.DEBUG:
-        <div class="exception">
+        <div class="block">
             <p>${le}</p>
             <p>
                 % for lto in lt:

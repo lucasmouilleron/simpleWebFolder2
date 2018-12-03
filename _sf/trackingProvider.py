@@ -35,7 +35,7 @@ class trackingProvider():
             if lh is not None: h.releaseLock(lh)
 
     ###################################################################################
-    def getTrackings(self, password=None, item=None, maxItems=None):
+    def getTrackings(self, password=None, item=None, protected=None, maxItems=None):
         trackingFile = h.makePath(self.basePath, ".tracking")
         lockFile = h.makePath(h.LOCKS_FOLDER, "_sfl_tracking")
         lh = None
@@ -46,6 +46,9 @@ class trackingProvider():
             trackings = []
             i = 0
             for d in datas[::-1]:
+                if protected is not None:
+                    if protected == "yes" and d[2] == "": continue
+                    if protected == "no" and d[2] != "": continue
                 if password is not None and password not in d[2]: continue
                 if item is not None and item not in d[0]: continue
                 trackings.append({"path": d[0], "authorized": d[1], "password": d[2], "ip": d[3], "date": h.parseInt(d[4], 0)})
