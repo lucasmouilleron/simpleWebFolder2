@@ -34,9 +34,9 @@
     <div class="section-title">Filter</div>
     <form method="post" class="inline">
         <label>Limit</label><select name="maxItems">
-        <option ${"SELECTED" if maxItems == 500 else ""}>500</option>
-        <option ${"SELECTED" if maxItems == 1000 else ""}>1000</option>
-        <option ${"SELECTED" if maxItems == all else ""}>all</option>
+        <option ${"SELECTED" if maxItems == "500" else ""}>500</option>
+        <option ${"SELECTED" if maxItems == "1000" else ""}>1000</option>
+        <option ${"SELECTED" if maxItems == "all" else ""}>all</option>
     </select>
         <label></label><input type="text" name="password" value="${password}" placeholder="Password" style="width:200px;"/>
         <label></label><input type="text" name="item" value="${item}" placeholder="Item" style="width:200px;"/>
@@ -61,11 +61,11 @@
             % for tracking in trackings:
                 <% evenClass = "even" if i % 2 == 1 else "odd" %>
                 <tr class="${evenClass}">
-                    <td>item</td>
-                    <td>item</td>
-                    <td>item</td>
-                    <td>item</td>
-                    <td>item</td>
+                    <td>${tracking["path"]}</td>
+                    <td>${tracking["password"]}</td>
+                    <td>${tracking["authorized"]}</td>
+                    <td>${tracking["ip"]}</td>
+                    <td>${h.formatTimestamp(tracking["date"], "YYYY/MM/DD HH:mm")}</td>
                 </tr>
                 <% i+=1 %>
             %endfor

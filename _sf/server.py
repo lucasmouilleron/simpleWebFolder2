@@ -151,7 +151,7 @@ class Server(Thread):
     def _routeTrackingAdmin(self):
         if not h.TRACKING: return self._redirect("/admin")
         if not self.ap.isAdmin(request): return self._redirect("/admin")
-        return self._makeTemplate("tracking", trackings=[], password="", item="")
+        return self._makeTemplate("tracking", trackings=tp.getTrackings(request.form.get("password", None), request.form.get("item", None), h.parseInt(request.form.get("maxItems",""), None)), password=request.form.get("password", ""), item=request.form.get("item", ""), maxItems=request.form.get("maxItems", "all"))
 
     ###################################################################################
     def _routeSharesAdmin(self):
@@ -200,7 +200,7 @@ h.logInfo("Auth provider built")
 tp = tp.trackingProvider(h.DATA_FOLDER)
 h.logInfo("Tracking provider built")
 
-ip = ip.itemsProvider(ap,  h.DATA_FOLDER)
+ip = ip.itemsProvider(ap, h.DATA_FOLDER)
 h.logInfo("Items provider built")
 
 server = Server(ip, ap, h.PORT, h.SSL, h.CERTIFICATE_KEY_FILE, h.CERTIFICATE_CRT_FILE, h.FULLCHAIN_CRT_FILE)
