@@ -21,7 +21,7 @@ class trackingProvider():
         headers = ["path", "authorized", "password", "ip", "date"]
         lh = None
         try:
-            lh = h.getLockExclusive(trackingFile, 5)
+            # lh = h.getLockExclusive(trackingFile, 5)
             if h.getFileSize(trackingFile) > self.maxSize:
                 datas = h.readCSV(trackingFile)
                 nbLines = len(datas)
