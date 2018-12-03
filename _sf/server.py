@@ -129,6 +129,7 @@ class Server(Thread):
             return self._redirect("/", response)
 
         if not self.ap.isAdmin(request): return self._makeTemplate("password-admin")
+        if ip.isItemLeaf(path): return send_from_directory(h.DATA_FOLDER, path)
         alerts = []
         containers, leafs = ip.getItems(path, request)
         readme = ip.getReadme(path)
@@ -137,7 +138,7 @@ class Server(Thread):
 
     ###################################################################################
     def _makeBaseNamspace(self):
-        return {"baseURL": "", "h": h}
+        return {"baseURL": "", "rootURL": request.base_url.rstrip("/"), "h": h}
 
     ###################################################################################
     def _makeTemplate(self, name, **data):
