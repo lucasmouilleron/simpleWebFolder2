@@ -135,7 +135,7 @@ class Server(Thread):
         if request.form.get("password-submit", False):
             response = make_response()
             self.ap.setAdminPassword(request.form.get("password", ""), request, response)
-            return self._redirect("/", response)
+            return self._redirect("/admin", response)
 
         if not self.ap.isAdmin(request): return self._makeTemplate("password-admin")
 
