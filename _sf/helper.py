@@ -17,6 +17,9 @@ from os.path import isfile
 import re
 import urllib.parse
 import traceback
+import collections
+import portalocker
+import time
 
 ###################################################################################
 SERVER_TIMEZONE = "Europe/Paris"
@@ -50,6 +53,9 @@ LOG_LOGGER = "main"
 LOG_FOLDER = ROOT_FOLDER + "/log"
 LOG_FILENAME = LOG_FOLDER + "/all.log"
 SPLASH_FILE = ROOT_FOLDER + "/config/splash.txt"
+###################################################################################
+CSV_SEP = ";"
+CSV_SEP_SAFE = "---"
 
 ###################################################################################
 consoleHandler = logging.StreamHandler()
@@ -170,19 +176,29 @@ def removeLineBreaks(string):
 
 
 ################################################################################
-def writeToCSV(data, filePath, append=False, csvSep=";", csvSepSafe="---"):
-    mode = "w" if not append else "a"
-    csvFile = open(filePath, mode)
-    for line in data:
+def writeToCSV(data, filePath, csvSEP=CSV_SEP, append=False, debug=False, noEmptyLastLine=False, headers=[], convertNan=True, replaceSeparatorInCells=True, removeLineBreakss=True, omitNoneRows=False, convertToStr=True):
+    mode = "w"
+    if append: mode = "a"
+    fileSize = getFileSize(filePath)
+    csvFile = open(filePath, mode, encoding="utf-8")
+    isIterable = True
+    if len(data) > 0: isIterable = isinstance(data[0], collections.Iterable)
+    if len(headers) > 0 and (not append or fileSize == 0): csvFile.write(csvSEP.join(headers) + "\n")
+    for i in range(len(data)):
+        line = data[i]
+        if omitNoneRows and line is None: continue
         lineString = ""
         first = True
+        if not isIterable: line = [line]
         for item in line:
-            if not first:
-                lineString += csvSep
-            else:
-                first = False
-            lineString += removeLineBreaks(str(item).replace(csvSep, csvSepSafe))
-        csvFile.write(lineString + "\n")
+            if not first: lineString += csvSEP
+            else: first = False
+            if convertToStr: item = str(item)
+            if removeLineBreakss: item = removeLineBreaks(item)
+            if replaceSeparatorInCells: item = item.replace(csvSEP, CSV_SEP_SAFE)
+            lineString += item
+        if noEmptyLastLine and i == len(data) - 1: csvFile.write(lineString)
+        else: csvFile.write(lineString + "\n")
     csvFile.close()
 
 
@@ -332,3 +348,41 @@ def urlEncode(path):
 ################################################################################
 def getLastExceptionAndTrace():
     return traceback.format_exc(), traceback.format_stack()
+
+
+################################################################################
+def getFileSize(filePath):
+    if not os.path.exists(filePath): return 0
+    return os.path.getsize(filePath)
+
+
+################################################################################
+def getLockShared(filePath, waitForUnlockInSecs=None):
+    try:
+        f = open(filePath, "w")
+        portalocker.lock(f, portalocker.LOCK_SH | portalocker.LOCK_NB)
+        return f
+    except:
+        if waitForUnlockInSecs is not None:
+            time.sleep(waitForUnlockInSecs)
+            return getLockExclusive(filePath, waitForUnlockInSecs=None)
+        else: return None
+
+
+################################################################################
+def getLockExclusive(filePath, waitForUnlockInSecs=None):
+    try:
+        f = open(filePath, "w")
+        portalocker.lock(f, portalocker.LOCK_EX | portalocker.LOCK_NB)
+        return f
+    except:
+        if waitForUnlockInSecs is not None:
+            time.sleep(waitForUnlockInSecs)
+            return getLockExclusive(filePath, waitForUnlockInSecs=None)
+        else: return None
+
+
+################################################################################
+def releaseLock(lockHandler):
+    if lockHandler is None: return
+    portalocker.unlock(lockHandler)

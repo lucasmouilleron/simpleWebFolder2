@@ -11,6 +11,7 @@ from mako.lookup import TemplateLookup
 import helper as h
 import itemsProvider as ip
 import authProvider as ap
+import trackingProvider as tp
 import os
 import mimetypes
 
@@ -34,12 +35,12 @@ class Server(Thread):
         self.httpServer = None
 
         self._addRoute("/hello", self._routeHello, ["GET"])
-        self._addRouteRaw("/", self._routeUser, ["GET", "POST"], "index")
-        self._addRouteRaw("/<path:path>", self._routeUser, ["GET", "POST"])
+        self._addRouteRaw("/", self._routeItems, ["GET", "POST"], "index")
+        self._addRouteRaw("/<path:path>", self._routeItems, ["GET", "POST"])
         self._addRouteRaw("/_sf_assets/<path:path>", self._routeAssets, ["GET", "POST"])
         self._addRouteRaw("/admin", self._routeAdmin, ["GET", "POST"])
         self._addRouteRaw("/noadmin", self._routeNoAdmin, ["GET"])
-        self._addRouteRaw("/tracking", self._routeTrackingAdmin, ["GET"])
+        self._addRouteRaw("/tracking", self._routeTrackingAdmin, ["GET", "POST"])
         self._addRouteRaw("/shares", self._routeSharesAdmin, ["GET", "POST"])
         self._addRouteRaw("/share", self._routeShare, ["GET", "POST"])
 
@@ -90,7 +91,7 @@ class Server(Thread):
         return send_from_directory(h.makePath(h.DATA_FOLDER, "_sf_assets"), path)
 
     ###################################################################################
-    def _routeUser(self, path="/"):
+    def _routeItems(self, path="/"):
         path = path.rstrip("/")
         if ap.isAdmin(request): return self._routeAdmin(path)
 
@@ -101,6 +102,7 @@ class Server(Thread):
             return self._redirect(path, response)
 
         isProtected, requiredPasswords, savedPassword, isAuthorized = ap.isAuthorized(path, request)
+        if h.TRACKING: tp.track(path, request, isAuthorized, savedPassword)
         if isAuthorized:
             if ip.isItemLeaf(path):
                 if self.ap.isForbidden(path): return self._makeTemplate("forbidden", path=path)
@@ -132,6 +134,10 @@ class Server(Thread):
 
         if not self.ap.isAdmin(request): return self._makeTemplate("password-admin")
 
+        return self._routeItemsAdmin(path)
+
+    ###################################################################################
+    def _routeItemsAdmin(self, path):
         if not ip.doesItemExists(path): return self._makeTemplate("not-found", path=path)
         if ip.isItemLeaf(path): return send_from_directory(h.DATA_FOLDER, path)
         alerts = []
@@ -145,7 +151,7 @@ class Server(Thread):
     def _routeTrackingAdmin(self):
         if not h.TRACKING: return self._redirect("/admin")
         if not self.ap.isAdmin(request): return self._redirect("/admin")
-        return "tracking"
+        return self._makeTemplate("tracking", trackings=[], password="", item="")
 
     ###################################################################################
     def _routeSharesAdmin(self):
@@ -191,7 +197,10 @@ h.displaySplash()
 ap = ap.authProvider(h.DATA_FOLDER, h.CONFIG.get("admin password", ""), h.FORBIDEN_ITEMS)
 h.logInfo("Auth provider built")
 
-ip = ip.itemsProvider(ap, h.DATA_FOLDER)
+tp = tp.trackingProvider(h.DATA_FOLDER)
+h.logInfo("Tracking provider built")
+
+ip = ip.itemsProvider(ap,  h.DATA_FOLDER)
 h.logInfo("Items provider built")
 
 server = Server(ip, ap, h.PORT, h.SSL, h.CERTIFICATE_KEY_FILE, h.CERTIFICATE_CRT_FILE, h.FULLCHAIN_CRT_FILE)
