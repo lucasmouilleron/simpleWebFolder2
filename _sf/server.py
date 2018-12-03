@@ -36,7 +36,7 @@ class Server(Thread):
         self._addRoute("/hello", self._routeHello, ["GET"])
         self._addRouteRaw("/", self._routeUser, ["GET", "POST"])
         self._addRouteRaw("/<path:path>", self._routeUser, ["GET", "POST"])
-        self._addRouteRaw("/sf_assets/<path:path>", self._routeAssets, ["GET", "POST"])
+        self._addRouteRaw("/_sf_assets/<path:path>", self._routeAssets, ["GET", "POST"])
 
         self.tplLookup = TemplateLookup(directories=[h.makePath(h.ROOT_FOLDER, "templates")])
 
@@ -95,28 +95,21 @@ class Server(Thread):
             isProtected, requiredPasswords, savedPassword, isAuthorized = ap.isAuthorized(path, request)
             if isAuthorized:
                 if ip.isItemLeaf(path):
+                    if self.ap.isForbidden(path): return self._makeTemplate("forbidden", path=path)
                     response = make_response(send_from_directory(h.DATA_FOLDER, path))
                 else:
-                    if "download" in request.args and not ap.listingForbidden(path):
-                        zipFile, zipName = ip.getZipFile(path, request), os.path.basename(path)
-                        if zipName == "": zipName = "root"
-                        result = send_file(zipFile, as_attachment=True, attachment_filename="%s.zip" % zipName)
-                        os.remove(zipFile)
-                        return result
-                    if ap.listingForbidden(path): alerts.append(["Can't list folder", "This folder's content is not listable."])
+                    if self.ap.isForbidden(path): return self._makeTemplate("forbidden", path=path)
+                    if ap.listingForbidden(path): return self._makeTemplate("forbidden", path=path)
+                    if "download" in request.args and not ap.listingForbidden(path): return self._downloadAndDeleteFile(ip.getZipFile(path, request), "%s.zip" % (os.path.basename(path) if path != "" else "root"))
                     containers, leafs = ip.getItems(path, request)
                     readme = ip.getReadme(path)
                     downloadAllowed = True
                     currentURLWithoutURI = path
-                    response = make_response(Template(filename=h.makePath(h.ROOT_FOLDER, "templates", "items.mako"), lookup=self.tplLookup).render(containers=containers, leafs=leafs, path=path, readme=readme, downloadAllowed=downloadAllowed, currentURLWithoutURI=currentURLWithoutURI, alerts=alerts, **self._makeBaseNamspace()))
+                    response = make_response(self._makeTemplate("items", containers=containers, leafs=leafs, path=path, readme=readme, downloadAllowed=downloadAllowed, currentURLWithoutURI=currentURLWithoutURI, alerts=alerts))
                 if request.form.get("password-submit", False): ap.setUserPassword(path, request.form.get("password", ""), request, response)
                 return response
-            else:
-                return Template(filename=h.makePath(h.ROOT_FOLDER, "templates", "password.mako"), lookup=self.tplLookup).render(path=path, **self._makeBaseNamspace())
-        else:
-            return Template(filename=h.makePath(h.ROOT_FOLDER, "templates", "not-found.mako"), lookup=self.tplLookup).render(path=path, **self._makeBaseNamspace())
-
-        return response
+            else: return self._makeTemplate("password", path=path)
+        else: return self._makeTemplate("not-found", path=path)
 
     ###################################################################################
     def _routeAdmin(self, path="/"):
@@ -128,14 +121,14 @@ class Server(Thread):
         return {"baseURL": "", "h": h}
 
     ###################################################################################
-    def _downloadAndDeleteFile(self, path):
-        def generate():
-            with open(path) as f: yield from f
-            os.remove(path)
+    def _makeTemplate(self, name, **data):
+        return Template(filename=h.makePath(h.ROOT_FOLDER, "templates", "%s.mako" % name), lookup=self.tplLookup).render(**data, **self._makeBaseNamspace())
 
-        r = self.app.response_class(generate(), mimetype=mimetypes.MimeTypes().guess_type(path)[0])
-        r.headers.set("Content-Disposition", "attachment", filename=path)
-        return r
+    ###################################################################################
+    def _downloadAndDeleteFile(self, path, name):
+        result = send_file(path, as_attachment=True, attachment_filename=name)
+        os.remove(path)
+        return result
 
 
 ###################################################################################
@@ -143,10 +136,10 @@ class Server(Thread):
 ###################################################################################
 h.displaySplash()
 
-ap = ap.authProvider(h.DATA_FOLDER, h.CONFIG.get("admin password", ""))
+ap = ap.authProvider(h.DATA_FOLDER, h.CONFIG.get("admin password", ""), h.FORBIDEN_ITEMS)
 h.logInfo("Auth provider built")
 
-ip = ip.itemsProvider(ap, h.DATA_FOLDER, h.FORBIDEN_ITEMS)
+ip = ip.itemsProvider(ap, h.DATA_FOLDER)
 h.logInfo("Items provider built")
 
 server = Server(ip, ap, h.dictionnaryDeepGet(h.CONFIG, "server", "port", default=5000), h.dictionnaryDeepGet(h.CONFIG, "server", "ssl", default=False), h.CERTIFICATE_KEY_FILE, h.CERTIFICATE_CRT_FILE, h.FULLCHAIN_CRT_FILE)

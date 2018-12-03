@@ -10,15 +10,23 @@ from flask import request
 class authProvider():
 
     ###################################################################################
-    def __init__(self, basePath, adminPassword):
+    def __init__(self, basePath, adminPassword, forbiddenItems):
         self.basePath = os.path.abspath(basePath)
         self.adminPassword = adminPassword
+        self.forbiddenItems = set(forbiddenItems)
 
     ###################################################################################
     def isAdmin(self, r: request):
         cookieKey = "_sf_admin_password"
         if cookieKey in r.cookies: return r.cookies[cookieKey] == self.adminPassword
         else: return False
+
+    ###################################################################################
+    def isForbidden(self, path):
+        path = path.lstrip("/")
+        if path.startswith("_sf"): return True
+        if os.path.basename(path) in self.forbiddenItems: return True
+        return False
 
     ###################################################################################
     def passwordProtected(self, path):
