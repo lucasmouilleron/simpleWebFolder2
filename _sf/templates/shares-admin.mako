@@ -38,8 +38,16 @@
         </div>
     %endfor
 
+<div class="block section">
+        <div class="section-title">Share lookup</div>
+        <form method="post" class="inline">
+            <input type="text" name="filterShareID" value="${filterShareID}" placeholder="share (partial) ID or share url"/>
+            <label></label><input type="submit" name="filter-share-submit" value="Filter" style="width:100px;"/>
+        </form>
+</div>
+
 <div class="shares section">
-    %if filterShareID is not None:
+    %if filterShareID !="":
         <div class="section-title">Shares found</div>
     %else:
         <div class="section-title">Latest ${maxShares} shares</div>
@@ -65,7 +73,7 @@
                 <% shareExpires = "Never" if share.get("duration",0)==0 else h.formatTimestamp(share["duration"]+share["creation"], "YYYY/MM/DD HH:mm")%>
                 <tr class="${evenClass}">
                     <td>${share["ID"]}</td>
-                    <td onclick="window.open('todo')"><a>${share["file"]}</a></td>
+                    <td onclick="window.open('/${share["file"]}')"><a>${share["file"]}</a></td>
                     <td>${shareExpires}</td>
                     <td>${share["password"]}</td>
                     <td>${len(share.get("views", []))}</td>
@@ -81,7 +89,7 @@
                         <a data-toggle="tooltip" title="Remove" class="confirmation" href="${rootURL}/remove-share=${shareIDEncoded}"><i class="icon fas fa-trash"></i></a>
                     </td>
                 </tr>
-                <% i = 0%>
+                <% i +=1%>
             %endfor
         </tbody>
     </table>

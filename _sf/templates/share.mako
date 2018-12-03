@@ -114,7 +114,7 @@
 
 <script>
     $(document).ready(function () {
-        window.name = "_share";
+        window.name = "_share_${share["ID"]}";
 
         $('[data-toggle="tooltip"]').tooltipster({theme: "tooltipster-borderless", animationDuration: 200, delay: 20, side: "bottom"});
         var table = $("table").stupidtable();

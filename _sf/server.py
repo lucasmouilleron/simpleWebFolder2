@@ -96,12 +96,12 @@ class Server(Thread):
     ###################################################################################
     def _routeItems(self, path="/"):
         path = path.rstrip("/")
-        if ap.isAdmin(request): return self._routeAdmin(path)
+        if self.ap.isAdmin(request): return self._routeAdmin(path)
 
         if not ip.doesItemExists(path): return self._makeTemplate("not-found", path=path)
         if request.form.get("password-submit", False):
             response = make_response()
-            ap.setUserPassword(path, request.form.get("password", ""), request, response)
+            self.ap.setUserPassword(path, request.form.get("password", ""), request, response)
             return self._redirect(path, response)
 
         isProtected, requiredPasswords, savedPassword, isAuthorized = ap.isAuthorized(path, request)
@@ -112,7 +112,7 @@ class Server(Thread):
                 return send_from_directory(h.DATA_FOLDER, path)
             else:
                 if self.ap.isForbidden(path): return self._makeTemplate("forbidden", path=path)
-                if ap.listingForbidden(path): return self._makeTemplate("forbidden", path=path)
+                if self.ap.listingForbidden(path): return self._makeTemplate("forbidden", path=path)
                 if "download" in request.args: return self._downloadAndDeleteFile(ip.getZipFile(path, request), "%s.zip" % (os.path.basename(path) if path != "" else "root"))
                 alerts = []
                 containers, leafs = ip.getItems(path, request)
@@ -132,7 +132,7 @@ class Server(Thread):
 
         if request.form.get("password-submit", False):
             response = make_response()
-            ap.setAdminPassword(request.form.get("password", ""), request, response)
+            self.ap.setAdminPassword(request.form.get("password", ""), request, response)
             return self._redirect("/", response)
 
         if not self.ap.isAdmin(request): return self._makeTemplate("password-admin")
@@ -144,7 +144,7 @@ class Server(Thread):
         if not ip.doesItemExists(path): return self._makeTemplate("not-found", path=path)
         if ip.isItemLeaf(path): return send_from_directory(h.DATA_FOLDER, path)
         alerts = []
-        isProtected, requiredPasswords, _, _ = ap.isAuthorized(path, request)
+        isProtected, requiredPasswords, _, _ = self.ap.isAuthorized(path, request)
         containers, leafs = ip.getItems(path, request)
         readme = ip.getReadme(path)
         response = make_response(self._makeTemplate("items-admin", passwords=requiredPasswords, containers=containers, leafs=leafs, path=path, readme=readme, downloadAllowed=not self.ap.downloadForbidden(path), alerts=alerts))
@@ -161,7 +161,9 @@ class Server(Thread):
     def _routeShares(self, alerts=None):
         if alerts is None: alerts = []
         if not self.ap.isAdmin(request): return self._redirect("/admin")
-        return self._makeTemplate("shares", shares=self.sp.listShares(request.form.get("shareID", None)), alerts=alerts)
+        maxShares = 50
+        filterShareID = request.form.get("filterShareID", "")
+        return self._makeTemplate("shares-admin", shares=self.sp.listShares(filterShareID, maxShares=maxShares), alerts=alerts, maxShares=maxShares, filterShareID=filterShareID)
 
     ###################################################################################
     def _routeShareRemove(self, shareID):
@@ -200,15 +202,24 @@ class Server(Thread):
     ###################################################################################
     def _routeShare(self, shareIDAndPath):
         shareID = shareIDAndPath.split("/")[0]
-        share, hint = self.sp.getShare(shareID)
-        if share is None: return self._makeTemplate("not-found", path=shareID)
+        if not self.sp.shareExists(shareID): return self._makeTemplate("not-found", path=shareID)
+
+        if request.form.get("password-submit", False):
+            response = make_response()
+            self.ap.setSharePassword(shareID, request.form.get("password", ""), request, response)
+            return self._redirect("/share=%s" % shareID, response)
+
+        isAdmin = self.ap.isAdmin(request)
+
+        subPath = os.path.normpath(shareIDAndPath.replace(shareID, "")).lstrip("/").rstrip("/").lstrip(".")
+        share, hint = self.sp.getShare(shareID, asAdmin=False, r=request, subPath=subPath)
+        if share is None: raise Exception("Can't get Share %s, hint:%s" % (shareID, hint))
+        if isAdmin: return self._makeTemplate("share-admin", shareID=shareID, share=share)
         sharePassword = share.get("password", "")
-        subPath = os.path.normpath(shareIDAndPath.replace(shareID, "")).lstrip("/").rstrip("/")
         shareBasePath = share["file"]
         path = h.makePath(shareBasePath, subPath).rstrip("/")
         displayPath = path.replace(shareBasePath, shareID)
-        # if sharePassword != "" and not self.ap.isAdmin(request) and not self.ap.isShareAuthorized(shareID, request): return self._makeTemplate("password", path=shareID)
-        if sharePassword != "" and not self.ap.isShareAuthorized(shareID, request): return self._makeTemplate("password", path=shareID)
+        if sharePassword != "" and not isAdmin and not self.ap.isShareAuthorized(shareID, request): return self._makeTemplate("share-password", displayPath=displayPath, share=share)
         if not ip.doesItemExists(path): return self._makeTemplate("not-found", path=path)
         if ip.isItemLeaf(path): return send_from_directory(h.DATA_FOLDER, path)
         else:

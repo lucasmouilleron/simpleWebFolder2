@@ -19,14 +19,16 @@ class sharesProvider():
         self.ap = ap
 
     ###################################################################################
-    def listShares(self, filterID=None):
+    def listShares(self, filterID=None, maxShares=None):
         shares = []
         items = h.listDirectoryItems(self.sharesPath, onlyFiles=True)
         for item in items:
             shareID = os.path.basename(item)
             if filterID is not None and filterID not in shareID: continue
-            shares.append(self.getShare(shareID)[0])
-        return sorted(shares, key=lambda d: d["creation"])
+            shares.append(self.getShare(shareID, asAdmin=True)[0])
+        shares = sorted(shares, key=lambda d: d["creation"])[::-1]
+        if maxShares is not None: return shares[0:min(maxShares, len(shares))]
+        else: return shares
 
     ###################################################################################
     def addShare(self, shareID, path, duration, password):
@@ -48,14 +50,22 @@ class sharesProvider():
             if lh is not None: h.releaseLock(lh)
 
     ###################################################################################
-    def getShare(self, shareID):
+    def getShare(self, shareID, r=None, subPath=None, asAdmin=False):
         sharePath = h.makePath(self.sharesPath, shareID)
         if not os.path.exists(sharePath): return None
         lh = None
         try:
             lockFile = h.makePath(h.LOCKS_FOLDER, "_sf_share%s" % shareID)
-            lh = h.getLockShared(lockFile, 5)
+            lh = h.getLockExclusive(lockFile, 5)
             share = h.loadJsonFile(sharePath)
+            if not asAdmin:
+                views = share.get("views", [])
+                view = {"date": h.now()}
+                if r is not None: view["ip"] = r.remote_addr
+                if subPath is not None: view["item"] = h.makePath(share["file"], subPath)
+                views.append(view)
+                share["views"] = views
+                h.writeJsonFile(sharePath, share)
             return share, "ok"
         except:
             le, lt = h.getLastExceptionAndTrace()
