@@ -2,7 +2,7 @@
 
 todo
 
-download
 admin section
-tracking
-shares
+tracking (+concurrent)
+shares (+concurrent)
+download limit

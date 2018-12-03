@@ -38,6 +38,7 @@ class itemsProvider():
             for root, dirs, files in os.walk(fullPath):
                 dirs[:] = [d for d in dirs if not self.ap.isForbidden(d.replace(self.basePath, ""))]
                 dirs[:] = [d for d in dirs if self.ap.isAuthorized(d.replace(self.basePath, ""), r)[3]]
+                dirs[:] = [d for d in dirs if not self.ap.downloadForbidden(d.replace(self.basePath, ""))]
                 for f in files:
                     fpath = h.makePath(root, f)
                     frpath = fpath.replace(self.basePath, "")

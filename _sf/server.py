@@ -89,7 +89,6 @@ class Server(Thread):
         path = path.rstrip("/")
         if ap.isAdmin(request): self._routeAdmin(path)
 
-
         if ip.doesItemExists(path):
             if request.form.get("password-submit", False): ap.setUserPassword(path, request.form.get("password", ""), request)
             isProtected, requiredPasswords, savedPassword, isAuthorized = ap.isAuthorized(path, request)
@@ -101,13 +100,11 @@ class Server(Thread):
                     if self.ap.isForbidden(path): return self._makeTemplate("forbidden", path=path)
                     if ap.listingForbidden(path): return self._makeTemplate("forbidden", path=path)
                     if "download" in request.args: return self._downloadAndDeleteFile(ip.getZipFile(path, request), "%s.zip" % (os.path.basename(path) if path != "" else "root"))
-                    raise Exception("test")
                     alerts = []
                     containers, leafs = ip.getItems(path, request)
                     readme = ip.getReadme(path)
-                    downloadAllowed = True
                     currentURLWithoutURI = path
-                    response = make_response(self._makeTemplate("items", containers=containers, leafs=leafs, path=path, readme=readme, downloadAllowed=downloadAllowed, currentURLWithoutURI=currentURLWithoutURI, alerts=alerts))
+                    response = make_response(self._makeTemplate("items", containers=containers, leafs=leafs, path=path, readme=readme, downloadAllowed=not self.ap.downloadForbidden(path), currentURLWithoutURI=currentURLWithoutURI, alerts=alerts))
                 if request.form.get("password-submit", False): ap.setUserPassword(path, request.form.get("password", ""), request, response)
                 return response
             else: return self._makeTemplate("password", path=path)

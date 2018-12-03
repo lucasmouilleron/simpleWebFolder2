@@ -220,7 +220,7 @@ form.inline input {
 
 .footer {
     margin-top: 40px;
-    border-top: 3px solid #ddd;
+    border-top: 0px solid #ddd;
     padding: 20px 0 0 0;
     text-align: center;
     color: #d0d0d0;
