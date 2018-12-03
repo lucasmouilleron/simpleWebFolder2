@@ -91,7 +91,7 @@ class Server(Thread):
 
     ###################################################################################
     def _routeAssets(self, path):
-        return send_from_directory(h.makePath(h.DATA_FOLDER, "_sf_assets"), path)
+        return send_from_directory(h.makePath(h.ROOT_FOLDER, "assets"), path)
 
     ###################################################################################
     def _routeItems(self, path="/"):
@@ -169,7 +169,7 @@ class Server(Thread):
     def _routeShareRemove(self, shareID):
         if not self.ap.isAdmin(request): return self._redirect("/admin")
         self.sp.removeShare(shareID)
-        return self._routeShares(alerts=[["Share removed", "The share %s has been removed." % shareID]])
+        return self._routeShares(alerts=[["Share removed", "The Share %s has been removed." % shareID]])
 
     ###################################################################################
     def _routeShareAdd(self, path):
@@ -186,16 +186,16 @@ class Server(Thread):
         if shareSubmit or shareForceSubmit:
             if shareID == "": shareID = defaultShareID
             shareID = h.clean(shareID)
-            if shareID == "": alerts.append(["Can't create share", "Share ID provided is invalid."])
+            if shareID == "": alerts.append(["Can't create Share", "Share ID provided is invalid."])
             else:
                 if not sp.shareExists(shareID) or shareForceSubmit:
                     share, hint = self.sp.addShare(shareID, path, duration, password)
                     if share is not None:
-                        alerts.append(["Share created", "The share %s has been created for %s" % (shareID, path)])
+                        alerts.append(["Share created", "The Share %s has been created for %s" % (shareID, path)])
                         return self._routeShares(alerts)
-                    else: alerts.append(["Can't create share", "Share %s could not be created. Hint: %s" % (shareID, hint)])
+                    else: alerts.append(["Can't create Share", "Share %s could not be created. Hint: %s" % (shareID, hint)])
                 else:
-                    alerts.append(["Can't create share", "The share ID %s is alread used for %s." % (shareID, path)])
+                    alerts.append(["Can't create Share", "The Share ID %s is alread used for %s." % (shareID, path)])
                     needForce = True
         return self._makeTemplate("share-add", path=path, defaultShareID=defaultShareID, shareID=shareID, duration=duration, alerts=alerts, needForce=needForce)
 
@@ -210,11 +210,12 @@ class Server(Thread):
             return self._redirect("/share=%s" % shareID, response)
 
         isAdmin = self.ap.isAdmin(request)
-
         subPath = os.path.normpath(shareIDAndPath.replace(shareID, "")).lstrip("/").rstrip("/").lstrip(".")
-        share, hint = self.sp.getShare(shareID, asAdmin=False, r=request, subPath=subPath)
+        share, hint = self.sp.getShare(shareID, asAdmin=isAdmin, r=request, subPath=subPath)
         if share is None: raise Exception("Can't get Share %s, hint:%s" % (shareID, hint))
+
         if isAdmin: return self._makeTemplate("share-admin", shareID=shareID, share=share)
+
         sharePassword = share.get("password", "")
         shareBasePath = share["file"]
         path = h.makePath(shareBasePath, subPath).rstrip("/")
