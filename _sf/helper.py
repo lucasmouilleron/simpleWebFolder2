@@ -47,6 +47,7 @@ MAIL = CONFIG.get("mail", "lucas.mouilleron@me.com")
 TRACKING = CONFIG.get("tracking", False)
 SHARING = CONFIG.get("sharing", False)
 TMP_FOLDER = CONFIG.get("tmp folder", "/tmp")
+LOCKS_FOLDER = CONFIG.get("locks folder", TMP_FOLDER)
 ###################################################################################
 LOG_FORMAT = "%(asctime)-15s - %(levelname)-7s - %(message)s"
 LOG_LOGGER = "main"

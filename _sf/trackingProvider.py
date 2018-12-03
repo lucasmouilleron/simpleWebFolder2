@@ -18,10 +18,11 @@ class trackingProvider():
     ###################################################################################
     def track(self, path, r, isAuthotirzed, passwordProvided):
         trackingFile = h.makePath(self.basePath, ".tracking")
+        lockFile = h.makePath(h.LOCKS_FOLDER, "_sfl_tracking")
         headers = ["path", "authorized", "password", "ip", "date"]
         lh = None
         try:
-            # lh = h.getLockExclusive(trackingFile, 5)
+            lh = h.getLockExclusive(lockFile, 5)
             if h.getFileSize(trackingFile) > self.maxSize:
                 datas = h.readCSV(trackingFile)
                 nbLines = len(datas)
