@@ -5,6 +5,7 @@ _sf/vendors
 _sf_overrides
 _sf_shares
 .tracking
+_sf/log
 
 ### demo files
 docs

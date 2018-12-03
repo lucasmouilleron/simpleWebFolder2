@@ -61,7 +61,7 @@ class itemsProvider():
             itemPath = item.replace(self.basePath, "")
             if self.ap.isForbidden(itemPath): continue
             if self.ap.showForbidden(itemPath): continue
-            if r is not None: protected, requiredPasswords, _, isAuthorized = self.ap.isAuthorized(itemPath, r)
+            if r is not None: protected, requiredPasswords, _, isAuthorized, lowerProtectedPath = self.ap.isAuthorized(itemPath, r)
             else: isAuthorized, requiredPasswords, protected = True, "", False
             itemsContainers.append({"path": itemPath, "name": os.path.basename(item), "lastModified": os.stat(item).st_mtime, "nbItems": len(h.listDirectoryItems(item)), "isAuthorized": isAuthorized, "passwords": requiredPasswords, "protected": protected})
         itemsLeafs = []
@@ -69,7 +69,7 @@ class itemsProvider():
             if not os.path.isfile(item): continue
             itemPath = item.replace(self.basePath, "")
             if self.ap.isForbidden(itemPath): continue
-            if r is not None: protected, requiredPasswords, _, isAuthorized = self.ap.isAuthorized(itemPath, r)
+            if r is not None: protected, requiredPasswords, _, isAuthorized, lowerProtectedPath = self.ap.isAuthorized(itemPath, r)
             else: isAuthorized, requiredPasswords, protected = True, "", False
             itemsLeafs.append({"path": itemPath, "name": os.path.basename(item), "lastModified": os.stat(item).st_mtime, "extension": os.path.splitext(item)[-1].replace(".", ""), "size": os.path.getsize(item), "isAuthorized": isAuthorized, "passwords": requiredPasswords, "protected": protected})
         return itemsContainers, itemsLeafs

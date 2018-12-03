@@ -93,11 +93,11 @@ class authProvider():
     ###################################################################################
     def isAuthorized(self, path, r: request):
         lowerProtectedPath = self.getLowerProtectedPath(path)
-        if (lowerProtectedPath == False): return (False, [], "", True)
+        if (lowerProtectedPath == False): return (False, [], "", True, False)
         requiredPasswords = h.readFromFile(h.makePath(self.basePath, lowerProtectedPath, ".password")).split("\n")
         requiredPasswords = [p for p in requiredPasswords if p != ""]
         savedPassword = self.getUserPassword(lowerProtectedPath, r)
-        return (True, requiredPasswords, savedPassword, savedPassword in requiredPasswords)
+        return (True, requiredPasswords, savedPassword, savedPassword in requiredPasswords, lowerProtectedPath)
 
     ###################################################################################
     def isShareAuthorized(self,shareID,r:request):

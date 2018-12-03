@@ -40,7 +40,7 @@
 
 <div class="block section">
         <div class="section-title">Share lookup</div>
-        <form method="post" class="inline">
+        <form method="post" action="/shares" class="inline">
             <input type="text" name="filterShareID" value="${filterShareID}" placeholder="share (partial) ID or share url"/>
             <label></label><input type="submit" name="filter-share-submit" value="Filter" style="width:100px;"/>
         </form>

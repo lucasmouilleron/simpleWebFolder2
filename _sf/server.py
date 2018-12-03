@@ -99,12 +99,14 @@ class Server(Thread):
         if self.ap.isAdmin(request): return self._routeAdmin(path)
 
         if not ip.doesItemExists(path): return self._makeTemplate("not-found", path=path)
+
+        isProtected, requiredPasswords, savedPassword, isAuthorized, lowerProtectedPath = ap.isAuthorized(path, request)
+
         if request.form.get("password-submit", False):
             response = make_response()
-            self.ap.setUserPassword(path, request.form.get("password", ""), request, response)
+            self.ap.setUserPassword(lowerProtectedPath, request.form.get("password", ""), request, response)
             return self._redirect(path, response)
 
-        isProtected, requiredPasswords, savedPassword, isAuthorized = ap.isAuthorized(path, request)
         if h.TRACKING: tp.track(path, request, isAuthorized, savedPassword)
         if isAuthorized:
             if ip.isItemLeaf(path):
@@ -118,7 +120,7 @@ class Server(Thread):
                 containers, leafs = ip.getItems(path, request)
                 readme = ip.getReadme(path)
                 return self._makeTemplate("items", containers=containers, leafs=leafs, path=path, readme=readme, downloadAllowed=not self.ap.downloadForbidden(path), currentURLWithoutURI=path, alerts=alerts)
-        else: return self._makeTemplate("password", path=path)
+        else: return self._makeTemplate("password", path=path, lowerProtectedPath=lowerProtectedPath)
 
     ###################################################################################
     def _routeNoAdmin(self):
@@ -144,16 +146,16 @@ class Server(Thread):
         if not ip.doesItemExists(path): return self._makeTemplate("not-found", path=path)
         if ip.isItemLeaf(path): return send_from_directory(h.DATA_FOLDER, path)
         alerts = []
-        isProtected, requiredPasswords, _, _ = self.ap.isAuthorized(path, request)
+        isProtected, requiredPasswords, _, _, _ = self.ap.isAuthorized(path, request)
         containers, leafs = ip.getItems(path, request)
         readme = ip.getReadme(path)
         subAlerts = []
-        if isProtected and len(requiredPasswords)>1: subAlerts.append("Password protected, see passwords below.")
-        if isProtected and len(requiredPasswords)==1: subAlerts.append("Password protected: %s."%requiredPasswords[0])
+        if isProtected and len(requiredPasswords) > 1: subAlerts.append("Password protected, see passwords below.")
+        if isProtected and len(requiredPasswords) == 1: subAlerts.append("Password protected: %s." % requiredPasswords[0])
         if self.ap.listingForbidden(path): subAlerts.append("Listing not allowed for non admin users.")
         if self.ap.showForbidden(path): subAlerts.append("Folder not shown for non admin users.")
         if self.ap.downloadForbidden(path): subAlerts.append("Folder not downloadable.")
-        if len(subAlerts)>0:alerts.append(["Special folder","<br/>".join(subAlerts)])
+        if len(subAlerts) > 0: alerts.append(["Special folder", "<br/>".join(subAlerts)])
         response = make_response(self._makeTemplate("items-admin", passwords=requiredPasswords, containers=containers, leafs=leafs, path=path, readme=readme, downloadAllowed=not self.ap.downloadForbidden(path), alerts=alerts))
         return response
 
@@ -205,7 +207,7 @@ class Server(Thread):
                 else:
                     alerts.append(["Can't create Share", "The Share ID %s is alread used for %s." % (shareID, path)])
                     needForce = True
-        return self._makeTemplate("share-add", path=path, defaultShareID=defaultShareID, shareID=shareID, duration=duration, alerts=alerts, needForce=needForce,addShareIsContainer=addShareIsContainer)
+        return self._makeTemplate("share-add", path=path, defaultShareID=defaultShareID, shareID=shareID, duration=duration, alerts=alerts, needForce=needForce, addShareIsContainer=addShareIsContainer)
 
     ###################################################################################
     def _routeShare(self, shareIDAndPath):
