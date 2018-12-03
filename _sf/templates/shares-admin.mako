@@ -84,7 +84,12 @@
                     </td>
                     <td>
                         <% shareIDEncoded = h.urlEncode(share["ID"])%>
-                        <a class="link" data-clipboard-text="${rootURL}/share=${shareIDEncoded}" data-toggle="tooltip" title="Copy link"><i class="icon fas fa-link"></i></a>
+                        % if share["password"]!="":
+                            <a class="link" data-clipboard-text="${rootURL}/share=${shareIDEncoded} (password: ${share["password"]})" data-toggle="tooltip" title="Copy link"><i class="icon fas fa-link"></i></a>
+                            %else:
+                            <a class="link" data-clipboard-text="${rootURL}/share=${shareIDEncoded}" data-toggle="tooltip" title="Copy link"><i class="icon fas fa-link"></i></a>
+                        % endif
+
                         <a data-toggle="tooltip" title="Details" href="${rootURL}/share=${shareIDEncoded}" target="_share_${shareIDEncoded}"><i class="icon fas fa-search"></i></a>
                         <a data-toggle="tooltip" title="Remove" class="confirmation" href="${rootURL}/remove-share=${shareIDEncoded}"><i class="icon fas fa-trash"></i></a>
                     </td>
