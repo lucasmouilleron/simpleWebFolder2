@@ -26,11 +26,9 @@
     <div class="parent" data-toggle="tooltip" title="Go to parent folder">
         %if subPath != "":
             <a href="/share=${share["ID"]}/${subPath}/.."><i class="icon fas fa-long-arrow-alt-up"></i></a>
-        %else:
-            .
         % endif
     </div>
-    <div class="page">${displayPath}</div>
+    <div class="page">/${displayPath}</div>
 </div>
 
     %for alert in alerts:

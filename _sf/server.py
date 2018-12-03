@@ -156,7 +156,7 @@ class Server(Thread):
         if self.ap.showForbidden(path): subAlerts.append("Folder not shown for non admin users.")
         if self.ap.downloadForbidden(path): subAlerts.append("Folder not downloadable.")
         if len(subAlerts) > 0: alerts.append(["Special folder", "<br/>".join(subAlerts)])
-        response = make_response(self._makeTemplate("items-admin", passwords=requiredPasswords, containers=containers, leafs=leafs, path=path, readme=readme, downloadAllowed=not self.ap.downloadForbidden(path), alerts=alerts))
+        response = make_response(self._makeTemplate("items-admin", passwords=requiredPasswords, containers=containers, leafs=leafs, path=path, readme=readme, alerts=alerts))
         return response
 
     ###################################################################################

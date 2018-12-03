@@ -24,7 +24,7 @@
 
 <div class="error section">
     <h2>Item not found</h2>
-    <p>The item <i>${path}</i> was not found.</p>
+    <p>The item <i>/${path}</i> was not found.</p>
 
     <p>If this is not normal, please send us an email @ <a href="mailto:${h.MAIL}">${h.MAIL}</a> if the problem persits.</p>
 

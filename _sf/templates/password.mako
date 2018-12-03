@@ -26,11 +26,9 @@
     <div class="parent" data-toggle="tooltip" title="Go to parent folder">
         %if path != "":
             <a href="${baseURL}/${path}/.."><i class="icon fas fa-long-arrow-alt-up"></i></a>
-        %else:
-            .
         % endif
     </div>
-    <div class="page">${path}</div>
+    <div class="page">/${path}</div>
 </div>
 
 <div class="block section">

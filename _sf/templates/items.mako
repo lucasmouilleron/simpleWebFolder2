@@ -26,14 +26,12 @@
     <div class="parent" data-toggle="tooltip" title="Go to parent folder">
         %if path != "":
             <a href="${baseURL}/${path}/.."><i class="icon fas fa-long-arrow-alt-up"></i></a>
-        %else:
-            .
         % endif
     </div>
     %if downloadAllowed:
         <div id="download" data-toggle="tooltip" title="Download folder"><a href="${path}?download"><i class="icon fas fa-download"></i></a></div>
     %endif
-    <div class="page">${path}</div>
+    <div class="page">/${path}</div>
 </div>
 
     %for alert in alerts:
