@@ -55,6 +55,7 @@ LOG_LOGGER = "main"
 LOG_FOLDER = ROOT_FOLDER + "/log"
 LOG_FILENAME = LOG_FOLDER + "/all.log"
 SPLASH_FILE = ROOT_FOLDER + "/config/splash.txt"
+STORE_LOG = CONFIG.get("store log", False)
 ###################################################################################
 CSV_SEP = ";"
 CSV_SEP_SAFE = "---"
@@ -64,7 +65,7 @@ consoleHandler = logging.StreamHandler()
 consoleHandler.setFormatter(coloredlogs.ColoredFormatter(fmt="%(asctime)s - %(levelname)s - %(message)s"))
 logging.getLogger(LOG_LOGGER).addHandler(consoleHandler)
 logging.getLogger(LOG_LOGGER).setLevel(logging.DEBUG)
-if CONFIG.get("storeLog", False):
+if STORE_LOG:
     if not os.path.exists(LOG_FOLDER): os.mkdir(LOG_FOLDER)
     fileHandler = logging.handlers.RotatingFileHandler(LOG_FILENAME, maxBytes=10e6, backupCount=5)
     fileHandler.setFormatter(logging.Formatter(LOG_FORMAT))

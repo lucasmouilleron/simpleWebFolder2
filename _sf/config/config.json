@@ -7,5 +7,6 @@
   "ssl": true,
   "admin password": "pass1234",
   "tracking": true,
-  "sharing": true
+  "sharing": true,
+  "store log":true
 }

@@ -38,7 +38,7 @@ class Server(Thread):
         self._addRoute("/hello", self._routeHello, ["GET"])
         self._addRouteRaw("/", self._routeItems, ["GET", "POST"], "index")
         self._addRouteRaw("/<path:path>", self._routeItems, ["GET", "POST"])
-        self._addRouteRaw("/_sf_assets/<path:path>", self._routeAssets, ["GET", "POST"])
+        self._addRouteRaw("/_sf_assets/<path:path>", self._routeAssets, ["GET"])
         self._addRouteRaw("/admin", self._routeAdmin, ["GET", "POST"])
         self._addRouteRaw("/noadmin", self._routeNoAdmin, ["GET"])
         self._addRouteRaw("/tracking", self._routeTrackingAdmin, ["GET", "POST"])
@@ -147,6 +147,13 @@ class Server(Thread):
         isProtected, requiredPasswords, _, _ = self.ap.isAuthorized(path, request)
         containers, leafs = ip.getItems(path, request)
         readme = ip.getReadme(path)
+        subAlerts = []
+        if isProtected and len(requiredPasswords)>1: subAlerts.append("Password protected, see passwords below.")
+        if isProtected and len(requiredPasswords)==1: subAlerts.append("Password protected: %s."%requiredPasswords[0])
+        if self.ap.listingForbidden(path): subAlerts.append("Listing not allowed for non admin users.")
+        if self.ap.showForbidden(path): subAlerts.append("Folder not shown for non admin users.")
+        if self.ap.downloadForbidden(path): subAlerts.append("Folder not downloadable.")
+        if len(subAlerts)>0:alerts.append(["Special folder","<br/>".join(subAlerts)])
         response = make_response(self._makeTemplate("items-admin", passwords=requiredPasswords, containers=containers, leafs=leafs, path=path, readme=readme, downloadAllowed=not self.ap.downloadForbidden(path), alerts=alerts))
         return response
 
@@ -183,6 +190,7 @@ class Server(Thread):
         shareSubmit = request.form.get("create-share-submit", False)
         shareForceSubmit = request.form.get("create-share-force-submit", False)
         needForce = False
+        addShareIsContainer = self.ip.isItemContainer(path)
         if shareSubmit or shareForceSubmit:
             if shareID == "": shareID = defaultShareID
             shareID = h.clean(shareID)
@@ -197,7 +205,7 @@ class Server(Thread):
                 else:
                     alerts.append(["Can't create Share", "The Share ID %s is alread used for %s." % (shareID, path)])
                     needForce = True
-        return self._makeTemplate("share-add", path=path, defaultShareID=defaultShareID, shareID=shareID, duration=duration, alerts=alerts, needForce=needForce)
+        return self._makeTemplate("share-add", path=path, defaultShareID=defaultShareID, shareID=shareID, duration=duration, alerts=alerts, needForce=needForce,addShareIsContainer=addShareIsContainer)
 
     ###################################################################################
     def _routeShare(self, shareIDAndPath):
