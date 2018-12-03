@@ -29,7 +29,7 @@ class trackingProvider():
                 offset = int(nbLines / 2)
                 if offset > 0: h.writeToCSV(datas[offset:nbLines - offset], trackingFile, headers=headers, append=False)
 
-            h.writeToCSV([[path, isAuthotirzed, passwordProvided, r.remote_addr, h.now()]], trackingFile, headers=headers, append=True)
+            h.writeToCSV([[path, isAuthotirzed, passwordProvided if passwordProvided is not None else "", r.remote_addr, h.now()]], trackingFile, headers=headers, append=True)
 
         finally:
             if lh is not None: h.releaseLock(lh)

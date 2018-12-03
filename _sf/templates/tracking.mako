@@ -46,7 +46,7 @@
             <option ${"SELECTED" if protected == "all" else ""}>all</option>
         </select>
         <label></label><input type="text" name="password" value="${password}" placeholder="Password" style="width:200px;"/>
-        <label></label><input type="text" name="item" value="${item}" placeholder="Item" style="width:200px;"/>
+        <label></label><input type="text" id="item" name="item" value="${item}" placeholder="Item" style="width:200px;"/>
         <label></label><input type="submit" name="filter" value="Filter" style="width:100px;"/>
     </form>
 </div>
@@ -85,6 +85,8 @@
 <script>
     $(document).ready(function () {
         window.name = "_tracking";
+
+        $("#item").focus();
 
         $('[data-toggle="tooltip"]').tooltipster({theme: "tooltipster-borderless", animationDuration: 200, delay: 20, side: "bottom"});
         var table = $("table").stupidtable();

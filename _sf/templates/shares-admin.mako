@@ -39,11 +39,11 @@
     %endfor
 
 <div class="block section">
-        <div class="section-title">Share lookup</div>
-        <form method="post" action="/shares" class="inline">
-            <input type="text" name="filterShareID" value="${filterShareID}" placeholder="share (partial) ID or share url"/>
-            <label></label><input type="submit" name="filter-share-submit" value="Filter" style="width:100px;"/>
-        </form>
+    <div class="section-title">Share lookup</div>
+    <form method="post" action="/shares" class="inline">
+        <input type="text" id="filterShareID" name="filterShareID" value="${filterShareID}" placeholder="share (partial) ID or share url"/>
+        <label></label><input type="submit" name="filter-share-submit" value="Filter" style="width:100px;"/>
+    </form>
 </div>
 
 <div class="shares section">
@@ -86,7 +86,7 @@
                         <% shareIDEncoded = h.urlEncode(share["ID"])%>
                         % if share["password"]!="":
                             <a class="link" data-clipboard-text="${rootURL}/share=${shareIDEncoded} (password: ${share["password"]})" data-toggle="tooltip" title="Copy link"><i class="icon fas fa-link"></i></a>
-                            %else:
+                        %else:
                             <a class="link" data-clipboard-text="${rootURL}/share=${shareIDEncoded}" data-toggle="tooltip" title="Copy link"><i class="icon fas fa-link"></i></a>
                         % endif
 
@@ -105,6 +105,8 @@
 <script>
     $(document).ready(function () {
         window.name = "_shares";
+
+        $("#filterShareID").focus();
 
         var clipboard = new ClipboardJS(".link");
         clipboard.on('success', function (e) {

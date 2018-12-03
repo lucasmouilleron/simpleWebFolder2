@@ -47,7 +47,7 @@
 
     <form method="post">
         <input readonly type="text" placeholder="${path}"/>
-        <input type="text" name="shareID" placeholder="Share ID* (default: ${defaultShareID})" value="${shareID}"/>
+        <input type="text" id="shareID" name="shareID" placeholder="Share ID* (default: ${defaultShareID})" value="${shareID}"/>
         <input type="hidden" name="defaultShareID" value="${defaultShareID}"/>
         <input type="text" name="duration" placeholder="Duration in days" value="${duration}"/>
         <input type="password" name="password" placeholder="Password" value=""/>
@@ -63,7 +63,7 @@
 
 <script>
     $(document).ready(function () {
-
+        $("#shareID").focus();
     });
 </script>
 
