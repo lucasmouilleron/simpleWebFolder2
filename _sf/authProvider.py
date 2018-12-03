@@ -98,3 +98,16 @@ class authProvider():
         requiredPasswords = [p for p in requiredPasswords if p != ""]
         savedPassword = self.getUserPassword(lowerProtectedPath, r)
         return (True, requiredPasswords, savedPassword, savedPassword in requiredPasswords)
+
+    ###################################################################################
+    def isShareAuthorized(self,shareID,r:request):
+        cookieKey = "_sf_share_pass_%s" % shareID
+        if cookieKey in r.cookies: return r.cookies[cookieKey]
+        else: return False
+
+    ###################################################################################
+    def setSharePassword(self, shareID, password, r, response=None):
+        cookieKey = "_sf_share_pass_%s" % shareID
+        r.cookies = dict(r.cookies)
+        r.cookies[cookieKey] = password
+        if response is not None: response.set_cookie(cookieKey, password)

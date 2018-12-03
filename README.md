@@ -2,5 +2,6 @@
 
 todo
 
-shares (+concurrent)
+share password
+share details
 download limit

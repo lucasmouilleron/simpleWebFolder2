@@ -200,13 +200,15 @@ class Server(Thread):
     ###################################################################################
     def _routeShare(self, shareIDAndPath):
         shareID = shareIDAndPath.split("/")[0]
-        subPath = os.path.normpath(shareIDAndPath.replace(shareID, "")).lstrip("/").rstrip("/")
         share, hint = self.sp.getShare(shareID)
         if share is None: return self._makeTemplate("not-found", path=shareID)
+        sharePassword = share.get("password", "")
+        subPath = os.path.normpath(shareIDAndPath.replace(shareID, "")).lstrip("/").rstrip("/")
         shareBasePath = share["file"]
         path = h.makePath(shareBasePath, subPath).rstrip("/")
         displayPath = path.replace(shareBasePath, shareID)
-        # verif password
+        # if sharePassword != "" and not self.ap.isAdmin(request) and not self.ap.isShareAuthorized(shareID, request): return self._makeTemplate("password", path=shareID)
+        if sharePassword != "" and not self.ap.isShareAuthorized(shareID, request): return self._makeTemplate("password", path=shareID)
         if not ip.doesItemExists(path): return self._makeTemplate("not-found", path=path)
         if ip.isItemLeaf(path): return send_from_directory(h.DATA_FOLDER, path)
         else:
