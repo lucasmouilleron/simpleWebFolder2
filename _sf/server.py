@@ -36,9 +36,12 @@ class Server(Thread):
         self._addRoute("/hello", self._routeHello, ["GET"])
         self._addRouteRaw("/", self._routeUser, ["GET", "POST"], "index")
         self._addRouteRaw("/<path:path>", self._routeUser, ["GET", "POST"])
+        self._addRouteRaw("/_sf_assets/<path:path>", self._routeAssets, ["GET", "POST"])
         self._addRouteRaw("/admin", self._routeAdmin, ["GET", "POST"])
         self._addRouteRaw("/noadmin", self._routeNoAdmin, ["GET"])
-        self._addRouteRaw("/_sf_assets/<path:path>", self._routeAssets, ["GET", "POST"])
+        self._addRouteRaw("/tracking", self._routeTrackingAdmin, ["GET"])
+        self._addRouteRaw("/shares", self._routeSharesAdmin, ["GET", "POST"])
+        self._addRouteRaw("/share", self._routeShare, ["GET", "POST"])
 
         self.tplLookup = TemplateLookup(directories=[h.makePath(h.ROOT_FOLDER, "templates")])
 
@@ -139,8 +142,23 @@ class Server(Thread):
         return response
 
     ###################################################################################
+    def _routeTrackingAdmin(self):
+        if not h.TRACKING: return self._redirect("/admin")
+        if not self.ap.isAdmin(request): return self._redirect("/admin")
+        return "tracking"
+
+    ###################################################################################
+    def _routeSharesAdmin(self):
+        if not self.ap.isAdmin(request): return self._redirect("/admin")
+        return "shares"
+
+    ###################################################################################
+    def _routeShare(self):
+        return "share"
+
+    ###################################################################################
     def _makeBaseNamspace(self):
-        return {"baseURL": "", "rootURL": self._getRootURL(), "h": h}
+        return {"h": h, "baseURL": "", "rootURL": self._getRootURL(), "tracking": h.TRACKING, "sharing": h.SHARING}
 
     ###################################################################################
     def _makeTemplate(self, name, **data):
@@ -153,7 +171,8 @@ class Server(Thread):
         return result
 
     ###################################################################################
-    def _redirect(self, path, response):
+    def _redirect(self, path, response=None):
+        if response is None: response = make_response()
         response.headers["Location"] = path
         response._status_code = 302
         response._status = "302 FOUND"

@@ -41,6 +41,8 @@ DEBUG = CONFIG.get("debug", False)
 NAME = CONFIG.get("name", "SWF2")
 CREDITS = CONFIG.get("credits", "Lucas Mouilleron")
 MAIL = CONFIG.get("mail", "lucas.mouilleron@me.com")
+TRACKING = CONFIG.get("tracking", False)
+SHARING = CONFIG.get("sharing", False)
 TMP_FOLDER = CONFIG.get("tmp folder", "/tmp")
 ###################################################################################
 LOG_FORMAT = "%(asctime)-15s - %(levelname)-7s - %(message)s"

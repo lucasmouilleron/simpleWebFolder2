@@ -23,7 +23,14 @@
 <div class="name"><a href="${baseURL}/">${h.NAME}</a></div>
 
 <div class="navigation section">
-    <div><a href="${baseURL}/noadmin"><i class="icon fas fas fa-lock-open"></i></a> |</div>
+    <div><a href="${baseURL}/noadmin"><i class="icon fas fas fa-lock-open"></i></a></div>
+    %if tracking:
+        <div class="tracking" data-toggle="tooltip" title="Tracking"><a href="/tracking" target="_tracking"><i class="icon fas fa-glasses"></i></a></div>
+    %endif
+    %if sharing:
+        <div class="sharing" data-toggle="tooltip" title="Sharing"><a href="/shares" target="_shares"><i class="icon fas fa-link"></i></a></div>
+    %endif
+    <div class="sep">|</div>
     <div class="parent" data-toggle="tooltip" title="Go to parent folder">
         %if path != "":
             <a href="${baseURL}/${path}/.."><i class="icon fas fa-long-arrow-alt-up"></i></a>
