@@ -22,11 +22,12 @@ import os
 class Server(Thread):
 
     ###################################################################################
-    def __init__(self, ip: ip.itemsProvider, ap: ap.authProvider, port, ssl=False, certificateKeyFile=None, certificateCrtFile=None, fullchainCrtFile=""):
+    def __init__(self, ip: ip.itemsProvider, ap: ap.authProvider, sp: sp.sharesProvider, port, ssl=False, certificateKeyFile=None, certificateCrtFile=None, fullchainCrtFile=""):
         Thread.__init__(self)
         self.app = Flask(__name__)
         self.ip = ip
         self.ap = ap
+        self.sp = sp
         self.port = port
         self.ssl = ssl
         self.certificateKeyFile = certificateKeyFile
@@ -41,8 +42,10 @@ class Server(Thread):
         self._addRouteRaw("/admin", self._routeAdmin, ["GET", "POST"])
         self._addRouteRaw("/noadmin", self._routeNoAdmin, ["GET"])
         self._addRouteRaw("/tracking", self._routeTrackingAdmin, ["GET", "POST"])
-        self._addRouteRaw("/shares", self._routeSharesAdmin, ["GET", "POST"])
-        self._addRouteRaw("/share", self._routeShare, ["GET", "POST"])
+        self._addRouteRaw("/share=<path:shareIDAndPath>", self._routeShare, ["GET", "POST"])
+        self._addRouteRaw("/shares", self._routeShares, ["GET", "POST"])
+        self._addRouteRaw("/remove-share=<shareID>", self._routeShareRemove, ["GET"])
+        self._addRouteRaw("/create-share=<path>", self._routeShareAdd, ["GET", "POST"])
 
         self.tplLookup = TemplateLookup(directories=[h.makePath(h.ROOT_FOLDER, "templates")])
 
@@ -155,13 +158,61 @@ class Server(Thread):
         return self._makeTemplate("tracking", trackings=tp.getTrackings(password if password != "" else None, item if item != "" else None, protected, h.parseInt(maxItems, None)), password=password, item=item, maxItems=maxItems, protected=protected)
 
     ###################################################################################
-    def _routeSharesAdmin(self):
+    def _routeShares(self, alerts=None):
+        if alerts is None: alerts = []
         if not self.ap.isAdmin(request): return self._redirect("/admin")
-        return self._makeTemplate("shares", shares=sp.listShares(request.form.get("shareID", None)))
+        return self._makeTemplate("shares", shares=self.sp.listShares(request.form.get("shareID", None)), alerts=alerts)
 
     ###################################################################################
-    def _routeShare(self):
-        return "share"
+    def _routeShareRemove(self, shareID):
+        if not self.ap.isAdmin(request): return self._redirect("/admin")
+        self.sp.removeShare(shareID)
+        return self._routeShares(alerts=[["Share removed", "The share %s has been removed." % shareID]])
+
+    ###################################################################################
+    def _routeShareAdd(self, path):
+        if not self.ap.isAdmin(request): return self._redirect("/admin")
+        alerts = []
+        path = h.decode(path)
+        shareID = request.form.get("shareID", "")
+        defaultShareID = request.form.get("defaultShareID", h.uniqueIDSmall())
+        duration = request.form.get("duration", "")
+        password = request.form.get("password", "")
+        shareSubmit = request.form.get("create-share-submit", False)
+        shareForceSubmit = request.form.get("create-share-force-submit", False)
+        needForce = False
+        if shareSubmit or shareForceSubmit:
+            if shareID == "": shareID = defaultShareID
+            shareID = h.clean(shareID)
+            if shareID == "": alerts.append(["Can't create share", "Share ID provided is invalid."])
+            else:
+                if not sp.shareExists(shareID) or shareForceSubmit:
+                    share, hint = self.sp.addShare(shareID, path, duration, password)
+                    if share is not None:
+                        alerts.append(["Share created", "The share %s has been created for %s" % (shareID, path)])
+                        return self._routeShares(alerts)
+                    else: alerts.append(["Can't create share", "Share %s could not be created. Hint: %s" % (shareID, hint)])
+                else:
+                    alerts.append(["Can't create share", "The share ID %s is alread used for %s." % (shareID, path)])
+                    needForce = True
+        return self._makeTemplate("share-add", path=path, defaultShareID=defaultShareID, shareID=shareID, duration=duration, alerts=alerts, needForce=needForce)
+
+    ###################################################################################
+    def _routeShare(self, shareIDAndPath):
+        shareID = shareIDAndPath.split("/")[0]
+        subPath = os.path.normpath(shareIDAndPath.replace(shareID, "")).lstrip("/").rstrip("/")
+        share, hint = self.sp.getShare(shareID)
+        if share is None: return self._makeTemplate("not-found", path=shareID)
+        shareBasePath = share["file"]
+        path = h.makePath(shareBasePath, subPath).rstrip("/")
+        displayPath = path.replace(shareBasePath, shareID)
+        # verif password
+        if not ip.doesItemExists(path): return self._makeTemplate("not-found", path=path)
+        if ip.isItemLeaf(path): return send_from_directory(h.DATA_FOLDER, path)
+        else:
+            alerts = []
+            containers, leafs = self.ip.getItems(path)
+            return self._makeTemplate("share", displayPath=displayPath, shareBasePath=shareBasePath, subPath=subPath, share=share, containers=containers, leafs=leafs, alerts=alerts, readme=ip.getReadme(path))
 
     ###################################################################################
     def _makeBaseNamspace(self):
@@ -207,7 +258,7 @@ h.logInfo("Shares provider built")
 ip = ip.itemsProvider(ap, h.DATA_FOLDER)
 h.logInfo("Items provider built")
 
-server = Server(ip, ap, h.PORT, h.SSL, h.CERTIFICATE_KEY_FILE, h.CERTIFICATE_CRT_FILE, h.FULLCHAIN_CRT_FILE)
+server = Server(ip, ap, sp, h.PORT, h.SSL, h.CERTIFICATE_KEY_FILE, h.CERTIFICATE_CRT_FILE, h.FULLCHAIN_CRT_FILE)
 server.start()
 h.logInfo("Server started", server.port, server.ssl)
 

@@ -20,6 +20,7 @@ import traceback
 import collections
 import portalocker
 import time
+import base64
 
 ###################################################################################
 SERVER_TIMEZONE = "Europe/Paris"
@@ -96,6 +97,10 @@ def displaySplash():
 ################################################################################
 def uniqueID():
     return str(uuid.uuid4())
+
+################################################################################
+def uniqueIDSmall():
+    return str(uuid.uuid4())[:8]
 
 
 ###################################################################################
@@ -351,6 +356,16 @@ def floatFormat(number, decimals=2, fast=True):
 
 
 ################################################################################
+def encode(s):
+    return str(base64.b64encode(s.encode('utf-8')), encoding="utf-8")
+
+
+################################################################################
+def decode(b):
+    return str(base64.b64decode(b), encoding="utf-8")
+
+
+################################################################################
 def urlEncode(path):
     return urllib.parse.quote(path).replace("%3D", "=").replace("%3A", ":").replace("%2F", "/")
 
@@ -416,3 +431,7 @@ def writeJsonFile(filePath, dictionnary, sortKeys=False, indent=4, compact=False
         fp.close()
     except:
         raise Exception("The json object could not be saved to file", filePath)
+
+################################################################################
+def cleanURL(url):
+    return url.replace('//','/', 1)

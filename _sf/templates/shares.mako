@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="${baseURL}/_sf_assets/tooltipster.css">
     <link rel="stylesheet" href="${baseURL}/_sf_assets/tooltipster-theme.css">
     <link rel="stylesheet" href="${baseURL}/_sf_assets/style.css">
-    <title>${h.NAME} - Shares</title>
+    <title>${h.NAME} - Admin - Shares</title>
 </head>
 
 <body>
@@ -22,6 +22,7 @@
 
 <div class="name"><a href="${baseURL}/">${h.NAME}</a></div>
 
+
 <div class="navigation section">
     <div><a href="${baseURL}/noadmin"><i class="icon fas fas fa-lock-open"></i></a></div>
     <div class="files" data-toggle="tooltip" title="Files"><a href="/" target="_files"><i class="icon fas fa-folder-open"></i></a></div>
@@ -29,6 +30,14 @@
         <div class="tracking" data-toggle="tooltip" title="Tracking"><a href="/tracking" target="_tracking"><i class="icon fas fa-glasses"></i></a></div>
     %endif
 </div>
+
+    %for alert in alerts:
+        <div class="alert">
+            <h2>${alert[0]}</h2>
+            <p>${alert[1]}</p>
+        </div>
+    %endfor
+
 <div class="shares section">
     %if filterShareID is not None:
         <div class="section-title">Shares found</div>
@@ -53,17 +62,23 @@
             %for share in shares:
                 <% shareURL = "ok"%>
                 <% evenClass = "even" if i % 2 == 1 else "odd"%>
+                <% shareExpires = "Never" if share.get("duration",0)==0 else h.formatTimestamp(share["duration"]+share["creation"], "YYYY/MM/DD HH:mm")%>
                 <tr class="${evenClass}">
                     <td>${share["ID"]}</td>
                     <td onclick="window.open('todo')"><a>${share["file"]}</a></td>
-                    <td>exp</td>
-                    <td>password</td>
-                    <td>view</td>
+                    <td>${shareExpires}</td>
+                    <td>${share["password"]}</td>
+                    <td>${len(share.get("views", []))}</td>
                     <td>
-                        todo
+                        %if len(share.get("views", []))>0:
+                        ${h.formatTimestamp(share["views"][-1]["date"], "YYYY/MM/DD HH:mm")}
+                        %endif
                     </td>
                     <td>
-                        todo
+                        <% shareIDEncoded = h.urlEncode(share["ID"])%>
+                        <a class="link" data-clipboard-text="${rootURL}/share=${shareIDEncoded}" data-toggle="tooltip" title="Copy link"><i class="icon fas fa-link"></i></a>
+                        <a data-toggle="tooltip" title="Details" href="${rootURL}/share=${shareIDEncoded}" target="_share_${shareIDEncoded}"><i class="icon fas fa-search"></i></a>
+                        <a data-toggle="tooltip" title="Remove" class="confirmation" href="${rootURL}/remove-share=${shareIDEncoded}"><i class="icon fas fa-trash"></i></a>
                     </td>
                 </tr>
                 <% i = 0%>
@@ -81,6 +96,10 @@
         var clipboard = new ClipboardJS(".link");
         clipboard.on('success', function (e) {
             alert("Link " + e.text + " copied to clipboard")
+        });
+
+        $('.confirmation').on('click', function () {
+            return confirm('Are you sure?');
         });
 
         $('[data-toggle="tooltip"]').tooltipster({theme: "tooltipster-borderless", animationDuration: 200, delay: 20, side: "bottom"});

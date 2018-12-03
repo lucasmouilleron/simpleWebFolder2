@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="${baseURL}/_sf_assets/tooltipster.css">
     <link rel="stylesheet" href="${baseURL}/_sf_assets/tooltipster-theme.css">
     <link rel="stylesheet" href="${baseURL}/_sf_assets/style.css">
-    <title>${h.NAME} - admin - /${path}</title>
+    <title>${h.NAME} - Admin - /${path}</title>
 </head>
 
 <body>
@@ -102,6 +102,7 @@
                         <% evenClass = "even" if i % 2 == 1 else "odd" %>
                         <% urlEncodedPath = h.urlEncode(item["path"])%>
                         <% isAllowedClass = "disabled" if item["protected"] else ""%>
+                        <% shareURLEncoded=h.encode(item["path"])%>
                         <% itemURL = h.urlEncode(h.makePath(rootURL , item["path"].lstrip("/"))) %>
                         <tr class="item ${evenClass}" data-item="${item["name"]}">
                             <td onclick="location.href='${urlEncodedPath}'"><i class="icon fas fa-folder ${isAllowedClass}"></i></td>
@@ -113,6 +114,9 @@
                                     <a data-toggle="tooltip" title="Copy link + password" class="link" data-clipboard-text="${itemURL} (password: ${item["passwords"][0]})"><i class="icon fas fa-link"></i></a>
                                 %else:
                                     <a data-toggle="tooltip" title="Copy link" class="link" data-clipboard-text="${itemURL}"><i class="icon fas fa-link"></i></a>
+                                % endif
+                                % if h.SHARING:
+                                    <a data-toggle="tooltip" title="Create share" href="${rootURL}/create-share=${shareURLEncoded}" target="_shares"><i class="icon fas fa-share-alt-square"></i></a>
                                 % endif
                             </td>
                         </tr>
@@ -143,6 +147,7 @@
                         <% evenClass = "even" if i % 2 == 1 else "odd"%>
                         <% sizeMB = h.floatFormat(item["size"]/1048576,1)%>
                         <% urlEncodedPath = h.urlEncode(item["path"])%>
+                        <% shareURLEncoded=h.encode(item["path"])%>
                         <% itemURL = h.urlEncode(h.makePath(rootURL , item["path"].lstrip("/"))) %>
                         <tr class="item ${evenClass}" data-item="${item["name"]}">
                             <td onclick="window.open('${urlEncodedPath}')"><i class="icon ${h.EXTENSIONS_CLASSES.get(item["extension"], h.EXTENSIONS_CLASSES["default"])}"></i></td>
@@ -154,6 +159,9 @@
                                     <a data-toggle="tooltip" title="Copy link + password" class="link" data-clipboard-text="${itemURL} (password: ${item["passwords"][0]})"><i class="icon fas fa-link"></i></a>
                                 %else:
                                     <a data-toggle="tooltip" title="Copy link" class="link" data-clipboard-text="${itemURL}"><i class="icon fas fa-link"></i></a>
+                                % endif
+                                % if h.SHARING:
+                                    <a data-toggle="tooltip" title="Create share" href="${rootURL}/create-share=${shareURLEncoded}" target="_shares"><i class="icon fas fa-share-alt-square"></i></a>
                                 % endif
                             </td>
                         </tr>
