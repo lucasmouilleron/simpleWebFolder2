@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="${baseURL}/_sf_assets/tooltipster.css">
     <link rel="stylesheet" href="${baseURL}/_sf_assets/tooltipster-theme.css">
     <link rel="stylesheet" href="${baseURL}/_sf_assets/style.css">
-    <link rel="stylesheet" href="${baseURL}/_sf_overrides/style.css">
+    <title>${h.NAME}</title>
 </head>
 
 <body>
@@ -36,11 +36,18 @@
 <div class="authenticate section">
     <div class="section-title">Protected area, please authenticate</div>
     <form method="post">
-        <input type="password" name="password" placeholder="Password"/>
+        <input id="password" type="password" name="password" placeholder="Password"/>
         <input type="submit" name="password-submit" value="Login"/>
     </form>
 </div>
 
 <div class="footer">${h.NAME} - ${h.CREDITS}</div>
+
+<script>
+    $(document).ready(function () {
+        $("#password").focus();
+    });
+</script>
+
 </body>
 </html>

@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="${baseURL}/_sf_assets/tooltipster.css">
     <link rel="stylesheet" href="${baseURL}/_sf_assets/tooltipster-theme.css">
     <link rel="stylesheet" href="${baseURL}/_sf_assets/style.css">
-    <title>${h.NAME}</title>
+    <title>${h.NAME} - admin</title>
 </head>
 
 <body>
@@ -22,14 +22,21 @@
 
 <div class="name"><a href="${baseURL}/">${h.NAME}</a></div>
 
-<div class="error section">
-    <h2>Item forbidden</h2>
-    <p>The item <i>${path}</i> is forbidden.</p>
-
-    <p>If this is not normal, please send us an email @ <a href="mailto:${h.MAIL}">${h.MAIL}</a> if the problem persits.</p>
-
+<div class="authenticate section">
+    <div class="section-title">Admin area, please authenticate</div>
+    <form method="post">
+        <input id="password" type="password" name="password" placeholder="Password"/>
+        <input type="submit" name="password-submit" value="Login"/>
+    </form>
 </div>
 
 <div class="footer">${h.NAME} - ${h.CREDITS}</div>
+
+<script>
+    $(document).ready(function () {
+        $("#password").focus();
+    });
+</script>
+
 </body>
 </html>

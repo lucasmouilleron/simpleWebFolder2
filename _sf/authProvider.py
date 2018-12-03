@@ -17,7 +17,7 @@ class authProvider():
 
     ###################################################################################
     def isAdmin(self, r: request):
-        cookieKey = "_sf_admin_password"
+        cookieKey = "_sf_admin_pass"
         if cookieKey in r.cookies: return r.cookies[cookieKey] == self.adminPassword
         else: return False
 
@@ -75,6 +75,20 @@ class authProvider():
         r.cookies = dict(r.cookies)
         r.cookies[cookieKey] = password
         if response is not None: response.set_cookie(cookieKey, password)
+
+    ###################################################################################
+    def setAdminPassword(self, password, r, response=None):
+        cookieKey = "_sf_admin_pass"
+        r.cookies = dict(r.cookies)
+        r.cookies[cookieKey] = password
+        if response is not None: response.set_cookie(cookieKey, password)
+
+    ###################################################################################
+    def removeAdminPassword(self, r, response=None):
+        cookieKey = "_sf_admin_pass"
+        r.cookies = dict(r.cookies)
+        r.cookies.pop(cookieKey)
+        if response is not None: response.set_cookie(cookieKey, "")
 
     ###################################################################################
     def isAuthorized(self, path, r: request):

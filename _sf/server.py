@@ -4,7 +4,7 @@
 import signal
 from threading import Thread
 from gevent.wsgi import WSGIServer
-from flask import Flask, request, jsonify, send_from_directory, redirect, make_response, send_file
+from flask import Flask, request, jsonify, send_from_directory, redirect, make_response, send_file, url_for
 from flask_cors import CORS
 from mako.template import Template
 from mako.lookup import TemplateLookup
@@ -34,8 +34,10 @@ class Server(Thread):
         self.httpServer = None
 
         self._addRoute("/hello", self._routeHello, ["GET"])
-        self._addRouteRaw("/", self._routeUser, ["GET", "POST"])
+        self._addRouteRaw("/", self._routeUser, ["GET", "POST"], "index")
         self._addRouteRaw("/<path:path>", self._routeUser, ["GET", "POST"])
+        self._addRouteRaw("/admin", self._routeAdmin, ["GET", "POST"])
+        self._addRouteRaw("/noadmin", self._routeNoAdmin, ["GET"])
         self._addRouteRaw("/_sf_assets/<path:path>", self._routeAssets, ["GET", "POST"])
 
         self.tplLookup = TemplateLookup(directories=[h.makePath(h.ROOT_FOLDER, "templates")])
@@ -87,15 +89,19 @@ class Server(Thread):
     ###################################################################################
     def _routeUser(self, path="/"):
         path = path.rstrip("/")
-        if ap.isAdmin(request): self._routeAdmin(path)
+        if ap.isAdmin(request): return self._routeAdmin(path)
 
         if ip.doesItemExists(path):
-            if request.form.get("password-submit", False): ap.setUserPassword(path, request.form.get("password", ""), request)
+            if request.form.get("password-submit", False):
+                response = make_response()
+                ap.setUserPassword(path, request.form.get("password", ""), request, response)
+                return self._redirect(path, response)
+
             isProtected, requiredPasswords, savedPassword, isAuthorized = ap.isAuthorized(path, request)
             if isAuthorized:
                 if ip.isItemLeaf(path):
                     if self.ap.isForbidden(path): return self._makeTemplate("forbidden", path=path)
-                    response = make_response(send_from_directory(h.DATA_FOLDER, path))
+                    return send_from_directory(h.DATA_FOLDER, path)
                 else:
                     if self.ap.isForbidden(path): return self._makeTemplate("forbidden", path=path)
                     if ap.listingForbidden(path): return self._makeTemplate("forbidden", path=path)
@@ -103,17 +109,31 @@ class Server(Thread):
                     alerts = []
                     containers, leafs = ip.getItems(path, request)
                     readme = ip.getReadme(path)
-                    currentURLWithoutURI = path
-                    response = make_response(self._makeTemplate("items", containers=containers, leafs=leafs, path=path, readme=readme, downloadAllowed=not self.ap.downloadForbidden(path), currentURLWithoutURI=currentURLWithoutURI, alerts=alerts))
-                if request.form.get("password-submit", False): ap.setUserPassword(path, request.form.get("password", ""), request, response)
-                return response
+                    return self._makeTemplate("items", containers=containers, leafs=leafs, path=path, readme=readme, downloadAllowed=not self.ap.downloadForbidden(path), currentURLWithoutURI=path, alerts=alerts)
             else: return self._makeTemplate("password", path=path)
         else: return self._makeTemplate("not-found", path=path)
 
     ###################################################################################
+    def _routeNoAdmin(self):
+        response = make_response()
+        self.ap.removeAdminPassword(request, response)
+        return self._redirect("/", response)
+
+    ###################################################################################
     def _routeAdmin(self, path="/"):
         path = path.rstrip("/")
-        return "admin"
+
+        if request.form.get("password-submit", False):
+            response = make_response()
+            ap.setAdminPassword(request.form.get("password", ""), request, response)
+            return self._redirect("/", response)
+
+        if not self.ap.isAdmin(request): return self._makeTemplate("password-admin")
+        alerts = []
+        containers, leafs = ip.getItems(path, request)
+        readme = ip.getReadme(path)
+        response = make_response(self._makeTemplate("items-admin", containers=containers, leafs=leafs, path=path, readme=readme, downloadAllowed=not self.ap.downloadForbidden(path), alerts=alerts))
+        return response
 
     ###################################################################################
     def _makeBaseNamspace(self):
@@ -128,6 +148,13 @@ class Server(Thread):
         result = send_file(path, as_attachment=True, attachment_filename=name)
         os.remove(path)
         return result
+
+    ###################################################################################
+    def _redirect(self, path, response):
+        response.headers["Location"] = path
+        response._status_code = 302
+        response._status = "302 FOUND"
+        return response
 
 
 ###################################################################################

@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="${baseURL}/_sf_assets/tooltipster.css">
     <link rel="stylesheet" href="${baseURL}/_sf_assets/tooltipster-theme.css">
     <link rel="stylesheet" href="${baseURL}/_sf_assets/style.css">
-    <title>${h.NAME} - ${path}</title>
+    <title>${h.NAME} - admin - ${path}</title>
 </head>
 
 <body>
@@ -23,6 +23,7 @@
 <div class="name"><a href="${baseURL}/">${h.NAME}</a></div>
 
 <div class="navigation section">
+    <div><a href="${baseURL}/noadmin"><i class="icon fas fas fa-lock-open"></i></a> | </div>
     <div class="parent" data-toggle="tooltip" title="Go to parent folder">
         %if path != "":
             <a href="${baseURL}/${path}/.."><i class="icon fas fa-long-arrow-alt-up"></i></a>

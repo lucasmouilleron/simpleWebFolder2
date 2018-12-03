@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="${baseURL}/_sf_assets/tooltipster.css">
     <link rel="stylesheet" href="${baseURL}/_sf_assets/tooltipster-theme.css">
     <link rel="stylesheet" href="${baseURL}/_sf_assets/style.css">
-    <link rel="stylesheet" href="${baseURL}/_sf_overrides/style.css">
+    <title>${h.NAME}</title>
 </head>
 
 <body>
