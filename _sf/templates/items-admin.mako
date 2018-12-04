@@ -46,6 +46,16 @@
         </div>
     %endfor
 
+    %if isProtected:
+        <div class="block section">
+            <div class="section-title">Add a password</div>
+            <form method="post" class="inline">
+                <input type="text" name="new-password" placeholder="password to add"/>
+                <label></label><input type="submit" name="add-password-submit" value="Add password" style="width:150px;"/>
+            </form>
+        </div>
+    %endif
+
     %if len(passwords)>1:
         <div class="block section">
             <div class="section-title">Passwords</div>

@@ -38,8 +38,7 @@ class sharesProvider():
         password = "" if password is None else password
         lh = None
         try:
-            lockFile = h.makePath(h.LOCKS_FOLDER, "_sf_share%s" % shareID)
-            lh = h.getLockExclusive(lockFile, 5)
+            lh = h.getLockExclusive(h.makePath(h.LOCKS_FOLDER, "_sf_share%s" % h.clean(shareID)), 5)
             share = {"ID": shareID, "file": path, "duration": duration, "password": password, "creation": h.now()}
             h.writeJsonFile(sharePath, share)
             if self.user is not None: h.changeFileOwner(sharePath, self.user)
@@ -56,8 +55,7 @@ class sharesProvider():
         if not os.path.exists(sharePath): return None
         lh = None
         try:
-            lockFile = h.makePath(h.LOCKS_FOLDER, "_sf_share%s" % shareID)
-            lh = h.getLockExclusive(lockFile, 5)
+            lh = h.getLockExclusive(h.makePath(h.LOCKS_FOLDER, "_sf_share%s" % h.clean(shareID)), 5)
             share = h.loadJsonFile(sharePath)
             if not asAdmin:
                 views = share.get("views", [])
@@ -81,8 +79,7 @@ class sharesProvider():
         if not os.path.exists(sharePath): raise Exception("Unknown share", shareID)
         lh = None
         try:
-            lockFile = h.makePath(h.LOCKS_FOLDER, "_sf_share%s" % shareID)
-            lh = h.getLockExclusive(lockFile, 5)
+            lh = h.getLockExclusive(h.makePath(h.LOCKS_FOLDER, "_sf_share%s" % h.clean(shareID)), 5)
             os.remove(sharePath)
             return True
         finally:

@@ -19,11 +19,10 @@ class trackingProvider():
     ###################################################################################
     def track(self, path, r, isAuthotirzed, passwordProvided):
         trackingFile = h.makePath(self.basePath, ".tracking")
-        lockFile = h.makePath(h.LOCKS_FOLDER, "_sfl_tracking")
         headers = ["path", "authorized", "password", "ip", "date"]
         lh = None
         try:
-            lh = h.getLockExclusive(lockFile, 5)
+            lh = h.getLockExclusive(h.makePath(h.LOCKS_FOLDER, "_sfl_tracking"), 5)
             if h.getFileSize(trackingFile) > self.maxSize:
                 datas = h.readCSV(trackingFile)
                 nbLines = len(datas)
@@ -31,7 +30,7 @@ class trackingProvider():
                 if offset > 0: h.writeToCSV(datas[offset:nbLines - offset], trackingFile, headers=headers, append=False)
 
             h.writeToCSV([[path, isAuthotirzed, passwordProvided if passwordProvided is not None else "", r.remote_addr, h.now()]], trackingFile, headers=headers, append=True)
-            if self.user is not None:h.changeFileOwner(path, self.user)
+            if self.user is not None:h.changeFileOwner(trackingFile, self.user)
 
         finally:
             if lh is not None: h.releaseLock(lh)

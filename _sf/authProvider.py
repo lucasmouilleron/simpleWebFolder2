@@ -63,6 +63,22 @@ class authProvider():
         return lowerPath.replace(self.basePath, "")
 
     ###################################################################################
+    def addNewPassword(self, path, password):
+        if password is None: return False
+        lh = None
+        try:
+            lh = h.getLockExclusive(h.makePath(h.LOCKS_FOLDER, "_sf_password_%s" % h.clean(path)), 5)
+            passwordFile = h.makePath(self.basePath, path, ".password")
+            if os.path.exists(passwordFile): requiredPasswords = [p for p in h.readFromFile(passwordFile).split("\n") if p != ""]
+            else: requiredPasswords = []
+            requiredPasswords.append(password)
+            h.writeToFile(passwordFile, "\n".join(list(set(requiredPasswords))))
+            return True
+        except: return False
+        finally:
+            if lh is not None: h.releaseLock(lh)
+
+    ###################################################################################
     def getUserPassword(self, path, r: request):
         path = h.clean(path if path != "" else "-")
         cookieKey = "_sf_pass_%s" % path
@@ -94,13 +110,17 @@ class authProvider():
     def isAuthorized(self, path, r: request):
         lowerProtectedPath = self.getLowerProtectedPath(path)
         if (lowerProtectedPath == False): return (False, [], "", True, False)
-        requiredPasswords = h.readFromFile(h.makePath(self.basePath, lowerProtectedPath, ".password")).split("\n")
-        requiredPasswords = [p for p in requiredPasswords if p != ""]
-        savedPassword = self.getUserPassword(lowerProtectedPath, r)
-        return (True, requiredPasswords, savedPassword, savedPassword in requiredPasswords, lowerProtectedPath)
+        lh = None
+        try:
+            lh = h.getLockShared(h.makePath(h.LOCKS_FOLDER, "_sf_password_%s" % h.clean(path)), 5)
+            requiredPasswords = [p for p in h.readFromFile(h.makePath(self.basePath, lowerProtectedPath, ".password")).split("\n") if p != ""]
+            savedPassword = self.getUserPassword(lowerProtectedPath, r)
+            return (True, requiredPasswords, savedPassword, savedPassword in requiredPasswords, lowerProtectedPath)
+        finally:
+            if lh is not None: h.releaseLock(lh)
 
     ###################################################################################
-    def isShareAuthorized(self,shareID,r:request):
+    def isShareAuthorized(self, shareID, r: request):
         cookieKey = "_sf_share_pass_%s" % shareID
         if cookieKey in r.cookies: return r.cookies[cookieKey]
         else: return False

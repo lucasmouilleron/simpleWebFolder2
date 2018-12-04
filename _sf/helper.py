@@ -450,4 +450,5 @@ def getUserID(user):
 
 ################################################################################
 def changeFileOwner(path, uid=-1, gid=-1):
-    os.chown(path, uid, gid)
+    if os.path.exists(path):
+        os.chown(path, uid, gid)

@@ -146,6 +146,10 @@ class Server(Thread):
         if not ip.doesItemExists(path): return self._makeTemplate("not-found", path=path)
         if ip.isItemLeaf(path): return send_from_directory(h.DATA_FOLDER, path)
         alerts = []
+        if request.form.get("add-password-submit", False):
+            passwordToAdd=request.form.get("new-password", None)
+            if self.ap.addNewPassword(path, passwordToAdd): alerts.append(["Password added", "The password %s has been added."%passwordToAdd])
+            else: alerts.append(["Can't add password", "The password %s could not be added."%passwordToAdd])
         isProtected, requiredPasswords, _, _, _ = self.ap.isAuthorized(path, request)
         containers, leafs = ip.getItems(path, request)
         readme = ip.getReadme(path)
@@ -156,7 +160,7 @@ class Server(Thread):
         if self.ap.showForbidden(path): subAlerts.append("Folder not shown for non admin users.")
         if self.ap.downloadForbidden(path): subAlerts.append("Folder not downloadable.")
         if len(subAlerts) > 0: alerts.append(["Special folder", "<br/>".join(subAlerts)])
-        response = make_response(self._makeTemplate("items-admin", passwords=requiredPasswords, containers=containers, leafs=leafs, path=path, readme=readme, alerts=alerts))
+        response = make_response(self._makeTemplate("items-admin", isProtected=isProtected, passwords=sorted(requiredPasswords), containers=containers, leafs=leafs, path=path, readme=readme, alerts=alerts))
         return response
 
     ###################################################################################
