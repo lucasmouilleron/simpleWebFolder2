@@ -21,6 +21,7 @@ import collections
 import portalocker
 import time
 import base64
+import pwd
 
 ###################################################################################
 SERVER_TIMEZONE = "Europe/Paris"
@@ -49,6 +50,7 @@ TRACKING = CONFIG.get("tracking", False)
 SHARING = CONFIG.get("sharing", False)
 TMP_FOLDER = CONFIG.get("tmp folder", "/tmp")
 LOCKS_FOLDER = CONFIG.get("locks folder", TMP_FOLDER)
+USER = CONFIG.get("user", None)
 ###################################################################################
 LOG_FORMAT = "%(asctime)-15s - %(levelname)-7s - %(message)s"
 LOG_LOGGER = "main"
@@ -98,6 +100,7 @@ def displaySplash():
 ################################################################################
 def uniqueID():
     return str(uuid.uuid4())
+
 
 ################################################################################
 def uniqueIDSmall():
@@ -433,6 +436,18 @@ def writeJsonFile(filePath, dictionnary, sortKeys=False, indent=4, compact=False
     except:
         raise Exception("The json object could not be saved to file", filePath)
 
+
 ################################################################################
 def cleanURL(url):
-    return url.replace('//','/', 1)
+    return url.replace('//', '/', 1)
+
+
+################################################################################
+def getUserID(user):
+    try: return pwd.getpwnam(user).pw_uid
+    except: return None
+
+
+################################################################################
+def changeFileOwner(path, uid=-1, gid=-1):
+    os.chown(path, uid, gid)

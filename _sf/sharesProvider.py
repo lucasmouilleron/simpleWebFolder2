@@ -4,8 +4,6 @@
 import os
 import helper as h
 import authProvider as ap
-import markdown2
-import zipfile
 
 
 ###################################################################################
@@ -14,8 +12,10 @@ import zipfile
 class sharesProvider():
 
     ###################################################################################
-    def __init__(self, ap: ap.authProvider, sharesPath):
-        self.sharesPath = os.path.abspath(sharesPath)
+    def __init__(self, ap: ap.authProvider, sharesPath, user=None):
+        self.user = h.getUserID(user)
+        self.sharesPath = h.makeDirPath(os.path.abspath(sharesPath))
+        if self.user is not None: h.changeFileOwner(self.sharesPath, self.user)
         self.ap = ap
 
     ###################################################################################
@@ -42,6 +42,7 @@ class sharesProvider():
             lh = h.getLockExclusive(lockFile, 5)
             share = {"ID": shareID, "file": path, "duration": duration, "password": password, "creation": h.now()}
             h.writeJsonFile(sharePath, share)
+            if self.user is not None: h.changeFileOwner(sharePath, self.user)
             return share, "ok"
         except:
             le, lt = h.getLastExceptionAndTrace()
@@ -66,6 +67,7 @@ class sharesProvider():
                 views.append(view)
                 share["views"] = views
                 h.writeJsonFile(sharePath, share)
+                if self.user is not None: h.changeFileOwner(sharePath, self.user)
             return share, "ok"
         except:
             le, lt = h.getLastExceptionAndTrace()

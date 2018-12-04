@@ -273,10 +273,10 @@ h.displaySplash()
 ap = ap.authProvider(h.DATA_FOLDER, h.CONFIG.get("admin password", ""), h.FORBIDEN_ITEMS)
 h.logInfo("Auth provider built")
 
-tp = tp.trackingProvider(h.DATA_FOLDER)
+tp = tp.trackingProvider(h.DATA_FOLDER, user=h.USER)
 h.logInfo("Tracking provider built")
 
-sp = sp.sharesProvider(ap, h.makeDirPath(h.DATA_FOLDER, "_sf_shares"))
+sp = sp.sharesProvider(ap, h.makePath(h.DATA_FOLDER, "_sf_shares"), user=h.USER)
 h.logInfo("Shares provider built")
 
 ip = ip.itemsProvider(ap, h.DATA_FOLDER)

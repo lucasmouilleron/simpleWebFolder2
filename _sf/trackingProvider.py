@@ -11,9 +11,10 @@ import helper as h
 class trackingProvider():
 
     ###################################################################################
-    def __init__(self, basePath, maxSize=3000):
+    def __init__(self, basePath, maxSize=3000, user=None):
         self.basePath = os.path.abspath(basePath)
         self.maxSize = maxSize
+        self.user = h.getUserID(user)
 
     ###################################################################################
     def track(self, path, r, isAuthotirzed, passwordProvided):
@@ -30,6 +31,7 @@ class trackingProvider():
                 if offset > 0: h.writeToCSV(datas[offset:nbLines - offset], trackingFile, headers=headers, append=False)
 
             h.writeToCSV([[path, isAuthotirzed, passwordProvided if passwordProvided is not None else "", r.remote_addr, h.now()]], trackingFile, headers=headers, append=True)
+            if self.user is not None:h.changeFileOwner(path, self.user)
 
         finally:
             if lh is not None: h.releaseLock(lh)
