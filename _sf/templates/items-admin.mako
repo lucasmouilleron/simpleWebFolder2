@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css">
     <link rel="stylesheet" href="${baseURL}/_sf_assets/tooltipster.css">
     <link rel="stylesheet" href="${baseURL}/_sf_assets/tooltipster-theme.css">
-    <link rel="stylesheet" href="${baseURL}/_sf_assets/style.css?ck=1">
+    <link rel="stylesheet" href="${baseURL}/_sf_assets/style.css?ck=2">
     <title>${h.NAME} - Admin - /${path}</title>
 </head>
 
@@ -120,7 +120,7 @@
                             <td onclick="location.href='${urlEncodedPath}'">${item["name"]}</td>
                             <td onclick="location.href='${urlEncodedPath}'">${h.formatTimestamp(item["lastModified"], "YYYY/MM/DD HH:mm")}</td>
                             <td onclick="location.href='${urlEncodedPath}'">${item["nbItems"]}</td>
-                            <td>
+                            <td class="actions">
                                 % if item["protected"]:
                                     <a data-toggle="tooltip" title="Copy link + password" class="link" data-clipboard-text="${itemURL} (password: ${item["passwords"][0]})"><i class="icon fas fa-link"></i></a>
                                 %else:
@@ -165,7 +165,7 @@
                             <td onclick="window.open('${urlEncodedPath}')">${item["name"]}</td>
                             <td onclick="window.open('${urlEncodedPath}')">${h.formatTimestamp(item["lastModified"], "YYYY/MM/DD HH:mm")}</td>
                             <td onclick="window.open('${urlEncodedPath}')">${sizeMB}</td>
-                            <td>
+                            <td class="actions">
                                 % if item["protected"]:
                                     <a data-toggle="tooltip" title="Copy link + password" class="link" data-clipboard-text="${itemURL} (password: ${item["passwords"][0]})"><i class="icon fas fa-link"></i></a>
                                 %else:

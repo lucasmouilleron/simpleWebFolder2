@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css">
     <link rel="stylesheet" href="${baseURL}/_sf_assets/tooltipster.css">
     <link rel="stylesheet" href="${baseURL}/_sf_assets/tooltipster-theme.css">
-    <link rel="stylesheet" href="${baseURL}/_sf_assets/style.css?ck=1">
+    <link rel="stylesheet" href="${baseURL}/_sf_assets/style.css?ck=2">
     <title>${h.NAME} - Admin - Shares</title>
 </head>
 
@@ -82,7 +82,7 @@
                         ${h.formatTimestamp(share["views"][-1]["date"], "YYYY/MM/DD HH:mm")}
                         %endif
                     </td>
-                    <td>
+                    <td class="actions">
                         <% shareIDEncoded = h.urlEncode(share["ID"])%>
                         % if share["password"]!="":
                             <a class="link" data-clipboard-text="${rootURL}/share=${shareIDEncoded} (password: ${share["password"]})" data-toggle="tooltip" title="Copy link"><i class="icon fas fa-link"></i></a>

@@ -241,3 +241,7 @@ a.disabled:hover {
 #passwords span {
     margin-right: 10px;
 }
+
+td.actions a {
+    margin-right:3px;
+}
