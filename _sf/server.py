@@ -14,6 +14,7 @@ import authProvider as ap
 import trackingProvider as tp
 import sharesProvider as sp
 import os
+import time
 
 
 ###################################################################################
@@ -53,8 +54,8 @@ class Server(Thread):
     ###################################################################################
     def run(self):
         CORS(self.app)
-        if self.ssl: self.httpServer = WSGIServer(("0.0.0.0", self.port), server.app, log=None, keyfile=self.certificateKeyFile, certfile=self.certificateCrtFile, ca_certs=self.fullchainCrtFile)
-        else: self.httpServer = WSGIServer(("0.0.0.0", self.port), server.app, log=None)
+        if self.ssl: self.httpServer = WSGIServer(("0.0.0.0", self.port), self.app, log=None, keyfile=self.certificateKeyFile, certfile=self.certificateCrtFile, ca_certs=self.fullchainCrtFile)
+        else: self.httpServer = WSGIServer(("0.0.0.0", self.port), self.app, log=None)
         self.httpServer.serve_forever()
 
     ###################################################################################
@@ -281,6 +282,28 @@ class Server(Thread):
 
 
 ###################################################################################
+###################################################################################
+###################################################################################
+class RedirectServer(Thread):
+    ###################################################################################
+    def __init__(self, port, mainServer: Server):
+        Thread.__init__(self)
+        self.app = Flask(__name__)
+        self.port = port
+        self.httpServer = None
+        self.mainServer = mainServer
+
+    ###################################################################################
+    def run(self):
+        self.httpServer = WSGIServer(("0.0.0.0", self.port), self.mainServer.app, log=None)
+        self.httpServer.serve_forever()
+
+    ###################################################################################
+    def stop(self):
+        self.httpServer.stop()
+
+
+###################################################################################
 # MAIN
 ###################################################################################
 h.displaySplash()
@@ -301,5 +324,13 @@ server = Server(ip, ap, sp, h.PORT, h.SSL, h.CERTIFICATE_KEY_FILE, h.CERTIFICATE
 server.start()
 h.logInfo("Server started", server.port, server.ssl)
 
+secondaryServer, secondaryPort = None, h.CONFIG.get("secondary port", None)
+if secondaryPort is not None:
+    time.sleep(1)
+    secondaryServer = RedirectServer(secondaryPort, server)
+    secondaryServer.start()
+    h.logInfo("Secondary server started", secondaryPort)
+
 signal.pause()
 server.stop()
+if secondaryServer is not None: secondaryServer.stop()

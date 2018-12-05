@@ -5,6 +5,7 @@
   "mail": "lucas.mouilleron@me.com",
   "port": 80,
   "ssl": false,
+  "secondary port":null,
   "admin password": "pass1234",
   "tracking": true,
   "sharing": true,
