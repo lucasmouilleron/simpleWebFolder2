@@ -26,4 +26,4 @@
     
 ## TODO
 - Clean shares
-- Clean tracking periodicly and not on track
+- Track and clean tracking periodicly to file (and not on the fly)

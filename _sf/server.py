@@ -155,7 +155,7 @@ class Server(Thread):
         readme = ip.getReadme(path)
         subAlerts = []
         if isProtected and len(requiredPasswords) > 1: subAlerts.append("Password protected, see passwords below.")
-        if isProtected and len(requiredPasswords) == 1: subAlerts.append("Password protected: %s." % requiredPasswords[0])
+        if isProtected and len(requiredPasswords) == 1: subAlerts.append("Password protected: %s" % requiredPasswords[0])
         if self.ap.listingForbidden(path): subAlerts.append("Listing not allowed for non admin users.")
         if self.ap.showForbidden(path): subAlerts.append("Folder not shown for non admin users.")
         if self.ap.downloadForbidden(path): subAlerts.append("Folder not downloadable.")
