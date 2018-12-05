@@ -38,9 +38,9 @@ else: CONFIG = {}
 ###################################################################################
 PORT = CONFIG.get("port", 5000)
 SSL = CONFIG.get("ssl", False)
-CERTIFICATE_KEY_FILE = CONFIG_FOLDER + "/server.key"
-CERTIFICATE_CRT_FILE = CONFIG_FOLDER + "/server.crt"
-FULLCHAIN_CRT_FILE = CONFIG_FOLDER + "/fullchain.crt"
+CERTIFICATE_KEY_FILE = CONFIG_FOLDER + "/ssl/server.key"
+CERTIFICATE_CRT_FILE = CONFIG_FOLDER + "/ssl/server.crt"
+FULLCHAIN_CRT_FILE = CONFIG_FOLDER + "/ssl/fullchain.crt"
 ###################################################################################
 DEBUG = CONFIG.get("debug", False)
 NAME = CONFIG.get("name", "SWF2")

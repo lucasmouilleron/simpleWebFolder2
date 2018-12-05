@@ -4,6 +4,8 @@
 _sf_shares
 .tracking
 _sf_log
+_sf/config/ssl/*
+_sf/config/config.json
 
 ### demo files
 docs
