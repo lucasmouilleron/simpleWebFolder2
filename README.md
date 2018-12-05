@@ -26,4 +26,4 @@
     
 ## TODO
 - Clean shares
-- Download limit
+- Clean tracking periodicly and not on track

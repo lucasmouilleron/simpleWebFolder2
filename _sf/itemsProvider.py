@@ -14,8 +14,9 @@ import zipfile
 class itemsProvider():
 
     ###################################################################################
-    def __init__(self, ap: ap.authProvider, basePath):
+    def __init__(self, ap: ap.authProvider, basePath, maxZipSize=50e6):
         self.basePath = os.path.abspath(basePath)
+        self.maxZipSize = maxZipSize
         self.ap = ap
 
     ###################################################################################
@@ -30,6 +31,7 @@ class itemsProvider():
 
     ###################################################################################
     def getZipFile(self, path, r):
+        addedSize = 0
         if not self.doesItemExists(path): return None
         fullPath = self.getFullPath(path)
         zipFilePath = h.makePath(h.TMP_FOLDER, h.uniqueID())
@@ -43,7 +45,12 @@ class itemsProvider():
                     fpath = h.makePath(root, f)
                     frpath = fpath.replace(self.basePath, "")
                     if self.ap.isForbidden(frpath): continue
+                    addedSize += h.getFileSize(fpath)
+                    if addedSize > self.maxZipSize: break
                     zipf.write(fpath, arcname=frpath)
+                if addedSize > self.maxZipSize:
+                    h.logDebug("Max zip file size reached", path, self.maxZipSize)
+                    break
             return zipFilePath
         except Exception as e:
             os.remove(zipFilePath)
