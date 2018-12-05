@@ -8,6 +8,7 @@
   "admin password": "pass1234",
   "tracking": true,
   "sharing": true,
-  "store log":true,
-  "user":"lucas"
+  "store log": true,
+  "user": "lucas",
+  "aliases": {}
 }

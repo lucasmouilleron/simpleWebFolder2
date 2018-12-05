@@ -22,7 +22,7 @@ import os
 class Server(Thread):
 
     ###################################################################################
-    def __init__(self, ip: ip.itemsProvider, ap: ap.authProvider, sp: sp.sharesProvider, port, ssl=False, certificateKeyFile=None, certificateCrtFile=None, fullchainCrtFile=""):
+    def __init__(self, ip: ip.itemsProvider, ap: ap.authProvider, sp: sp.sharesProvider, port, ssl=False, certificateKeyFile=None, certificateCrtFile=None, fullchainCrtFile="", aliases=None):
         Thread.__init__(self)
         self.app = Flask(__name__)
         self.ip = ip
@@ -34,6 +34,7 @@ class Server(Thread):
         self.certificateCrtFile = certificateCrtFile
         self.fullchainCrtFile = fullchainCrtFile
         self.httpServer = None
+        self.aliases = aliases
 
         self._addRoute("/hello", self._routeHello, ["GET"])
         self._addRouteRaw("/", self._routeItems, ["GET", "POST"], "index")
@@ -95,7 +96,8 @@ class Server(Thread):
 
     ###################################################################################
     def _routeItems(self, path="/"):
-        path = path.rstrip("/")
+        path = self._aliasPath(path.rstrip("/"))
+
         if self.ap.isAdmin(request): return self._routeAdmin(path)
 
         if not ip.doesItemExists(path): return self._makeTemplate("not-found", path=path)
@@ -147,9 +149,9 @@ class Server(Thread):
         if ip.isItemLeaf(path): return send_from_directory(h.DATA_FOLDER, path)
         alerts = []
         if request.form.get("add-password-submit", False):
-            passwordToAdd=request.form.get("new-password", None)
-            if self.ap.addNewPassword(path, passwordToAdd): alerts.append(["Password added", "The password %s has been added."%passwordToAdd])
-            else: alerts.append(["Can't add password", "The password %s could not be added."%passwordToAdd])
+            passwordToAdd = request.form.get("new-password", None)
+            if self.ap.addNewPassword(path, passwordToAdd): alerts.append(["Password added", "The password %s has been added." % passwordToAdd])
+            else: alerts.append(["Can't add password", "The password %s could not be added." % passwordToAdd])
         isProtected, requiredPasswords, _, _, _ = self.ap.isAuthorized(path, request)
         containers, leafs = ip.getItems(path, request)
         readme = ip.getReadme(path)
@@ -265,8 +267,17 @@ class Server(Thread):
         return response
 
     ###################################################################################
+    def _getDomain(self):
+        return self._getRootURL().replace("https://", "").replace("http://", "")
+
+    ###################################################################################
     def _getRootURL(self):
         return request.url_root.rstrip("/")
+
+    ###################################################################################
+    def _aliasPath(self, path):
+        if self.aliases is None: return path
+        return self.aliases.get(path, path)
 
 
 ###################################################################################
@@ -286,7 +297,7 @@ h.logInfo("Shares provider built")
 ip = ip.itemsProvider(ap, h.DATA_FOLDER)
 h.logInfo("Items provider built")
 
-server = Server(ip, ap, sp, h.PORT, h.SSL, h.CERTIFICATE_KEY_FILE, h.CERTIFICATE_CRT_FILE, h.FULLCHAIN_CRT_FILE)
+server = Server(ip, ap, sp, h.PORT, h.SSL, h.CERTIFICATE_KEY_FILE, h.CERTIFICATE_CRT_FILE, h.FULLCHAIN_CRT_FILE, aliases=h.CONFIG.get("aliases", None))
 server.start()
 h.logInfo("Server started", server.port, server.ssl)
 
