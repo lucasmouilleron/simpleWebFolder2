@@ -16,6 +16,8 @@
 ## Install
 - Pytohn 3
 - `pip install -r _sf/requirements.txt`
+- Copy `_sf/assets/sample.style.css` to `_sf/assets/style.css`
+- Copy `_sf/config/sample.config.json` to `_sf/config/config.json` 
 - Drop `_sf` folder in the root folder you want to expose 
 
 ## Customisation
