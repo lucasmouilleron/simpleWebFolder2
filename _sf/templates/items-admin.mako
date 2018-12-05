@@ -110,13 +110,13 @@
                         <% isAllowedClass = "disabled" if itemSpecial else ""%>
                         <% shareURLEncoded=h.encode(item["path"])%>
                         <% itemURL = h.urlEncode(h.makePath(rootURL , item["path"].lstrip("/"))) %>
-                        <% toggleTooltip = "tooltip" if itemSpecial else ""%>
+                        <% toggleTooltip = "tooltip-left" if itemSpecial else ""%>
                         <% tooltipTitle = []%>
                         <% if item["protected"]: tooltipTitle.append("protected")%>
                         <% if item["forbidden"]: tooltipTitle.append("forbidden")%>
                         <% if item["showForbidden"]: tooltipTitle.append("hidden")%>
-                        <tr class="item ${evenClass}" data-item="${item["name"]}">
-                            <td onclick="location.href='${urlEncodedPath}'" data-toggle="${toggleTooltip}" title="${", ".join(tooltipTitle)}"><i class="icon fas fa-folder ${isAllowedClass}"></i></td>
+                        <tr class="item ${evenClass}" data-item="${item["name"]}" data-toggle="${toggleTooltip}" title="${", ".join(tooltipTitle)}">
+                            <td onclick="location.href='${urlEncodedPath}'"><i class="icon fas fa-folder ${isAllowedClass}"></i></td>
                             <td onclick="location.href='${urlEncodedPath}'">${item["name"]}</td>
                             <td onclick="location.href='${urlEncodedPath}'">${h.formatTimestamp(item["lastModified"], "YYYY/MM/DD HH:mm")}</td>
                             <td onclick="location.href='${urlEncodedPath}'">${item["nbItems"]}</td>
@@ -195,6 +195,7 @@
         });
 
         $('[data-toggle="tooltip"]').tooltipster({theme: "tooltipster-borderless", animationDuration: 200, delay: 20, side: "bottom"});
+        $('[data-toggle="tooltip-left"]').tooltipster({theme: "tooltipster-borderless", animationDuration: 200, delay: 20, side: "left"});
         var table = $("table").stupidtable();
         table.bind("aftertablesort", function (event, data) {
             var tableElt = data.$th.parent().parent().parent();
