@@ -17,9 +17,9 @@ class trackingProvider():
         self.user = h.getUserID(user)
 
     ###################################################################################
-    def track(self, path, r, isAuthotirzed, passwordProvided):
+    def track(self, path, r, isProtected, isAuthotirzed, passwordProvided):
         trackingFile = h.makePath(self.basePath, ".tracking")
-        headers = ["path", "authorized", "password", "ip", "date"]
+        headers = ["path", "authorized", "password", "ip", "date", "protected"]
         lh = None
         try:
             lh = h.getLockExclusive(h.makePath(h.LOCKS_FOLDER, "_sfl_tracking"), 5)
@@ -29,8 +29,8 @@ class trackingProvider():
                 offset = int(nbLines / 2)
                 if offset > 0: h.writeToCSV(datas[offset:nbLines - offset], trackingFile, headers=headers, append=False)
 
-            h.writeToCSV([[path, isAuthotirzed, passwordProvided if passwordProvided is not None else "", r.remote_addr, h.now()]], trackingFile, headers=headers, append=True)
-            if self.user is not None:h.changeFileOwner(trackingFile, self.user)
+            h.writeToCSV([[path, isAuthotirzed, passwordProvided if passwordProvided is not None else "", r.remote_addr, h.now(), isProtected]], trackingFile, headers=headers, append=True)
+            if self.user is not None: h.changeFileOwner(trackingFile, self.user)
 
         finally:
             if lh is not None: h.releaseLock(lh)
@@ -48,11 +48,12 @@ class trackingProvider():
             i = 0
             for d in datas[::-1]:
                 if protected is not None:
-                    if protected == "yes" and d[2] == "": continue
-                    if protected == "no" and d[2] != "": continue
+                    tProtected = h.parseBool(d[5], False, trueValue="True")
+                    if protected == "yes" and not tProtected: continue
+                    if protected == "no" and tProtected: continue
                 if password is not None and password not in d[2]: continue
                 if item is not None and item not in d[0]: continue
-                trackings.append({"path": d[0], "authorized": d[1], "password": d[2], "ip": d[3], "date": h.parseInt(d[4], 0)})
+                trackings.append({"path": d[0], "authorized": d[1], "password": d[2], "ip": d[3], "date": h.parseInt(d[4], 0), "protected": d[5]})
                 i += 1
                 if maxItems is not None and i > maxItems: break
             return trackings

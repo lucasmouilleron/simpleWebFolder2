@@ -57,8 +57,9 @@
         <thead>
         <tr>
             <th data-sort="string-ins">Item</th>
-            <th data-sort="string-ins" width="200">Password</th>
+            <th data-sort="string-ins" width="100">Protected</th>
             <th data-sort="string-ins" width="100">Authorized</th>
+            <th data-sort="string-ins" width="200">Password</th>
             <th data-sort="string-ins" width="140">IP</th>
             <th data-sort="string-ins" width="160">Date</th>
         </tr>
@@ -69,8 +70,9 @@
                 <% evenClass = "even" if i % 2 == 1 else "odd" %>
                 <tr class="${evenClass}">
                     <td>${tracking["path"]}</td>
-                    <td>${tracking["password"]}</td>
+                    <td>${tracking["protected"]}</td>
                     <td>${tracking["authorized"]}</td>
+                    <td>${tracking["password"]}</td>
                     <td>${tracking["ip"]}</td>
                     <td>${h.formatTimestamp(tracking["date"], "YYYY/MM/DD HH:mm")}</td>
                 </tr>

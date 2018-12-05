@@ -107,7 +107,7 @@ class Server(Thread):
             self.ap.setUserPassword(lowerProtectedPath, request.form.get("password", ""), request, response)
             return self._redirect(path, response)
 
-        if h.TRACKING: tp.track(path, request, isAuthorized, savedPassword)
+        if h.TRACKING: tp.track(path, request, isProtected, isAuthorized, savedPassword)
         if isAuthorized:
             if ip.isItemLeaf(path):
                 if self.ap.isForbidden(path): return self._makeTemplate("forbidden", path=path)
