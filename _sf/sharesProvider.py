@@ -24,7 +24,7 @@ class sharesProvider():
         items = h.listDirectoryItems(self.sharesPath, onlyFiles=True)
         for item in items:
             shareID = os.path.basename(item)
-            if filterID is not None and filterID not in shareID: continue
+            if filterID is not None and filterID.lower() not in shareID.lower(): continue
             shares.append(self.getShare(shareID, asAdmin=True)[0])
         shares = sorted(shares, key=lambda d: d["creation"])[::-1]
         if maxShares is not None: return shares[0:min(maxShares, len(shares))]

@@ -53,8 +53,8 @@ class trackingProvider():
                     tProtected = h.parseBool(d[5], False, trueValue="True")
                     if protected == "yes" and not tProtected: continue
                     if protected == "no" and tProtected: continue
-                if password is not None and password not in d[2]: continue
-                if item is not None and item not in d[0]: continue
+                if password is not None and password.lower() not in d[2].lower(): continue
+                if item is not None and item.lower() not in d[0].lower(): continue
                 trackings.append({"path": d[0], "authorized": d[1], "password": d[2], "ip": d[3], "date": h.parseInt(d[4], 0), "protected": d[5]})
                 i += 1
                 if maxItems is not None and i > maxItems: break

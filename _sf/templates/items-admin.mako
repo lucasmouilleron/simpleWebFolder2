@@ -197,20 +197,20 @@
         });
 
         $("#search-item").keyup(function () {
-            var itemSearch = this.value;
+            var itemSearch = this.value.toLowerCase();
             $(".leafs").hide();
             $(".containers").hide();
             $(".leafs tr.item").hide();
             $(".containers tr.item").hide();
             $(".leafs tr.item").each(function (i, a) {
-                var potentialItem = $(this).attr("data-item");
+                var potentialItem = $(this).attr("data-item").toLowerCase();
                 if (potentialItem.indexOf(itemSearch) !== -1) {
                     $(this).show();
                     $(".leafs").show();
                 }
             });
             $(".containers tr.item").each(function (i, a) {
-                var potentialItem = $(this).attr("data-item");
+                var potentialItem = $(this).attr("data-item").toLowerCase();
                 if (potentialItem.indexOf(itemSearch) !== -1) {
                     $(this).show();
                     $(".containers").show();
@@ -219,12 +219,12 @@
         });
 
         $("#search-password").keyup(function () {
-            var passwordSearch = this.value;
+            var passwordSearch = this.value.toLowerCase();
             $("#passwords span").hide();
             $("#no-found-passwords").hide();
             var found = 0;
             $("#passwords span").each(function (i, a) {
-                var potentialPassword = $(this).attr("data-password");
+                var potentialPassword = $(this).attr("data-password").toLowerCase();
                 if (potentialPassword.indexOf(passwordSearch) !== -1) {
                     $(this).show();
                     found++;
