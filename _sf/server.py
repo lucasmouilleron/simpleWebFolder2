@@ -154,7 +154,7 @@ class Server(Thread):
             if self.ap.addNewPassword(path, passwordToAdd): alerts.append(["Password added", "The password %s has been added." % passwordToAdd])
             else: alerts.append(["Can't add password", "The password %s could not be added." % passwordToAdd])
         isProtected, requiredPasswords, _, _, _ = self.ap.isAuthorized(path, request)
-        containers, leafs = ip.getItems(path, request)
+        containers, leafs = ip.getItems(path, request, asAdmin=True)
         readme = ip.getReadme(path)
         subAlerts = []
         if isProtected and len(requiredPasswords) > 1: subAlerts.append("Password protected, see passwords below.")

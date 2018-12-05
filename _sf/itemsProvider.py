@@ -57,7 +57,7 @@ class itemsProvider():
             raise (e)
 
     ###################################################################################
-    def getItems(self, path, r=None):
+    def getItems(self, path, r=None, asAdmin=False):
         if not self.doesItemExists(path): return [], []
         if self.ap.listingForbidden(path): return [], []
         fullPath = self.getFullPath(path)
@@ -66,19 +66,26 @@ class itemsProvider():
         for item in items:
             if not os.path.isdir(item): continue
             itemPath = item.replace(self.basePath, "")
-            if self.ap.isForbidden(itemPath): continue
-            if self.ap.showForbidden(itemPath): continue
+            if itemPath.lstrip("/").startswith("_sf"): continue
+            isForbidden = self.ap.isForbidden(itemPath)
+            if not asAdmin and isForbidden: continue
+            showForbidden = self.ap.showForbidden(itemPath)
+            if not asAdmin and showForbidden: continue
             if r is not None: protected, requiredPasswords, _, isAuthorized, lowerProtectedPath = self.ap.isAuthorized(itemPath, r)
             else: isAuthorized, requiredPasswords, protected = True, "", False
-            itemsContainers.append({"path": itemPath, "name": os.path.basename(item), "lastModified": os.stat(item).st_mtime, "nbItems": len(h.listDirectoryItems(item)), "isAuthorized": isAuthorized, "passwords": requiredPasswords, "protected": protected})
+            if asAdmin: isAuthorized = True
+            itemsContainers.append({"path": itemPath, "name": os.path.basename(item), "lastModified": os.stat(item).st_mtime, "nbItems": len(h.listDirectoryItems(item)), "isAuthorized": isAuthorized, "passwords": requiredPasswords, "protected": protected, "forbidden": isForbidden, "showForbidden": showForbidden})
         itemsLeafs = []
         for item in items:
             if not os.path.isfile(item): continue
             itemPath = item.replace(self.basePath, "")
-            if self.ap.isForbidden(itemPath): continue
+            if itemPath.lstrip("/").startswith("_sf"): continue
+            isForbidden = self.ap.isForbidden(itemPath)
+            if not asAdmin and isForbidden: continue
             if r is not None: protected, requiredPasswords, _, isAuthorized, lowerProtectedPath = self.ap.isAuthorized(itemPath, r)
             else: isAuthorized, requiredPasswords, protected = True, "", False
-            itemsLeafs.append({"path": itemPath, "name": os.path.basename(item), "lastModified": os.stat(item).st_mtime, "extension": os.path.splitext(item)[-1].replace(".", ""), "size": os.path.getsize(item), "isAuthorized": isAuthorized, "passwords": requiredPasswords, "protected": protected})
+            if asAdmin: isAuthorized = True
+            itemsLeafs.append({"path": itemPath, "name": os.path.basename(item), "lastModified": os.stat(item).st_mtime, "extension": os.path.splitext(item)[-1].replace(".", ""), "size": os.path.getsize(item), "isAuthorized": isAuthorized, "passwords": requiredPasswords, "protected": protected, "forbidden": isForbidden, "showForbidden": showForbidden})
         return itemsContainers, itemsLeafs
 
     ###################################################################################

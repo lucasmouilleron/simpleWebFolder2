@@ -106,11 +106,17 @@
                     % for item in containers:
                         <% evenClass = "even" if i % 2 == 1 else "odd" %>
                         <% urlEncodedPath = h.urlEncode(item["path"])%>
-                        <% isAllowedClass = "disabled" if item["protected"] else ""%>
+                        <% itemSpecial = item["protected"] or item["forbidden"] or item["showForbidden"]%>
+                        <% isAllowedClass = "disabled" if itemSpecial else ""%>
                         <% shareURLEncoded=h.encode(item["path"])%>
                         <% itemURL = h.urlEncode(h.makePath(rootURL , item["path"].lstrip("/"))) %>
+                        <% toggleTooltip = "tooltip" if itemSpecial else ""%>
+                        <% tooltipTitle = []%>
+                        <% if item["protected"]: tooltipTitle.append("protected")%>
+                        <% if item["forbidden"]: tooltipTitle.append("forbidden")%>
+                        <% if item["showForbidden"]: tooltipTitle.append("hidden")%>
                         <tr class="item ${evenClass}" data-item="${item["name"]}">
-                            <td onclick="location.href='${urlEncodedPath}'"><i class="icon fas fa-folder ${isAllowedClass}"></i></td>
+                            <td onclick="location.href='${urlEncodedPath}'" data-toggle="${toggleTooltip}" title="${", ".join(tooltipTitle)}"><i class="icon fas fa-folder ${isAllowedClass}"></i></td>
                             <td onclick="location.href='${urlEncodedPath}'">${item["name"]}</td>
                             <td onclick="location.href='${urlEncodedPath}'">${h.formatTimestamp(item["lastModified"], "YYYY/MM/DD HH:mm")}</td>
                             <td onclick="location.href='${urlEncodedPath}'">${item["nbItems"]}</td>
