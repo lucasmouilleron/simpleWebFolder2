@@ -26,7 +26,7 @@
     <div><a href="${baseURL}/noadmin"><i class="icon fas fas fa-lock-open"></i></a></div>
     <div class="files" data-toggle="tooltip" title="Files"><a href="/" target="_files"><i class="icon fas fa-folder-open"></i></a></div>
     %if sharing:
-        <div class="sharing" data-toggle="tooltip" title="Sharing"><a href="/shares" target="_shares"><i class="icon fas fa-link"></i></a></div>
+        <div class="sharing" data-toggle="tooltip" title="Sharing"><a href="/shares" target="_shares"><i class="icon fas fa-share-alt-square"></i></a></div>
     %endif
 </div>
 
