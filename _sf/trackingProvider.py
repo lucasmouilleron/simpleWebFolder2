@@ -11,7 +11,7 @@ import helper as h
 class trackingProvider():
 
     ###################################################################################
-    def __init__(self, basePath, maxSize=3000, user=None):
+    def __init__(self, basePath, maxSize=3e6, user=None):
         self.basePath = os.path.abspath(basePath)
         self.maxSize = maxSize
         self.user = h.getUserID(user)
@@ -23,7 +23,9 @@ class trackingProvider():
         lh = None
         try:
             lh = h.getLockExclusive(h.makePath(h.LOCKS_FOLDER, "_sfl_tracking"), 5)
-            if h.getFileSize(trackingFile) > self.maxSize:
+            trackingFileSize = h.getFileSize(trackingFile)
+            if trackingFileSize > self.maxSize:
+                h.logInfo("Tracking file too big, splitting in 2", trackingFileSize, self.maxSize)
                 datas = h.readCSV(trackingFile)
                 nbLines = len(datas)
                 offset = int(nbLines / 2)
