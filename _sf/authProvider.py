@@ -90,21 +90,21 @@ class authProvider():
         cookieKey = "_sf_pass_%s" % h.clean(path if path != "" else "-")
         r.cookies = dict(r.cookies)
         r.cookies[cookieKey] = password
-        if response is not None: response.set_cookie(cookieKey, password)
+        if response is not None: response.set_cookie(cookieKey, password, max_age=60 * 60 * 24 * 300)
 
     ###################################################################################
     def setAdminPassword(self, password, r, response=None):
         cookieKey = "_sf_admin_pass"
         r.cookies = dict(r.cookies)
         r.cookies[cookieKey] = password
-        if response is not None: response.set_cookie(cookieKey, password)
+        if response is not None: response.set_cookie(cookieKey, password, max_age=60 * 60 * 24 * 300)
 
     ###################################################################################
     def removeAdminPassword(self, r, response=None):
         cookieKey = "_sf_admin_pass"
         r.cookies = dict(r.cookies)
         r.cookies.pop(cookieKey)
-        if response is not None: response.set_cookie(cookieKey, "")
+        if response is not None: response.set_cookie(cookieKey, "", max_age=60 * 60 * 24 * 300)
 
     ###################################################################################
     def isAuthorized(self, path, r: request):
@@ -130,4 +130,4 @@ class authProvider():
         cookieKey = "_sf_share_pass_%s" % shareID
         r.cookies = dict(r.cookies)
         r.cookies[cookieKey] = password
-        if response is not None: response.set_cookie(cookieKey, password)
+        if response is not None: response.set_cookie(cookieKey, password, max_age=60 * 60 * 24 * 300)
