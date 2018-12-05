@@ -6,6 +6,7 @@ _sf_shares
 _sf_log
 _sf/config/ssl/*
 _sf/config/config.json
+_sf/assets/style.css
 
 ### demo files
 docs
