@@ -15,7 +15,7 @@
 <body>
 
 <div class="header">
-    <a href="${baseURL}/">
+    <a href="${baseURL}/tracking">
         <div class="logo"></div>
     </a>
 </div>

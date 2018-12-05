@@ -15,7 +15,7 @@
 <body>
 
 <div class="header">
-    <a href="${baseURL}/">
+    <a href="${baseURL}/shares">
         <div class="logo"></div>
     </a>
 </div>
