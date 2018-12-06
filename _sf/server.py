@@ -118,7 +118,7 @@ class Server(Thread):
             else:
                 if self.ap.isForbidden(path): return self._makeTemplate("forbidden", path=path)
                 if self.ap.listingForbidden(path): return self._makeTemplate("forbidden", path=path)
-                if "download" in request.args: return self._downloadAndDeleteFile(ip.getZipFile(path, request), "%s.zip" % (os.path.basename(path) if path != "" else "root"))
+                if "download" in request.args and not self.ap.downloadForbidden(path): return self._downloadAndDeleteFile(ip.getZipFile(path, request), "%s.zip" % (os.path.basename(path) if path != "" else "root"))
                 alerts = []
                 containers, leafs = ip.getItems(path, request)
                 readme = ip.getReadme(path)

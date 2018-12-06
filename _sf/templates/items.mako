@@ -24,7 +24,7 @@
 
 <div class="navigation section">
     %if downloadAllowed:
-        <div id="download" data-toggle="tooltip" title="Download folder"><a href="${path}?download"><i class="icon fas fa-download"></i></a></div>
+        <div id="download" data-toggle="tooltip" title="Download folder"><a href="${baseURL}/${path}?download"><i class="icon fas fa-download"></i></a></div>
     %endif
     <div class="parent" data-toggle="tooltip" title="Go to parent folder">
         %if path != "":
