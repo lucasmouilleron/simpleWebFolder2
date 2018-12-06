@@ -179,7 +179,7 @@ class Server(Thread):
         if isProtected and len(requiredPasswords) == 1: subAlerts.append("Password protected: %s" % requiredPasswords[0])
         if self.ap.listingForbidden(path): subAlerts.append("Listing not allowed for non admin users.")
         if self.ap.showForbidden(path): subAlerts.append("Folder not shown for non admin users.")
-        if self.ap.downloadForbidden(path): subAlerts.append("Folder not downloadable.")
+        if self.ap.downloadForbidden(path) and path != "": subAlerts.append("Folder not downloadable.")
         if len(subAlerts) > 0: alerts.append(["Special folder", "<br/>".join(subAlerts)])
         response = make_response(self._makeTemplate("items-admin", isProtected=isProtected, passwords=sorted(requiredPasswords), containers=containers, leafs=leafs, path=path, readme=readme, alerts=alerts))
         return response
