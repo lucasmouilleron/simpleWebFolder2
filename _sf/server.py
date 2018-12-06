@@ -4,7 +4,7 @@
 import signal
 from threading import Thread
 from gevent.wsgi import WSGIServer
-from flask import Flask, request, jsonify, send_from_directory, redirect, make_response, send_file, url_for
+from flask import Flask, request, jsonify, send_from_directory, redirect, make_response, send_file, url_for, Response
 from flask_cors import CORS
 from mako.template import Template
 from mako.lookup import TemplateLookup
@@ -39,7 +39,7 @@ class Server(Thread):
 
         self._addRoute("/hello", self._routeHello, ["GET"])
         self._addRouteRaw("/", self._routeItems, ["GET", "POST"], "index")
-        self._addRouteRaw("/<path:path>", self._routeItems, ["GET", "POST"])
+        self._addRouteRaw("/<path:path>", self._routeItems, ["GET", "POST"], noCache=True)
         self._addRouteRaw("/_sf_assets/<path:path>", self._routeAssets, ["GET"])
         self._addRouteRaw("/admin", self._routeAdmin, ["GET", "POST"])
         self._addRouteRaw("/noadmin", self._routeNoAdmin, ["GET"])
@@ -63,9 +63,24 @@ class Server(Thread):
         self.httpServer.stop()
 
     ###################################################################################
-    def _addRoute(self, rule, callback, methods=["GET"], endpoint=None):
+    def _noCache(self, r=None):
+        if r is None: r = make_response()
+        if r is not None and type(r) != Response: r = make_response(r)
+        headers = dict(r.headers)
+        headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+        headers["Pragma"] = "no-cache"
+        headers["Expires"] = "0"
+        headers["Cache-Control"] = "public, max-age=0"
+        r.headers = headers
+        return r
+
+    ###################################################################################
+    def _addRoute(self, rule, callback, methods=["GET"], endpoint=None, noCache=True):
         def callbackReal(*args, **kwargs):
-            try: return jsonify(callback(*args, **kwargs))
+            try:
+                r = jsonify(callback(*args, **kwargs))
+                if noCache: r = self._noCache(r)
+                return r
             except Exception as e:
                 h.logWarning("Error processing request", request.data.decode("utf-8"), request.endpoint, h.formatException(e))
                 return jsonify({"result": 500, "hint": h.formatException(e)})
@@ -74,9 +89,12 @@ class Server(Thread):
         self.app.add_url_rule(rule, endpoint, callbackReal, methods=methods)
 
     ###################################################################################
-    def _addRouteRaw(self, rule, callback, methods, endpoint=None):
+    def _addRouteRaw(self, rule, callback, methods, endpoint=None, noCache=False):
         def callbackReal(*args, **kwargs):
-            try: return callback(*args, **kwargs)
+            try:
+                r = callback(*args, **kwargs)
+                if noCache: r = self._noCache(r)
+                return r
             except Exception as e:
                 le, lt = h.getLastExceptionAndTrace()
                 print(le)

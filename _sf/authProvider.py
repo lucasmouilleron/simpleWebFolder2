@@ -8,6 +8,7 @@ from flask import request
 ###################################################################################
 COOKIE_DURATION = 60 * 60 * 24 * 300
 
+
 ###################################################################################
 class authProvider():
 
@@ -44,6 +45,7 @@ class authProvider():
 
     ###################################################################################
     def downloadForbidden(self, path):
+        if path == "": return True
         return h.isfile(h.makePath(self.basePath, path, ".nodownload")) or self.showForbidden(path) or self.listingForbidden(path)
 
     ###################################################################################
