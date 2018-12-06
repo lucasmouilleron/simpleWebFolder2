@@ -106,15 +106,16 @@
                     % for item in containers:
                         <% evenClass = "even" if i % 2 == 1 else "odd" %>
                         <% urlEncodedPath = h.urlEncode(item["path"])%>
-                        <% itemSpecial = item["protected"] or item["forbidden"] or item["showForbidden"]%>
-                        <% isAllowedClass = "disabled" if itemSpecial else ""%>
                         <% shareURLEncoded=h.encode(item["path"])%>
                         <% itemURL = h.urlEncode(h.makePath(rootURL , item["path"].lstrip("/"))) %>
-                        <% toggleTooltip = "tooltip-left" if itemSpecial else ""%>
                         <% tooltipTitle = []%>
                         <% if item["protected"]: tooltipTitle.append("protected")%>
                         <% if item["forbidden"]: tooltipTitle.append("forbidden")%>
                         <% if item["showForbidden"]: tooltipTitle.append("hidden")%>
+                        <% if item["listingForbidden"]: tooltipTitle.append("no listing")%>
+                        <% itemSpecial = len(tooltipTitle)>0 %>
+                        <% toggleTooltip = "tooltip-left" if itemSpecial else ""%>
+                        <% isAllowedClass = "disabled" if itemSpecial else ""%>
                         <tr class="item ${evenClass}" data-item="${item["name"]}" data-toggle="${toggleTooltip}" title="${", ".join(tooltipTitle)}">
                             <td onclick="location.href='${urlEncodedPath}'"><i class="icon fas fa-folder ${isAllowedClass}"></i></td>
                             <td onclick="location.href='${urlEncodedPath}'">${item["name"]}</td>

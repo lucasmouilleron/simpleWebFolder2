@@ -59,7 +59,7 @@ class itemsProvider():
     ###################################################################################
     def getItems(self, path, r=None, asAdmin=False):
         if not self.doesItemExists(path): return [], []
-        if self.ap.listingForbidden(path): return [], []
+        if not asAdmin and self.ap.listingForbidden(path): return [], []
         fullPath = self.getFullPath(path)
         items = h.listDirectoryItems(fullPath)
         itemsContainers = []
@@ -74,7 +74,8 @@ class itemsProvider():
             if r is not None: protected, requiredPasswords, _, isAuthorized, lowerProtectedPath = self.ap.isAuthorized(itemPath, r)
             else: isAuthorized, requiredPasswords, protected = True, "", False
             if asAdmin: isAuthorized = True
-            itemsContainers.append({"path": itemPath, "name": os.path.basename(item), "lastModified": os.stat(item).st_mtime, "nbItems": len(h.listDirectoryItems(item)), "isAuthorized": isAuthorized, "passwords": requiredPasswords, "protected": protected, "forbidden": isForbidden, "showForbidden": showForbidden})
+            listingForbidden = self.ap.listingForbidden(itemPath)
+            itemsContainers.append({"path": itemPath, "name": os.path.basename(item), "lastModified": os.stat(item).st_mtime, "nbItems": len(h.listDirectoryItems(item)), "isAuthorized": isAuthorized, "passwords": requiredPasswords, "protected": protected, "forbidden": isForbidden, "showForbidden": showForbidden, "listingForbidden": listingForbidden})
         itemsLeafs = []
         for item in items:
             if not os.path.isfile(item): continue
