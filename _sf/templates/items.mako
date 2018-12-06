@@ -23,14 +23,16 @@
 <div class="name"><a href="${baseURL}/">${h.NAME}</a></div>
 
 <div class="navigation section">
-    <div class="parent" data-toggle="tooltip" title="Go to parent folder">
-        %if path != "":
-            <a href="${baseURL}/${path}/.."><i class="icon fas fa-long-arrow-alt-up"></i></a>
-        % endif
-    </div>
     %if downloadAllowed:
         <div id="download" data-toggle="tooltip" title="Download folder"><a href="${path}?download"><i class="icon fas fa-download"></i></a></div>
     %endif
+    <div class="parent" data-toggle="tooltip" title="Go to parent folder">
+        %if path != "":
+            <a href="${baseURL}/${path}/.."><i class="icon fas fa-long-arrow-alt-up"></i></a>
+        %else:
+            <a class="disabled"><i class="icon fas fa-long-arrow-alt-up"></i></a>
+        % endif
+    </div>
     <div class="page">/${path}</div>
 </div>
 

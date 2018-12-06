@@ -41,7 +41,7 @@
 <div class="block section">
     <div class="section-title">Create share</div>
     %if addShareIsContainer:
-        <div>Warning: You are creating a share on a folder. All sub files and folders of <i>${path}</i> will be accessible from this share.</div>
+        <div class="warning">Warning: You are creating a share on a folder. All sub files and folders of <i>${path}</i> will be accessible from this share.</div>
     %endif
 
 

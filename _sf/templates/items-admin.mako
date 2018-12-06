@@ -34,6 +34,8 @@
     <div class="parent" data-toggle="tooltip" title="Go to parent folder">
         %if path != "":
             <a href="${baseURL}/${path}/.."><i class="icon fas fa-long-arrow-alt-up"></i></a>
+        %else:
+            <a class="disabled"><i class="icon fas fa-long-arrow-alt-up"></i></a>
         % endif
     </div>
     <div class="page">/${path}</div>
@@ -124,8 +126,10 @@
                             <td class="actions">
                                 % if item["protected"]:
                                     <a data-toggle="tooltip" title="Copy link + password" class="link" data-clipboard-text="${itemURL} (password: ${item["passwords"][0]})"><i class="icon fas fa-link"></i></a>
-                                %else:
+                                %elif not item["listingForbidden"]:
                                     <a data-toggle="tooltip" title="Copy link" class="link" data-clipboard-text="${itemURL}"><i class="icon fas fa-link"></i></a>
+                                %else:
+                                    <a data-toggle="tooltip" title="Can't copy link" class="link disabled"><i class="icon fas fa-link"></i></a>
                                 % endif
                                 % if h.SHARING:
                                     <a data-toggle="tooltip" title="Create share" href="${rootURL}/create-share=${shareURLEncoded}" target="_shares"><i class="icon fas fa-share-alt-square"></i></a>

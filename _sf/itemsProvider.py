@@ -57,9 +57,9 @@ class itemsProvider():
             raise (e)
 
     ###################################################################################
-    def getItems(self, path, r=None, asAdmin=False):
+    def getItems(self, path, r=None, asAdmin=False, overrideListingForbidden=False, overrideNoShow=False):
         if not self.doesItemExists(path): return [], []
-        if not asAdmin and self.ap.listingForbidden(path): return [], []
+        if not overrideListingForbidden and not asAdmin and self.ap.listingForbidden(path): return [], []
         fullPath = self.getFullPath(path)
         items = h.listDirectoryItems(fullPath)
         itemsContainers = []
@@ -70,7 +70,7 @@ class itemsProvider():
             isForbidden = self.ap.isForbidden(itemPath)
             if not asAdmin and isForbidden: continue
             showForbidden = self.ap.showForbidden(itemPath)
-            if not asAdmin and showForbidden: continue
+            if not overrideNoShow and not asAdmin and showForbidden: continue
             if r is not None: protected, requiredPasswords, _, isAuthorized, lowerProtectedPath = self.ap.isAuthorized(itemPath, r)
             else: isAuthorized, requiredPasswords, protected = True, "", False
             if asAdmin: isAuthorized = True

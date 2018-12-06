@@ -242,7 +242,7 @@ class Server(Thread):
         if ip.isItemLeaf(path): return send_from_directory(h.DATA_FOLDER, path)
         else:
             alerts = []
-            containers, leafs = self.ip.getItems(path)
+            containers, leafs = self.ip.getItems(path, overrideListingForbidden=True, overrideNoShow=True)
             return self._makeTemplate("share", displayPath=displayPath, shareBasePath=shareBasePath, subPath=subPath, share=share, containers=containers, leafs=leafs, alerts=alerts, readme=ip.getReadme(path))
 
     ###################################################################################

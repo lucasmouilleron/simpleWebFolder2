@@ -63,6 +63,7 @@ class sharesProvider():
                 if r is not None: view["ip"] = r.remote_addr
                 if subPath is not None: view["item"] = h.makePath(share["file"], subPath)
                 views.append(view)
+                views = sorted(views, key=lambda v: v["date"])[::-1]
                 share["views"] = views
                 h.writeJsonFile(sharePath, share)
                 if self.user is not None: h.changeFileOwner(sharePath, self.user)
