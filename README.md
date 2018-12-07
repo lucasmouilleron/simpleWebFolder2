@@ -25,7 +25,7 @@
 - Edit `_sf/assets/style.css`
     
 ## TODO
+- Upload to tmp folder: http://flask.pocoo.org/docs/1.0/patterns/fileuploads/
 - Clean tmp folder
-- Upload to tmp folder
 - Clean shares
 - Track and clean tracking periodicly to file (and not on the fly)

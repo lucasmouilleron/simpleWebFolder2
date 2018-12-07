@@ -48,6 +48,10 @@
         </div>
     %endfor
 
+    %if addAllowed:
+        add form
+    %endif
+
     %if isProtected:
         <div class="block section">
             <div class="section-title">Add a password</div>
