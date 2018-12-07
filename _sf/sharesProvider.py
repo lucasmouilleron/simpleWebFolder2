@@ -37,7 +37,6 @@ class sharesProvider():
             shareID = os.path.basename(item)
             if filterID is not None and filterID.lower() not in shareID.lower(): continue
             shares.append(self.getShare(shareID, asAdmin=True)[0])
-        print(shares)
         shares = sorted(shares, key=lambda d: d.creation)[::-1]
         if maxShares is not None: return shares[0:min(maxShares, len(shares))]
         else: return shares
