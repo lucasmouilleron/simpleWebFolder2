@@ -14,10 +14,22 @@ import zipfile
 class itemsProvider():
 
     ###################################################################################
-    def __init__(self, ap: ap.authProvider, basePath, maxZipSize=50e6):
+    def __init__(self, ap: ap.authProvider, basePath, maxZipSize=50e6, tmpFolder=None, tmpFolderDuration=None, user=None):
         self.basePath = os.path.abspath(basePath)
         self.maxZipSize = maxZipSize
+        self.tmpFolder = tmpFolder
+        self.tmpFolderDuration = tmpFolderDuration
+        self.user = h.getUserID(user)
         self.ap = ap
+
+        if self.tmpFolder is not None:
+            tmpPath = h.makePath(self.basePath, self.tmpFolder)
+            if not os.path.exists(tmpPath):
+                h.makeDir(tmpPath)
+                if self.user is not None: h.changeFileOwner(tmpPath, self.user)
+            ap.setListingForbidden(self.tmpFolder)
+            ap.setDownloadForbidden(self.tmpFolder)
+            ap.setShowForbidden(self.tmpFolder)
 
     ###################################################################################
     def getFullPath(self, path):

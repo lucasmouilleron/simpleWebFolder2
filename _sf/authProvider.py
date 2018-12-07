@@ -39,14 +39,27 @@ class authProvider():
     def listingForbidden(self, path):
         return h.isfile(h.makePath(self.basePath, path, ".nolist"))
 
+
+    ###################################################################################
+    def setListingForbidden(self, path):
+        h.writeToFile(h.makePath(self.basePath, path, ".nolist"), "")
+
     ###################################################################################
     def showForbidden(self, path):
         return h.isfile(h.makePath(self.basePath, path, ".noshow"))
 
     ###################################################################################
+    def setShowForbidden(self, path):
+        h.writeToFile(h.makePath(self.basePath, path, ".noshow"), "")
+
+    ###################################################################################
     def downloadForbidden(self, path):
         if path == "": return True
         return h.isfile(h.makePath(self.basePath, path, ".nodownload")) or self.showForbidden(path) or self.listingForbidden(path)
+
+    ###################################################################################
+    def setDownloadForbidden(self, path):
+        h.writeToFile(h.makePath(self.basePath, path, ".nodownload"), "")
 
     ###################################################################################
     def getLowerProtectedPath(self, path):

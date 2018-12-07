@@ -52,7 +52,7 @@
 </div>
 
 <div class="trackings section">
-    <div class="section-title">Trackings</div>
+    <div class="section-title">${len(trackings)} trackings</div>
     <table>
         <thead>
         <tr>

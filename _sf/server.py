@@ -335,7 +335,7 @@ h.logInfo("Tracking provider built")
 sp = sp.sharesProvider(ap, h.makePath(h.DATA_FOLDER, "_sf_shares"), user=h.USER)
 h.logInfo("Shares provider built")
 
-ip = ip.itemsProvider(ap, h.DATA_FOLDER)
+ip = ip.itemsProvider(ap, h.DATA_FOLDER, tmpFolder=h.CONFIG.get("tmp folder", None),tmpFolderDuration=h.CONFIG.get("tmp folder duration in days", None), user=h.USER)
 h.logInfo("Items provider built")
 
 server = Server(ip, ap, sp, h.PORT, h.SSL, h.CERTIFICATE_KEY_FILE, h.CERTIFICATE_CRT_FILE, h.FULLCHAIN_CRT_FILE, aliases=h.CONFIG.get("aliases", None))

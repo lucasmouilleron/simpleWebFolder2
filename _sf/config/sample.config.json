@@ -5,11 +5,13 @@
   "mail": "lucas.mouilleron@me.com",
   "port": 80,
   "ssl": false,
-  "secondary port":null,
+  "secondary port": null,
   "admin password": "pass1234",
   "tracking": true,
   "sharing": true,
   "store log": true,
   "user": "lucas",
+  "tmp folder": "/tmp",
+  "tmp folder duration in days": 5,
   "aliases": {}
 }
