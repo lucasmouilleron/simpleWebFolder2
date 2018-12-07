@@ -210,6 +210,7 @@ class Server(Thread):
     ###################################################################################
     def _routeShareAdd(self, path):
         if not self.ap.isAdmin(request): return self._redirect("/admin")
+        if self.ap.shareForbidden(path): return self._makeTemplate("forbidden", path=path)
         alerts = []
         path = h.decode(path)
         shareID = request.form.get("shareID", "")

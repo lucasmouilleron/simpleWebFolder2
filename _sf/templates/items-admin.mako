@@ -117,6 +117,7 @@
                         <% if item["showForbidden"]: tooltipTitle.append("hidden")%>
                         <% if item["listingForbidden"]: tooltipTitle.append("no listing")%>
                         <% if item["shareForbidden"]: tooltipTitle.append("no share")%>
+                        <% if item["isTmpFolder"]: tooltipTitle.append("upload allowed")%>
                         <% itemSpecial = len(tooltipTitle)>0 %>
                         <% toggleTooltip = "tooltip-left" if itemSpecial else ""%>
                         <% isAllowedClass = "disabled" if itemSpecial else ""%>
