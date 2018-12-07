@@ -189,7 +189,7 @@ class Server(Thread):
         subAlerts = []
         if isProtected and len(requiredPasswords) > 1: subAlerts.append("Password protected, see passwords below.")
         if isProtected and len(requiredPasswords) == 1: subAlerts.append("Password protected: %s" % requiredPasswords[0])
-        if isTmpFolder == path: subAlerts.append("Tmp folder.")
+        if isTmpFolder: subAlerts.append("Tmp folder.")
         if addAllowed: subAlerts.append("Upload allowed.")
         if self.ap.listingForbidden(path): subAlerts.append("Listing not allowed for non admin users.")
         if self.ap.showForbidden(path): subAlerts.append("Folder not shown for non admin users.")
