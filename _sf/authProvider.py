@@ -25,6 +25,14 @@ class authProvider():
         else: return False
 
     ###################################################################################
+    def isAddAllowed(self, path):
+        return h.isfile(h.makePath(self.basePath, path, ".addallowed"))
+
+    ###################################################################################
+    def setAddAllowed(self, path):
+        h.writeToFile(h.makePath(self.basePath, path, ".addallowed"), "")
+
+    ###################################################################################
     def isForbidden(self, path):
         path = path.lstrip("/")
         if path.startswith("_sf"): return True
@@ -38,7 +46,6 @@ class authProvider():
     ###################################################################################
     def listingForbidden(self, path):
         return h.isfile(h.makePath(self.basePath, path, ".nolist"))
-
 
     ###################################################################################
     def setListingForbidden(self, path):

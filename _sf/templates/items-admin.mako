@@ -106,7 +106,7 @@
                 <tr>
                     <% i = 0 %>
                     % for item in containers:
-                        <% folderClass="fa-folder-plus" if item["isTmpFolder"] else "fa-folder"%>
+                        <% folderClass="fa-folder-plus" if item["addAllowed"] else "fa-folder"%>
                         <% evenClass = "even" if i % 2 == 1 else "odd" %>
                         <% urlEncodedPath = h.urlEncode(item["path"])%>
                         <% shareURLEncoded=h.encode(item["path"])%>
@@ -117,7 +117,8 @@
                         <% if item["showForbidden"]: tooltipTitle.append("hidden")%>
                         <% if item["listingForbidden"]: tooltipTitle.append("no listing")%>
                         <% if item["shareForbidden"]: tooltipTitle.append("no share")%>
-                        <% if item["isTmpFolder"]: tooltipTitle.append("upload allowed")%>
+                        <% if item["isTmpFolder"]: tooltipTitle.append("tmp folder")%>
+                        <% if item["addAllowed"]: tooltipTitle.append("upload allowed")%>
                         <% itemSpecial = len(tooltipTitle)>0 %>
                         <% toggleTooltip = "tooltip-left" if itemSpecial else ""%>
                         <% isAllowedClass = "disabled" if itemSpecial else ""%>

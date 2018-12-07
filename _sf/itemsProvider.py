@@ -31,6 +31,7 @@ class itemsProvider():
             ap.setDownloadForbidden(self.tmpFolder)
             ap.setShowForbidden(self.tmpFolder)
             ap.setShareForbidden(self.tmpFolder)
+            ap.setAddAllowed(self.tmpFolder)
 
     ###################################################################################
     def getFullPath(self, path):
@@ -89,8 +90,9 @@ class itemsProvider():
             if asAdmin: isAuthorized = True
             listingForbidden = self.ap.listingForbidden(itemPath)
             shareForbidden = self.ap.shareForbidden(itemPath)
+            addAllowed = self.ap.isAddAllowed(itemPath)
             isTmpFolder = itemPath.lstrip("/") == self.tmpFolder
-            itemsContainers.append({"path": itemPath, "name": os.path.basename(item), "lastModified": os.stat(item).st_mtime, "nbItems": len(h.listDirectoryItems(item)), "isAuthorized": isAuthorized, "passwords": requiredPasswords, "protected": protected, "forbidden": isForbidden, "showForbidden": showForbidden, "listingForbidden": listingForbidden, "shareForbidden": shareForbidden, "isTmpFolder": isTmpFolder})
+            itemsContainers.append({"path": itemPath, "name": os.path.basename(item), "lastModified": os.stat(item).st_mtime, "nbItems": len(h.listDirectoryItems(item)), "isAuthorized": isAuthorized, "passwords": requiredPasswords, "protected": protected, "forbidden": isForbidden, "showForbidden": showForbidden, "listingForbidden": listingForbidden, "shareForbidden": shareForbidden, "isTmpFolder": isTmpFolder, "addAllowed": addAllowed})
         itemsLeafs = []
         for item in items:
             if not os.path.isfile(item): continue

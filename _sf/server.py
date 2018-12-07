@@ -171,13 +171,18 @@ class Server(Thread):
             passwordToAdd = request.form.get("new-password", None)
             if self.ap.addNewPassword(path, passwordToAdd): alerts.append(["Password added", "The password %s has been added." % passwordToAdd])
             else: alerts.append(["Can't add password", "The password %s could not be added." % passwordToAdd])
+        if request.form.get("add-leaf", False):
+            if not self.ap.isAddAllowed(path): return self._makeTemplate("forbidden", path=path)
+            file = request.files["file"]
+            print(file)
         isProtected, requiredPasswords, _, _, _ = self.ap.isAuthorized(path, request)
         containers, leafs = ip.getItems(path, request, asAdmin=True)
         readme = ip.getReadme(path)
         subAlerts = []
         if isProtected and len(requiredPasswords) > 1: subAlerts.append("Password protected, see passwords below.")
         if isProtected and len(requiredPasswords) == 1: subAlerts.append("Password protected: %s" % requiredPasswords[0])
-        if self.ip.tmpFolder == path: subAlerts.append("Tmp folder, temporary upload alowed.")
+        if self.ip.tmpFolder == path: subAlerts.append("Tmp folder.")
+        if self.ap.isAddAllowed(path): subAlerts.append("Upload allowed.")
         if self.ap.listingForbidden(path): subAlerts.append("Listing not allowed for non admin users.")
         if self.ap.showForbidden(path): subAlerts.append("Folder not shown for non admin users.")
         if self.ap.shareForbidden(path): subAlerts.append("Folder cannot be shared with Sares.")
