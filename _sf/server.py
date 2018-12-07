@@ -196,7 +196,7 @@ class Server(Thread):
         if self.ap.shareForbidden(path): subAlerts.append("Folder cannot be shared with Sares.")
         if self.ap.downloadForbidden(path) and path != "": subAlerts.append("Folder not downloadable.")
         if len(subAlerts) > 0: alerts.append(["Special folder", "<br/>".join(subAlerts)])
-        response = make_response(self._makeTemplate("items-admin", isProtected=isProtected, passwords=sorted(requiredPasswords), containers=containers, leafs=leafs, path=path, readme=readme, alerts=alerts, addAllowed=addAllowed, isTmpFolder = isTmpFolder))
+        response = make_response(self._makeTemplate("items-admin", isProtected=isProtected, passwords=sorted(requiredPasswords), containers=containers, leafs=leafs, path=path, readme=readme, alerts=alerts, addAllowed=addAllowed, isTmpFolder=isTmpFolder))
         return response
 
     ###################################################################################
@@ -229,6 +229,7 @@ class Server(Thread):
         shareID = request.form.get("shareID", "")
         defaultShareID = request.form.get("defaultShareID", h.uniqueIDSmall())
         duration = request.form.get("duration", "")
+        durationInSecs = h.parseInt(duration, 0) * 24 * 60 * 60
         password = request.form.get("password", "")
         shareSubmit = request.form.get("create-share-submit", False)
         shareForceSubmit = request.form.get("create-share-force-submit", False)
@@ -240,7 +241,7 @@ class Server(Thread):
             if shareID == "": alerts.append(["Can't create Share", "Share ID provided is invalid."])
             else:
                 if not sp.shareExists(shareID) or shareForceSubmit:
-                    share, hint = self.sp.addShare(shareID, path, duration, password)
+                    share, hint = self.sp.addShare(shareID, path, durationInSecs, password)
                     if share is not None:
                         alerts.append(["Share created", "The Share %s has been created for %s" % (shareID, path)])
                         return self._routeShares(alerts)
@@ -263,7 +264,7 @@ class Server(Thread):
         isAdmin = self.ap.isAdmin(request)
         subPath = os.path.normpath(shareIDAndPath.replace(shareID, "")).lstrip("/").rstrip("/").lstrip(".")
         share, hint = self.sp.getShare(shareID, asAdmin=isAdmin, r=request, subPath=subPath)
-        if share is None: raise Exception("Can't get Share %s, hint:%s" % (shareID, hint))
+        if share is None: raise Exception("Can't get Share %s, %s" % (shareID, hint))
 
         if isAdmin: return self._makeTemplate("share-admin", shareID=shareID, share=share)
 
@@ -351,7 +352,7 @@ h.logInfo("Tracking provider built")
 sp = sp.sharesProvider(ap, h.makePath(h.DATA_FOLDER, "_sf_shares"), user=h.USER)
 h.logInfo("Shares provider built")
 
-ip = ip.itemsProvider(ap, h.DATA_FOLDER, tmpFolder=h.CONFIG.get("tmp folder", None), tmpFolderDuration=h.CONFIG.get("tmp folder duration in days", None), user=h.USER)
+ip = ip.itemsProvider(ap, h.DATA_FOLDER, tmpFolder=h.CONFIG.get("tmp folder", None), tmpFolderDuratioInDaysn=h.CONFIG.get("tmp folder duration in days", None), user=h.USER)
 h.logInfo("Items provider built")
 
 server = Server(ip, ap, sp, h.PORT, h.SSL, h.CERTIFICATE_KEY_FILE, h.CERTIFICATE_CRT_FILE, h.FULLCHAIN_CRT_FILE, aliases=h.CONFIG.get("aliases", None), maxUploadSize=h.CONFIG.get("max upload size", 20e6))

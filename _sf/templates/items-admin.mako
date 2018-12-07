@@ -110,7 +110,7 @@
                     <th data-sort="string-ins" style="width:20%;">Last modified</th>
                     <th data-sort="int" style="width:10%;"># items</th>
                     %if isTmpFolder:
-                        <th data-sort="int" style="width:10%;">Expiration</th>
+                        <th data-sort="int" style="width:20%;">Expiration</th>
                     %endif
                     <th width="70">Actions</th>
                 </tr>
@@ -141,7 +141,7 @@
                             <td onclick="location.href='${urlEncodedPath}'">${h.formatTimestamp(item["lastModified"], "YYYY/MM/DD HH:mm")}</td>
                             <td onclick="location.href='${urlEncodedPath}'">${item["nbItems"]}</td>
                             %if isTmpFolder:
-                                <td onclick="location.href='${urlEncodedPath}'">todo</td>
+                                <td onclick="location.href='${urlEncodedPath}'">${h.formatTimestamp(item["expires"],"YYYY/MM/DD HH:mm")}</td>
                             %endif
                             <td class="actions">
                                 % if item["protected"]:
@@ -151,7 +151,7 @@
                                 %else:
                                     <a data-toggle="tooltip" title="Can't copy link" class="link disabled"><i class="icon fas fa-link"></i></a>
                                 % endif
-                                % if h.SHARING:
+                                % if h.SHARING and not isTmpFolder:
                                     %if not item["shareForbidden"]:
                                         <a data-toggle="tooltip" title="Create share" href="${rootURL}/create-share=${shareURLEncoded}" target="_shares"><i class="icon fas fa-share-alt-square"></i></a>
                                     %else:
@@ -178,7 +178,7 @@
                     <th data-sort="string-ins" style="width:20%;">Last modified</th>
                     <th data-sort="float" style="width:10%;">Size (mb)</th>
                     %if isTmpFolder:
-                        <th data-sort="int" style="width:10%;">Expiration</th>
+                        <th data-sort="int" style="width:20%;">Expiration</th>
                     %endif
                     <th width="70">Actions</th>
                 </tr>
@@ -198,7 +198,7 @@
                             <td onclick="window.open('${urlEncodedPath}')">${h.formatTimestamp(item["lastModified"], "YYYY/MM/DD HH:mm")}</td>
                             <td onclick="window.open('${urlEncodedPath}')">${sizeMB}</td>
                             %if isTmpFolder:
-                                <td onclick="location.href='${urlEncodedPath}'">todo</td>
+                                <td onclick="location.href='${urlEncodedPath}'">${h.formatTimestamp(item["expires"],"YYYY/MM/DD HH:mm")}</td>
                             %endif
                             <td class="actions">
                                 % if item["protected"]:
@@ -206,7 +206,7 @@
                                 %else:
                                     <a data-toggle="tooltip" title="Copy link" class="link" data-clipboard-text="${itemURL}"><i class="icon fas fa-link"></i></a>
                                 % endif
-                                % if h.SHARING:
+                                % if h.SHARING and not isTmpFolder:
                                     <a data-toggle="tooltip" title="Create share" href="${rootURL}/create-share=${shareURLEncoded}" target="_shares"><i class="icon fas fa-share-alt-square"></i></a>
                                 % endif
                             </td>

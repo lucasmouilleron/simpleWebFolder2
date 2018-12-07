@@ -16,11 +16,11 @@ import threading
 class itemsProvider():
 
     ###################################################################################
-    def __init__(self, ap: ap.authProvider, basePath, maxZipSize=50e6, tmpFolder=None, tmpFolderDuration=7, user=None):
+    def __init__(self, ap: ap.authProvider, basePath, maxZipSize=50e6, tmpFolder=None, tmpFolderDuratioInDaysn=7, user=None):
         self.basePath = os.path.abspath(basePath)
         self.maxZipSize = maxZipSize
         self.tmpFolder = tmpFolder.lstrip("/")
-        self.tmpFolderDuration = tmpFolderDuration
+        self.tmpFolderDuration = tmpFolderDuratioInDaysn * 24 * 60 * 60
         self.user = h.getUserID(user)
         self.ap = ap
         self.cleanTmpThread = None
@@ -35,7 +35,7 @@ class itemsProvider():
             ap.setShowForbidden(self.tmpFolder)
             ap.setShareForbidden(self.tmpFolder)
             ap.setAddAllowed(self.tmpFolder)
-            self.cleanTmpThread = CleanTmp(tmpPath, tmpFolderDuration)
+            self.cleanTmpThread = CleanTmp(tmpPath, self.tmpFolderDuration)
             self.cleanTmpThread.start()
 
     ###################################################################################
@@ -103,7 +103,7 @@ class itemsProvider():
             addAllowed = self.ap.isAddAllowed(itemPath)
             isTmpFolder = itemPath.lstrip("/") == self.tmpFolder
             expires = 0
-            if containerIsTmpFolder: expires = 1
+            if containerIsTmpFolder:  expires = h.getFileModified(h.makePath(self.basePath, itemPath)) + self.tmpFolderDuration
             itemsContainers.append({"path": itemPath, "name": os.path.basename(item), "lastModified": os.stat(item).st_mtime, "nbItems": len(h.listDirectoryItems(item)), "isAuthorized": isAuthorized, "passwords": requiredPasswords, "protected": protected, "forbidden": isForbidden, "showForbidden": showForbidden, "listingForbidden": listingForbidden, "shareForbidden": shareForbidden, "isTmpFolder": isTmpFolder, "addAllowed": addAllowed, "expires": expires})
         itemsLeafs = []
         for item in items:
@@ -116,7 +116,7 @@ class itemsProvider():
             else: isAuthorized, requiredPasswords, protected = True, "", False
             if asAdmin: isAuthorized = True
             expires = 0
-            if containerIsTmpFolder: expires = 1
+            if containerIsTmpFolder:  expires = h.getFileModified(h.makePath(self.basePath, itemPath)) + self.tmpFolderDuration
             itemsLeafs.append({"path": itemPath, "name": os.path.basename(item), "lastModified": os.stat(item).st_mtime, "extension": os.path.splitext(item)[-1].replace(".", ""), "size": os.path.getsize(item), "isAuthorized": isAuthorized, "passwords": requiredPasswords, "protected": protected, "forbidden": isForbidden, "expires": expires})
         return itemsContainers, itemsLeafs
 
@@ -157,12 +157,12 @@ class itemsProvider():
 class CleanTmp(Thread):
 
     ###################################################################################
-    def __init__(self, tmpFolder, tmpDurationInDays):
+    def __init__(self, tmpFolder, tmpDuration):
         Thread.__init__(self)
         self._interrupt = False
         self._exitEvent = threading.Event()
         self.tmpFolder = tmpFolder
-        self.tmpDuration = tmpDurationInDays * 24 * 60 * 60
+        self.tmpDuration = tmpDuration
 
     ###################################################################################
     def run(self):
