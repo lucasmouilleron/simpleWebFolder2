@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="${baseURL}/_sf_assets/tooltipster.css">
     <link rel="stylesheet" href="${baseURL}/_sf_assets/tooltipster-theme.css">
     <link rel="stylesheet" href="${baseURL}/_sf_assets/style.css?ck=2">
-    <title>${h.NAME} - Admin - Share ${share["ID"]}</title>
+    <title>${h.NAME} - Admin - Share ${share.ID}</title>
 </head>
 
 <body>
@@ -32,8 +32,8 @@
 </div>
 
 <div class="share section">
-    <div class="section-title">Share ${share["ID"]}</div>
-    <% shareExpires = "Never" if share.get("duration",0)==0 else h.formatTimestamp(share["duration"]+share["creation"], "YYYY/MM/DD HH:mm")%>
+    <div class="section-title">Share ${share.ID}</div>
+    <% shareExpires = "Never" if share.duration==0 else h.formatTimestamp(share.duration+share.creation, "YYYY/MM/DD HH:mm")%>
     <table>
         <thead>
         <tr>
@@ -48,19 +48,19 @@
         <tbody>
 
         <tr>
-            <td>${share["ID"]}</td>
+            <td>${share.ID}</td>
             <td></td>
-            <td onclick="window.open('/${share["file"]}')"><a>${share["file"]}</a></td>
+            <td onclick="window.open('/${share.file}')"><a>${share.file}</a></td>
             <td>${shareExpires}</td>
-            <td>${share["password"]}</td>
-            <td>${len(share.get("views", []))}</td>
+            <td>${share.password}</td>
+            <td>${len(share.views)}</td>
         </tr>
         </tbody>
     </table>
 </div>
 
 <div class="views section">
-    <div class="section-title">Share ${share["ID"]} views</div>
+    <div class="section-title">Share ${share.ID} views</div>
     <table>
         <thead>
         <tr>
@@ -71,7 +71,7 @@
         </thead>
         <tbody>
             <% i = 0 %>
-            %for view in share.get("views",[]):
+            %for view in share.views:
                 <% evenClass = "even" if i % 2 == 1 else "odd" %>
                 <tr class="${evenClass}">
                     <td>${view["ip"]}</td>
@@ -89,7 +89,7 @@
 
 <script>
     $(document).ready(function () {
-        window.name = "_share_${share["ID"]}";
+        window.name = "_share_${share.ID}";
 
         $('[data-toggle="tooltip"]').tooltipster({theme: "tooltipster-borderless", animationDuration: 200, delay: 20, side: "bottom"});
         var table = $("table").stupidtable();

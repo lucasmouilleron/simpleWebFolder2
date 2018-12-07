@@ -9,6 +9,19 @@ import authProvider as ap
 ###################################################################################
 ###################################################################################
 ###################################################################################
+class share:
+    def __init__(self, ID, creation, file, views, password, duration):
+        self.ID = ID
+        self.creation = creation
+        self.file = file
+        self.views = views
+        self.password = password
+        self.duration = duration
+
+
+###################################################################################
+###################################################################################
+###################################################################################
 class sharesProvider():
 
     ###################################################################################
@@ -26,7 +39,8 @@ class sharesProvider():
             shareID = os.path.basename(item)
             if filterID is not None and filterID.lower() not in shareID.lower(): continue
             shares.append(self.getShare(shareID, asAdmin=True)[0])
-        shares = sorted(shares, key=lambda d: d["creation"])[::-1]
+        print(shares)
+        shares = sorted(shares, key=lambda d: d.creation)[::-1]
         if maxShares is not None: return shares[0:min(maxShares, len(shares))]
         else: return shares
 
@@ -38,10 +52,10 @@ class sharesProvider():
         lh = None
         try:
             lh = h.getLockExclusive(h.makePath(h.LOCKS_FOLDER, "_sf_share%s" % h.clean(shareID)), 5)
-            share = {"ID": shareID, "file": path, "duration": duration, "password": password, "creation": h.now()}
-            h.writeJsonFile(sharePath, share)
+            s = share(shareID, h.now(), path, [], password, duration)
+            h.writeJsonFile(sharePath, {"ID": s.ID, "file": s.file, "creation": s.creation, "views": s.views, "duration": s.duration, "password": s.password})
             if self.user is not None: h.changeFileOwner(sharePath, self.user)
-            return share, "ok"
+            return s, "ok"
         except:
             le, lt = h.getLastExceptionAndTrace()
             return None, le
@@ -51,23 +65,26 @@ class sharesProvider():
     ###################################################################################
     def getShare(self, shareID, r=None, subPath=None, asAdmin=False):
         sharePath = h.makePath(self.sharesPath, shareID)
-        if not os.path.exists(sharePath): return None
+        if not os.path.exists(sharePath): return None, None
         lh = None
         try:
             lh = h.getLockExclusive(h.makePath(h.LOCKS_FOLDER, "_sf_share%s" % h.clean(shareID)), 5)
-            share = h.loadJsonFile(sharePath)
-            if not asAdmin and share["duration"] >0 and share["duration"] + share["creation"] < h.now(): return None, "Share has expired"
+            shareJson = h.loadJsonFile(sharePath)
+            s = share(shareJson["ID"], shareJson["creation"], shareJson["file"], shareJson.get("views", []), shareJson.get("password"), shareJson.get("duration", 0))
+            if not asAdmin and s.duration > 0 and s.duration + s.creation < h.now(): return None, "Share has expired"
             if not asAdmin:
-                views = share.get("views", [])
+                views = s.views
                 view = {"date": h.now()}
                 if r is not None: view["ip"] = r.remote_addr
-                if subPath is not None: view["item"] = h.makePath(share["file"], subPath)
+                if subPath is not None: view["item"] = h.makePath(s.file, subPath)
                 views.append(view)
                 views = sorted(views, key=lambda v: v["date"])[::-1]
-                share["views"] = views
-                h.writeJsonFile(sharePath, share)
+                s.views = views
+                print(views)
+                h.writeJsonFile(sharePath, {"ID": s.ID, "file": s.file, "creation": s.creation, "views": s.views, "duration": s.duration, "password": s.password})
                 if self.user is not None: h.changeFileOwner(sharePath, self.user)
-            return share, "ok"
+
+            return s, "ok"
         except:
             le, lt = h.getLastExceptionAndTrace()
             return None, le

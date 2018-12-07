@@ -70,22 +70,22 @@
             %for share in shares:
                 <% shareURL = "ok"%>
                 <% evenClass = "even" if i % 2 == 1 else "odd"%>
-                <% shareExpires = "Never" if share.get("duration",0)==0 else h.formatTimestamp(share["duration"]+share["creation"], "YYYY/MM/DD HH:mm")%>
+                <% shareExpires = "Never" if share.duration==0 else h.formatTimestamp(share.duration+share.creation, "YYYY/MM/DD HH:mm")%>
                 <tr class="${evenClass}">
-                    <td>${share["ID"]}</td>
-                    <td onclick="window.open('/${share["file"]}')"><a>${share["file"]}</a></td>
+                    <td>${share.ID}</td>
+                    <td onclick="window.open('/${share.file}')"><a>${share.file}</a></td>
                     <td>${shareExpires}</td>
-                    <td>${share["password"]}</td>
-                    <td>${len(share.get("views", []))}</td>
+                    <td>${share.password}</td>
+                    <td>${len(share.views)}</td>
                     <td>
-                        %if len(share.get("views", []))>0:
-                        ${h.formatTimestamp(share["views"][-1]["date"], "YYYY/MM/DD HH:mm")}
+                        %if len(share.views)>0:
+                        ${h.formatTimestamp(share.views[-1]["date"], "YYYY/MM/DD HH:mm")}
                         %endif
                     </td>
                     <td class="actions">
-                        <% shareIDEncoded = h.urlEncode(share["ID"])%>
-                        % if share["password"]!="":
-                            <a class="link" data-clipboard-text="${rootURL}/share=${shareIDEncoded} (password: ${share["password"]})" data-toggle="tooltip" title="Copy link"><i class="icon fas fa-link"></i></a>
+                        <% shareIDEncoded = h.urlEncode(share.ID)%>
+                        % if share.password!="":
+                            <a class="link" data-clipboard-text="${rootURL}/share=${shareIDEncoded} (password: ${share.password})" data-toggle="tooltip" title="Copy link"><i class="icon fas fa-link"></i></a>
                         %else:
                             <a class="link" data-clipboard-text="${rootURL}/share=${shareIDEncoded}" data-toggle="tooltip" title="Copy link"><i class="icon fas fa-link"></i></a>
                         % endif

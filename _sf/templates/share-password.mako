@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="${baseURL}/_sf_assets/tooltipster.css">
     <link rel="stylesheet" href="${baseURL}/_sf_assets/tooltipster-theme.css">
     <link rel="stylesheet" href="${baseURL}/_sf_assets/style.css?ck=2">
-    <title>${h.NAME} - Share ${share["ID"]}</title>
+    <title>${h.NAME} - Share ${share.ID}</title>
 </head>
 
 <body>

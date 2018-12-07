@@ -269,8 +269,8 @@ class Server(Thread):
 
         if isAdmin: return self._makeTemplate("share-admin", shareID=shareID, share=share)
 
-        sharePassword = share.get("password", "")
-        shareBasePath = share["file"]
+        sharePassword = share.password
+        shareBasePath = share.file
         path = h.makePath(shareBasePath, subPath).rstrip("/")
         displayPath = path.replace(shareBasePath, shareID)
         if sharePassword != "" and not isAdmin and not self.ap.isShareAuthorized(shareID, request): return self._makeTemplate("share-password", displayPath=displayPath, share=share)

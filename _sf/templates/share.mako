@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="${baseURL}/_sf_assets/tooltipster.css">
     <link rel="stylesheet" href="${baseURL}/_sf_assets/tooltipster-theme.css">
     <link rel="stylesheet" href="${baseURL}/_sf_assets/style.css?ck=2">
-    <title>${h.NAME} - Share ${share["ID"]}</title>
+    <title>${h.NAME} - Share ${share.ID}</title>
 </head>
 
 <body>
@@ -25,7 +25,7 @@
 <div class="navigation section">
     <div class="parent" data-toggle="tooltip" title="Go to parent folder">
         %if subPath != "":
-            <a href="/share=${share["ID"]}/${subPath}/.."><i class="icon fas fa-long-arrow-alt-up"></i></a>
+            <a href="/share=${share.ID}/${subPath}/.."><i class="icon fas fa-long-arrow-alt-up"></i></a>
         %else:
             <a class="disabled"><i class="icon fas fa-long-arrow-alt-up"></i></a>
         % endif
@@ -64,12 +64,12 @@
                     <% i = 0 %>
                     % for item in containers:
                         <% evenClass = "even" if i % 2 == 1 else "odd" %>
-                        <% urlEncodedURL = h.urlEncode(h.cleanURL(item["path"].replace(shareBasePath,"")).lstrip("/"))%>
-                        <tr onclick="location.href='/share=${share["ID"]}/${urlEncodedURL}'" class="${evenClass}">
+                        <% urlEncodedURL = h.urlEncode(h.cleanURL(item.path.replace(shareBasePath,"")).lstrip("/"))%>
+                        <tr onclick="location.href='/share=${share.ID}/${urlEncodedURL}'" class="${evenClass}">
                             <td><i class="icon fas fa-folder"></i></td>
-                            <td>${item["name"]}</td>
-                            <td>${h.formatTimestamp(item["lastModified"], "YYYY/MM/DD HH:mm")}</td>
-                            <td>${item["nbItems"]}</td>
+                            <td>${item.name}</td>
+                            <td>${h.formatTimestamp(item.lastModified, "YYYY/MM/DD HH:mm")}</td>
+                            <td>${item.nbItems}</td>
                         </tr>
                         <% i+=1 %>
                     % endfor
@@ -95,12 +95,12 @@
                     <% i = 0 %>
                     % for item in leafs:
                         <% evenClass = "even" if i % 2 == 1 else "odd"%>
-                        <% sizeMB = h.floatFormat(item["size"]/1048576,1)%>
-                        <% urlEncodedURL = h.urlEncode(h.cleanURL(item["path"].replace(shareBasePath,"")).lstrip("/"))%>
-                        <tr onclick="window.open('/share=${share["ID"]}/${urlEncodedURL}')" class="${evenClass}">
-                            <td><i class="icon ${h.EXTENSIONS_CLASSES.get(item["extension"], h.EXTENSIONS_CLASSES["default"])}"></i></td>
-                            <td>${item["name"]}</td>
-                            <td>${h.formatTimestamp(item["lastModified"], "YYYY/MM/DD HH:mm")}</td>
+                        <% sizeMB = h.floatFormat(item.size/1048576,1)%>
+                        <% urlEncodedURL = h.urlEncode(h.cleanURL(item.path.replace(shareBasePath,"")).lstrip("/"))%>
+                        <tr onclick="window.open('/share=${share.ID}/${urlEncodedURL}')" class="${evenClass}">
+                            <td><i class="icon ${h.EXTENSIONS_CLASSES.get(item.extension, h.EXTENSIONS_CLASSES["default"])}"></i></td>
+                            <td>${item.name}</td>
+                            <td>${h.formatTimestamp(item.lastModified, "YYYY/MM/DD HH:mm")}</td>
                             <td>${sizeMB}</td>
                         </tr>
                         <% i+=1 %>
@@ -114,7 +114,7 @@
 
 <script>
     $(document).ready(function () {
-        window.name = "_share_${share["ID"]}";
+        window.name = "_share_${share.ID}";
 
         $('[data-toggle="tooltip"]').tooltipster({theme: "tooltipster-borderless", animationDuration: 200, delay: 20, side: "bottom"});
         var table = $("table").stupidtable();
