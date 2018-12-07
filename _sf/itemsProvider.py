@@ -14,7 +14,7 @@ import zipfile
 class itemsProvider():
 
     ###################################################################################
-    def __init__(self, ap: ap.authProvider, basePath, maxZipSize=50e6,maxAddSize=20e6,  tmpFolder=None, tmpFolderDuration=None, user=None):
+    def __init__(self, ap: ap.authProvider, basePath, maxZipSize=50e6, maxAddSize=20e6, tmpFolder=None, tmpFolderDuration=None, user=None):
         self.basePath = os.path.abspath(basePath)
         self.maxZipSize = maxZipSize
         self.tmpFolder = tmpFolder.lstrip("/")
@@ -109,10 +109,11 @@ class itemsProvider():
     ###################################################################################
     def addLead(self, path, file):
         try:
-            if
             bits = list(os.path.splitext(file.filename))
             ext = bits.pop()
             filename = "%s%s" % ("".join(bits), ext)
+            if self.isItemLeaf(h.makePath(path, filename)): return False, "Item already exists"
+            if self.isItemContainer(h.makePath(path, filename)): return False, "Item already exists"
             file.save(h.makePath(self.basePath, path, filename))
             return True, filename
         except:

@@ -36,8 +36,9 @@ class Server(Thread):
         self.fullchainCrtFile = fullchainCrtFile
         self.httpServer = None
         self.aliases = aliases
+        self.maxUploadSize = maxUploadSize
 
-        if maxUploadSize is not None: self.app.config["MAX_CONTENT_LENGTH"] = maxUploadSize
+        if self.maxUploadSize is not None: self.app.config["MAX_CONTENT_LENGTH"] = self.maxUploadSize
 
         self._addRoute("/hello", self._routeHello, ["GET"])
         self._addRouteRaw("/", self._routeItems, ["GET", "POST"], "index")
@@ -178,8 +179,8 @@ class Server(Thread):
             if not addAllowed: return self._makeTemplate("forbidden", path=path)
             file = request.files["file"]
             result, hint = self.ip.addLead(path, file)
-            if not result: return Template(filename=h.makePath(h.ROOT_FOLDER, "templates", "error.mako"), lookup=self.tplLookup).render(e=hint, **self._makeBaseNamspace(), le=None, lt=None)
-            alerts.append(["File added", "The file %s has been added." % hint])
+            if not result: alerts.append(["Can't add file", "The file can't be added: %s." % hint])
+            else: alerts.append(["File added", "The file %s has been added." % hint])
 
         isProtected, requiredPasswords, _, _, _ = self.ap.isAuthorized(path, request)
         containers, leafs = ip.getItems(path, request, asAdmin=True)
@@ -352,7 +353,7 @@ h.logInfo("Shares provider built")
 ip = ip.itemsProvider(ap, h.DATA_FOLDER, tmpFolder=h.CONFIG.get("tmp folder", None), tmpFolderDuration=h.CONFIG.get("tmp folder duration in days", None), user=h.USER)
 h.logInfo("Items provider built")
 
-server = Server(ip, ap, sp, h.PORT, h.SSL, h.CERTIFICATE_KEY_FILE, h.CERTIFICATE_CRT_FILE, h.FULLCHAIN_CRT_FILE, aliases=h.CONFIG.get("aliases", None), maxUploadSize=h.CONFIG.get("max upload size", 20))
+server = Server(ip, ap, sp, h.PORT, h.SSL, h.CERTIFICATE_KEY_FILE, h.CERTIFICATE_CRT_FILE, h.FULLCHAIN_CRT_FILE, aliases=h.CONFIG.get("aliases", None), maxUploadSize=h.CONFIG.get("max upload size", 20e6))
 server.start()
 h.logInfo("Server started", server.port, server.ssl)
 
