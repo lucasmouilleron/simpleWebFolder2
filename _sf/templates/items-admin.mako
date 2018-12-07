@@ -5,7 +5,7 @@
     <script src="${baseURL}/_sf_assets/stupidtable.js"></script>
     <script src="${baseURL}/_sf_assets/clipboard.js"></script>
     <script src="${baseURL}/_sf_assets/tooltipstr.js"></script>
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.0/css/all.css">
     <link rel="stylesheet" href="${baseURL}/_sf_assets/tooltipster.css">
     <link rel="stylesheet" href="${baseURL}/_sf_assets/tooltipster-theme.css">
     <link rel="stylesheet" href="${baseURL}/_sf_assets/style.css?ck=2">
@@ -106,6 +106,7 @@
                 <tr>
                     <% i = 0 %>
                     % for item in containers:
+                        <% folderClass="fa-folder-plus" if item["isTmpFolder"] else "fa-folder"%>
                         <% evenClass = "even" if i % 2 == 1 else "odd" %>
                         <% urlEncodedPath = h.urlEncode(item["path"])%>
                         <% shareURLEncoded=h.encode(item["path"])%>
@@ -120,7 +121,7 @@
                         <% toggleTooltip = "tooltip-left" if itemSpecial else ""%>
                         <% isAllowedClass = "disabled" if itemSpecial else ""%>
                         <tr class="item ${evenClass}" data-item="${item["name"]}" data-toggle="${toggleTooltip}" title="${", ".join(tooltipTitle)}">
-                            <td onclick="location.href='${urlEncodedPath}'"><i class="icon fas fa-folder ${isAllowedClass}"></i></td>
+                            <td onclick="location.href='${urlEncodedPath}'"><i class="icon fas ${folderClass} ${isAllowedClass}"></i></td>
                             <td onclick="location.href='${urlEncodedPath}'">${item["name"]}</td>
                             <td onclick="location.href='${urlEncodedPath}'">${h.formatTimestamp(item["lastModified"], "YYYY/MM/DD HH:mm")}</td>
                             <td onclick="location.href='${urlEncodedPath}'">${item["nbItems"]}</td>

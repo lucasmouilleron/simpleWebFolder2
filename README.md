@@ -25,5 +25,7 @@
 - Edit `_sf/assets/style.css`
     
 ## TODO
+- Clean tmp folder
+- Upload to tmp folder
 - Clean shares
 - Track and clean tracking periodicly to file (and not on the fly)

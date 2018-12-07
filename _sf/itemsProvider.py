@@ -17,7 +17,7 @@ class itemsProvider():
     def __init__(self, ap: ap.authProvider, basePath, maxZipSize=50e6, tmpFolder=None, tmpFolderDuration=None, user=None):
         self.basePath = os.path.abspath(basePath)
         self.maxZipSize = maxZipSize
-        self.tmpFolder = tmpFolder
+        self.tmpFolder = tmpFolder.lstrip("/")
         self.tmpFolderDuration = tmpFolderDuration
         self.user = h.getUserID(user)
         self.ap = ap
@@ -89,7 +89,8 @@ class itemsProvider():
             if asAdmin: isAuthorized = True
             listingForbidden = self.ap.listingForbidden(itemPath)
             shareForbidden = self.ap.shareForbidden(itemPath)
-            itemsContainers.append({"path": itemPath, "name": os.path.basename(item), "lastModified": os.stat(item).st_mtime, "nbItems": len(h.listDirectoryItems(item)), "isAuthorized": isAuthorized, "passwords": requiredPasswords, "protected": protected, "forbidden": isForbidden, "showForbidden": showForbidden, "listingForbidden": listingForbidden, "shareForbidden":shareForbidden})
+            isTmpFolder = itemPath.lstrip("/") == self.tmpFolder
+            itemsContainers.append({"path": itemPath, "name": os.path.basename(item), "lastModified": os.stat(item).st_mtime, "nbItems": len(h.listDirectoryItems(item)), "isAuthorized": isAuthorized, "passwords": requiredPasswords, "protected": protected, "forbidden": isForbidden, "showForbidden": showForbidden, "listingForbidden": listingForbidden, "shareForbidden": shareForbidden, "isTmpFolder": isTmpFolder})
         itemsLeafs = []
         for item in items:
             if not os.path.isfile(item): continue
