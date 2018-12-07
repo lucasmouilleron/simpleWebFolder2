@@ -49,7 +49,13 @@
     %endfor
 
     %if addAllowed:
-        add form
+        <div class="block section">
+            <div class="section-title">Add a file</div>
+            <form method="post" enctype="multipart/form-data" class="inline">
+                <input type="file" name="file">
+                <label></label><input type="submit" name="add-leaf" value="Upload">
+            </form>
+        </div>
     %endif
 
     %if isProtected:

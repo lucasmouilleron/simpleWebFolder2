@@ -175,7 +175,10 @@ class Server(Thread):
         if request.form.get("add-leaf", False):
             if not addAllowed: return self._makeTemplate("forbidden", path=path)
             file = request.files["file"]
-            print(file)
+            result, hint = self.ip.addLead(path, file)
+            if not result: return Template(filename=h.makePath(h.ROOT_FOLDER, "templates", "error.mako"), lookup=self.tplLookup).render(e=hint, **self._makeBaseNamspace(), le=None, lt=None)
+            alerts.append(["File added", "The file %s has been added." % hint])
+
         isProtected, requiredPasswords, _, _, _ = self.ap.isAuthorized(path, request)
         containers, leafs = ip.getItems(path, request, asAdmin=True)
         readme = ip.getReadme(path)

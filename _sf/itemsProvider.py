@@ -107,6 +107,18 @@ class itemsProvider():
         return itemsContainers, itemsLeafs
 
     ###################################################################################
+    def addLead(self, path, file):
+        try:
+            bits = list(os.path.splitext(file.filename))
+            ext = bits.pop()
+            filename = "%s%s" % ( "".join(bits), ext)
+            file.save(h.makePath(self.basePath, path, filename))
+            return True, filename
+        except:
+            le, lt = h.getLastExceptionAndTrace()
+            return False, le
+
+    ###################################################################################
     def doesItemExists(self, path):
         return os.path.exists(self.getFullPath(path))
 

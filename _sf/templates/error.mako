@@ -27,7 +27,7 @@
     <p>Hint: ${e}</p>
     <p>We are sorry for this.<br/>Please send us an email @ <a href="mailto:${h.MAIL}">${h.MAIL}</a> if the problem persits.</p>
 
-    % if h.DEBUG:
+    % if h.DEBUG and le is not None and lt is not None:
         <div class="block">
             <p>${le}</p>
             <p>
