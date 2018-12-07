@@ -264,22 +264,22 @@ class Server(Thread):
 
         isAdmin = self.ap.isAdmin(request)
         subPath = os.path.normpath(shareIDAndPath.replace(shareID, "")).lstrip("/").rstrip("/").lstrip(".")
-        share, hint = self.sp.getShare(shareID, asAdmin=isAdmin, r=request, subPath=subPath)
-        if share is None: raise Exception("Can't get Share %s, %s" % (shareID, hint))
+        s, hint = self.sp.getShare(shareID, asAdmin=isAdmin, r=request, subPath=subPath)
+        if s is None: raise Exception("Can't get Share %s, %s" % (shareID, hint))
 
-        if isAdmin: return self._makeTemplate("share-admin", shareID=shareID, share=share)
+        if isAdmin: return self._makeTemplate("share-admin", shareID=shareID, share=s)
 
-        sharePassword = share.password
-        shareBasePath = share.file
+        sharePassword = s.password
+        shareBasePath = s.file
         path = h.makePath(shareBasePath, subPath).rstrip("/")
         displayPath = path.replace(shareBasePath, shareID)
-        if sharePassword != "" and not isAdmin and not self.ap.isShareAuthorized(shareID, request): return self._makeTemplate("share-password", displayPath=displayPath, share=share)
+        if sharePassword != "" and not isAdmin and not self.ap.isShareAuthorized(s, request): return self._makeTemplate("share-password", displayPath=displayPath, share=s)
         if not ip.doesItemExists(path): return self._makeTemplate("not-found", path=path)
         if ip.isItemLeaf(path): return send_from_directory(h.DATA_FOLDER, path)
         else:
             alerts = []
             containers, leafs = self.ip.getItems(path, overrideListingForbidden=True, overrideNoShow=True)
-            return self._makeTemplate("share", displayPath=displayPath, shareBasePath=shareBasePath, subPath=subPath, share=share, containers=containers, leafs=leafs, alerts=alerts, readme=ip.getReadme(path))
+            return self._makeTemplate("share", displayPath=displayPath, shareBasePath=shareBasePath, subPath=subPath, share=s, containers=containers, leafs=leafs, alerts=alerts, readme=ip.getReadme(path))
 
     ###################################################################################
     def _makeBaseNamspace(self):
@@ -350,7 +350,7 @@ h.logInfo("Auth provider built")
 tp = tp.trackingProvider(h.DATA_FOLDER, user=h.USER)
 h.logInfo("Tracking provider built")
 
-sp = sp.sharesProvider(ap, h.makePath(h.DATA_FOLDER, "_sf_shares"), user=h.USER)
+sp = sp.sharesProvider(h.makePath(h.DATA_FOLDER, "_sf_shares"), user=h.USER)
 h.logInfo("Shares provider built")
 
 ip = ip.itemsProvider(ap, h.DATA_FOLDER, tmpFolder=h.CONFIG.get("tmp folder", None), tmpFolderDuratioInDaysn=h.CONFIG.get("tmp folder duration in days", None), user=h.USER)

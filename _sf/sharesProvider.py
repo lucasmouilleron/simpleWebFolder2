@@ -3,7 +3,6 @@
 ###################################################################################
 import os
 import helper as h
-import authProvider as ap
 
 
 ###################################################################################
@@ -25,11 +24,10 @@ class share:
 class sharesProvider():
 
     ###################################################################################
-    def __init__(self, ap: ap.authProvider, sharesPath, user=None):
+    def __init__(self, sharesPath, user=None):
         self.user = h.getUserID(user)
         self.sharesPath = h.makeDirPath(os.path.abspath(sharesPath))
         if self.user is not None: h.changeFileOwner(self.sharesPath, self.user)
-        self.ap = ap
 
     ###################################################################################
     def listShares(self, filterID=None, maxShares=None):
@@ -80,10 +78,8 @@ class sharesProvider():
                 views.append(view)
                 views = sorted(views, key=lambda v: v["date"])[::-1]
                 s.views = views
-                print(views)
                 h.writeJsonFile(sharePath, {"ID": s.ID, "file": s.file, "creation": s.creation, "views": s.views, "duration": s.duration, "password": s.password})
                 if self.user is not None: h.changeFileOwner(sharePath, self.user)
-
             return s, "ok"
         except:
             le, lt = h.getLastExceptionAndTrace()

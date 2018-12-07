@@ -4,6 +4,7 @@
 import os
 import helper as h
 from flask import request
+import sharesProvider as sp
 
 ###################################################################################
 COOKIE_DURATION = 60 * 60 * 24 * 300
@@ -20,9 +21,7 @@ class authProvider():
 
     ###################################################################################
     def isAdmin(self, r: request):
-        cookieKey = "_sf_admin_pass"
-        if cookieKey in r.cookies: return r.cookies[cookieKey] == self.adminPassword
-        else: return False
+        return r.cookies.get("_sf_admin_pass", "_not_set") == self.adminPassword
 
     ###################################################################################
     def isAddAllowed(self, path):
@@ -152,10 +151,8 @@ class authProvider():
             if lh is not None: h.releaseLock(lh)
 
     ###################################################################################
-    def isShareAuthorized(self, shareID, r: request):
-        cookieKey = "_sf_share_pass_%s" % shareID
-        if cookieKey in r.cookies: return r.cookies[cookieKey]
-        else: return False
+    def isShareAuthorized(self, s: sp.share, r: request):
+        return s.password == r.cookies.get("_sf_share_pass_%s" % s.ID, "_no_set")
 
     ###################################################################################
     def setSharePassword(self, shareID, password, r, response=None):
