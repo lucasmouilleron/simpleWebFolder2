@@ -56,7 +56,6 @@ class sharesProvider():
         try:
             lh = h.getLockExclusive(h.makePath(h.LOCKS_FOLDER, "_sf_share%s" % h.clean(shareID)), 5)
             share = h.loadJsonFile(sharePath)
-            print(share)
             if not asAdmin and share["duration"] >0 and share["duration"] + share["creation"] < h.now(): return None, "Share has expired"
             if not asAdmin:
                 views = share.get("views", [])
