@@ -30,6 +30,7 @@ class itemsProvider():
             ap.setListingForbidden(self.tmpFolder)
             ap.setDownloadForbidden(self.tmpFolder)
             ap.setShowForbidden(self.tmpFolder)
+            ap.setShareForbidden(self.tmpFolder)
 
     ###################################################################################
     def getFullPath(self, path):
@@ -87,7 +88,8 @@ class itemsProvider():
             else: isAuthorized, requiredPasswords, protected = True, "", False
             if asAdmin: isAuthorized = True
             listingForbidden = self.ap.listingForbidden(itemPath)
-            itemsContainers.append({"path": itemPath, "name": os.path.basename(item), "lastModified": os.stat(item).st_mtime, "nbItems": len(h.listDirectoryItems(item)), "isAuthorized": isAuthorized, "passwords": requiredPasswords, "protected": protected, "forbidden": isForbidden, "showForbidden": showForbidden, "listingForbidden": listingForbidden})
+            shareForbidden = self.ap.shareForbidden(itemPath)
+            itemsContainers.append({"path": itemPath, "name": os.path.basename(item), "lastModified": os.stat(item).st_mtime, "nbItems": len(h.listDirectoryItems(item)), "isAuthorized": isAuthorized, "passwords": requiredPasswords, "protected": protected, "forbidden": isForbidden, "showForbidden": showForbidden, "listingForbidden": listingForbidden, "shareForbidden":shareForbidden})
         itemsLeafs = []
         for item in items:
             if not os.path.isfile(item): continue

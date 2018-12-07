@@ -62,6 +62,14 @@ class authProvider():
         h.writeToFile(h.makePath(self.basePath, path, ".nodownload"), "")
 
     ###################################################################################
+    def shareForbidden(self, path):
+        return h.isfile(h.makePath(self.basePath, path, ".noshare"))
+
+    ###################################################################################
+    def setShareForbidden(self, path):
+        h.writeToFile(h.makePath(self.basePath, path, ".noshare"), "")
+
+    ###################################################################################
     def getLowerProtectedPath(self, path):
         relativePath = path
         lowerPath = False

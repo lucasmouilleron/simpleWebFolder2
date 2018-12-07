@@ -115,6 +115,7 @@
                         <% if item["forbidden"]: tooltipTitle.append("forbidden")%>
                         <% if item["showForbidden"]: tooltipTitle.append("hidden")%>
                         <% if item["listingForbidden"]: tooltipTitle.append("no listing")%>
+                        <% if item["shareForbidden"]: tooltipTitle.append("no share")%>
                         <% itemSpecial = len(tooltipTitle)>0 %>
                         <% toggleTooltip = "tooltip-left" if itemSpecial else ""%>
                         <% isAllowedClass = "disabled" if itemSpecial else ""%>
@@ -132,7 +133,11 @@
                                     <a data-toggle="tooltip" title="Can't copy link" class="link disabled"><i class="icon fas fa-link"></i></a>
                                 % endif
                                 % if h.SHARING:
-                                    <a data-toggle="tooltip" title="Create share" href="${rootURL}/create-share=${shareURLEncoded}" target="_shares"><i class="icon fas fa-share-alt-square"></i></a>
+                                    %if not item["shareForbidden"]:
+                                        <a data-toggle="tooltip" title="Create share" href="${rootURL}/create-share=${shareURLEncoded}" target="_shares"><i class="icon fas fa-share-alt-square"></i></a>
+                                    %else:
+                                        <a data-toggle="tooltip" title="Can't share" class="link disabled"><i class="icon fas fa-share-alt-square"></i></a>
+                                    % endif
                                 % endif
                             </td>
                         </tr>
