@@ -119,40 +119,40 @@
                 <tr>
                     <% i = 0 %>
                     % for item in containers:
-                        <% folderClass="fa-folder-plus" if item["addAllowed"] else "fa-folder"%>
+                        <% folderClass="fa-folder-plus" if item.addAllowed else "fa-folder"%>
                         <% evenClass = "even" if i % 2 == 1 else "odd" %>
-                        <% urlEncodedPath = h.urlEncode(item["path"])%>
-                        <% shareURLEncoded=h.encode(item["path"])%>
-                        <% itemURL = h.urlEncode(h.makePath(rootURL , item["path"].lstrip("/"))) %>
+                        <% urlEncodedPath = h.urlEncode(item.path)%>
+                        <% shareURLEncoded=h.encode(item.path)%>
+                        <% itemURL = h.urlEncode(h.makePath(rootURL , item.path.lstrip("/"))) %>
                         <% tooltipTitle = []%>
-                        <% if item["protected"]: tooltipTitle.append("protected")%>
-                        <% if item["forbidden"]: tooltipTitle.append("forbidden")%>
-                        <% if item["showForbidden"]: tooltipTitle.append("hidden")%>
-                        <% if item["listingForbidden"]: tooltipTitle.append("no listing")%>
-                        <% if item["shareForbidden"]: tooltipTitle.append("no share")%>
-                        <% if item["isTmpFolder"]: tooltipTitle.append("tmp folder")%>
-                        <% if item["addAllowed"]: tooltipTitle.append("upload allowed")%>
+                        <% if item.protected: tooltipTitle.append("protected")%>
+                        <% if item.forbidden: tooltipTitle.append("forbidden")%>
+                        <% if item.showForbidden: tooltipTitle.append("hidden")%>
+                        <% if item.listingForbidden: tooltipTitle.append("no listing")%>
+                        <% if item.shareForbidden: tooltipTitle.append("no share")%>
+                        <% if item.isTmpFolder: tooltipTitle.append("tmp folder")%>
+                        <% if item.addAllowed: tooltipTitle.append("upload allowed")%>
                         <% itemSpecial = len(tooltipTitle)>0 %>
                         <% toggleTooltip = "tooltip-left" if itemSpecial else ""%>
                         <% isAllowedClass = "disabled" if itemSpecial else ""%>
-                        <tr class="item ${evenClass}" data-item="${item["name"]}" data-toggle="${toggleTooltip}" title="${", ".join(tooltipTitle)}">
+                        <tr class="item ${evenClass}" data-item="${item.name}" data-toggle="${toggleTooltip}" title="${", ".join(tooltipTitle)}">
                             <td onclick="location.href='${urlEncodedPath}'"><i class="icon fas ${folderClass} ${isAllowedClass}"></i></td>
-                            <td onclick="location.href='${urlEncodedPath}'">${item["name"]}</td>
-                            <td onclick="location.href='${urlEncodedPath}'">${h.formatTimestamp(item["lastModified"], "YYYY/MM/DD HH:mm")}</td>
-                            <td onclick="location.href='${urlEncodedPath}'">${item["nbItems"]}</td>
+                            <td onclick="location.href='${urlEncodedPath}'">${item.name}</td>
+                            <td onclick="location.href='${urlEncodedPath}'">${h.formatTimestamp(item.lastModified, "YYYY/MM/DD HH:mm")}</td>
+                            <td onclick="location.href='${urlEncodedPath}'">${item.nbItems}</td>
                             %if isTmpFolder:
-                                <td onclick="location.href='${urlEncodedPath}'">${h.formatTimestamp(item["expires"],"YYYY/MM/DD HH:mm")}</td>
+                                <td onclick="location.href='${urlEncodedPath}'">${h.formatTimestamp(item.expires,"YYYY/MM/DD HH:mm")}</td>
                             %endif
                             <td class="actions">
-                                % if item["protected"]:
-                                    <a data-toggle="tooltip" title="Copy link + password" class="link" data-clipboard-text="${itemURL} (password: ${item["passwords"][0]})"><i class="icon fas fa-link"></i></a>
-                                %elif not item["listingForbidden"]:
+                                % if item.protected:
+                                    <a data-toggle="tooltip" title="Copy link + password" class="link" data-clipboard-text="${itemURL} (password: ${item.passwords[0]})"><i class="icon fas fa-link"></i></a>
+                                %elif not item.listingForbidden:
                                     <a data-toggle="tooltip" title="Copy link" class="link" data-clipboard-text="${itemURL}"><i class="icon fas fa-link"></i></a>
                                 %else:
                                     <a data-toggle="tooltip" title="Can't copy link" class="link disabled"><i class="icon fas fa-link"></i></a>
                                 % endif
                                 % if h.SHARING and not isTmpFolder:
-                                    %if not item["shareForbidden"]:
+                                    %if not item.shareForbidden:
                                         <a data-toggle="tooltip" title="Create share" href="${rootURL}/create-share=${shareURLEncoded}" target="_shares"><i class="icon fas fa-share-alt-square"></i></a>
                                     %else:
                                         <a data-toggle="tooltip" title="Can't share" class="link disabled"><i class="icon fas fa-share-alt-square"></i></a>
@@ -188,21 +188,21 @@
                     <% i = 0 %>
                     % for item in leafs:
                         <% evenClass = "even" if i % 2 == 1 else "odd"%>
-                        <% sizeMB = h.floatFormat(item["size"]/1048576,1)%>
-                        <% urlEncodedPath = h.urlEncode(item["path"])%>
-                        <% shareURLEncoded=h.encode(item["path"])%>
-                        <% itemURL = h.urlEncode(h.makePath(rootURL , item["path"].lstrip("/"))) %>
-                        <tr class="item ${evenClass}" data-item="${item["name"]}">
-                            <td onclick="window.open('${urlEncodedPath}')"><i class="icon ${h.EXTENSIONS_CLASSES.get(item["extension"], h.EXTENSIONS_CLASSES["default"])}"></i></td>
-                            <td onclick="window.open('${urlEncodedPath}')">${item["name"]}</td>
-                            <td onclick="window.open('${urlEncodedPath}')">${h.formatTimestamp(item["lastModified"], "YYYY/MM/DD HH:mm")}</td>
+                        <% sizeMB = h.floatFormat(item.size/1048576,1)%>
+                        <% urlEncodedPath = h.urlEncode(item.path)%>
+                        <% shareURLEncoded=h.encode(item.path)%>
+                        <% itemURL = h.urlEncode(h.makePath(rootURL , item.path.lstrip("/"))) %>
+                        <tr class="item ${evenClass}" data-item="${item.name}">
+                            <td onclick="window.open('${urlEncodedPath}')"><i class="icon ${h.EXTENSIONS_CLASSES.get(item.extension, h.EXTENSIONS_CLASSES["default"])}"></i></td>
+                            <td onclick="window.open('${urlEncodedPath}')">${item.name}</td>
+                            <td onclick="window.open('${urlEncodedPath}')">${h.formatTimestamp(item.lastModified, "YYYY/MM/DD HH:mm")}</td>
                             <td onclick="window.open('${urlEncodedPath}')">${sizeMB}</td>
                             %if isTmpFolder:
-                                <td onclick="location.href='${urlEncodedPath}'">${h.formatTimestamp(item["expires"],"YYYY/MM/DD HH:mm")}</td>
+                                <td onclick="location.href='${urlEncodedPath}'">${h.formatTimestamp(item.expires,"YYYY/MM/DD HH:mm")}</td>
                             %endif
                             <td class="actions">
-                                % if item["protected"]:
-                                    <a data-toggle="tooltip" title="Copy link + password" class="link" data-clipboard-text="${itemURL} (password: ${item["passwords"][0]})"><i class="icon fas fa-link"></i></a>
+                                % if item.protected:
+                                    <a data-toggle="tooltip" title="Copy link + password" class="link" data-clipboard-text="${itemURL} (password: ${item.passwords[0]})"><i class="icon fas fa-link"></i></a>
                                 %else:
                                     <a data-toggle="tooltip" title="Copy link" class="link" data-clipboard-text="${itemURL}"><i class="icon fas fa-link"></i></a>
                                 % endif

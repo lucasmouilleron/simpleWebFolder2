@@ -8,6 +8,35 @@ import markdown2
 import zipfile
 from threading import Thread
 import threading
+from typing import List
+
+
+###################################################################################
+###################################################################################
+###################################################################################
+class item:
+    def __init__(self, path, name, lastModified, isAuthorized, protected, forbidden, showForbidden, listingForbidden, downloadForbidden, shareForbidden, isTmpFolder, addAllowed, leaf, container, lowerProtectedPath, nbItems=0, passwords=[], expires=0, size=0, extension="", savedPassword=""):
+        self.path = path
+        self.name = name
+        self.lastModified = lastModified
+        self.nbItems = nbItems
+        self.isAuthorized = isAuthorized
+        self.passwords = passwords
+        self.protected = protected
+        self.forbidden = forbidden
+        self.showForbidden = showForbidden
+        self.listingForbidden = listingForbidden
+        self.downloadForbidden = downloadForbidden
+        self.shareForbidden = shareForbidden
+        self.isTmpFolder = isTmpFolder
+        self.addAllowed = addAllowed
+        self.expires = expires
+        self.leaf = leaf
+        self.container = container
+        self.size = size
+        self.extension = extension
+        self.savedPassword = savedPassword
+        self.lowerProtectedPath = lowerProtectedPath
 
 
 ###################################################################################
@@ -80,7 +109,7 @@ class itemsProvider():
             raise (e)
 
     ###################################################################################
-    def getItem(self, path, r=None, asAdmin=False):
+    def getItem(self, path, r=None, asAdmin=False) -> item:
         if not self.doesItemExists(path): return None
         fullPath = h.makePath(self.basePath, path)
         isLeaf = self.isItemLeaf(path)
@@ -104,13 +133,12 @@ class itemsProvider():
         showForbidden = self.ap.showForbidden(path)
         addAllowed = self.ap.isAddAllowed(path)
         downloadForbidden = self.ap.downloadForbidden(path)
-
         expires = h.getFileModified(h.makePath(self.basePath, path)) + self.tmpFolderDuration
-        item = {"path": path, "name": os.path.basename(path), "lastModified": os.stat(fullPath).st_mtime, "nbItems": nbItems, "isAuthorized": isAuthorized, "passwords": requiredPasswords, "protected": protected, "forbidden": isForbidden, "showForbidden": showForbidden, "listingForbidden": listingForbidden, "downloadForbidden": downloadForbidden, "shareForbidden": shareForbidden, "isTmpFolder": isTmpFolder, "addAllowed": addAllowed, "expires": expires, "leaf": isLeaf, "container": isContainer, "size": size, "extension": extension, "savedPassword": savedPassword, "lowerProtectedPath": lowerProtectedPath}
-        return item
+
+        return item(path, os.path.basename(path), os.stat(fullPath).st_mtime, isAuthorized, protected, isForbidden, showForbidden, listingForbidden, downloadForbidden, shareForbidden, isTmpFolder, addAllowed, isLeaf, isContainer, lowerProtectedPath, nbItems, requiredPasswords, expires, size, extension, savedPassword)
 
     ###################################################################################
-    def getItems(self, path, r=None, asAdmin=False, overrideListingForbidden=False, overrideNoShow=False):
+    def getItems(self, path, r=None, asAdmin=False, overrideListingForbidden=False, overrideNoShow=False) -> (List[item], List[item]):
         if not self.doesItemExists(path): return [], []
         if not overrideListingForbidden and not asAdmin and self.ap.listingForbidden(path): return [], []
         fullPath = self.getFullPath(path)
@@ -124,7 +152,8 @@ class itemsProvider():
             if not asAdmin and isForbidden: continue
             showForbidden = self.ap.showForbidden(itemPath)
             if not overrideNoShow and not asAdmin and showForbidden: continue
-            itemsContainers.append(self.getItem(itemPath, r, asAdmin))
+            i = self.getItem(itemPath, r, asAdmin)
+            if i is not None: itemsContainers.append(i)
         itemsLeafs = []
         for item in items:
             if not os.path.isfile(item): continue
@@ -132,7 +161,8 @@ class itemsProvider():
             if itemPath.lstrip("/").startswith("_sf"): continue
             isForbidden = self.ap.isForbidden(itemPath)
             if not asAdmin and isForbidden: continue
-            itemsLeafs.append(self.getItem(itemPath, r, asAdmin))
+            i = self.getItem(itemPath, r, asAdmin)
+            if i is not None: itemsLeafs.append(i)
         return itemsContainers, itemsLeafs
 
     ###################################################################################

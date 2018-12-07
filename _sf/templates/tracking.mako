@@ -69,12 +69,12 @@
             % for tracking in trackings:
                 <% evenClass = "even" if i % 2 == 1 else "odd" %>
                 <tr class="${evenClass}">
-                    <td>${tracking["path"]}</td>
-                    <td>${tracking["protected"]}</td>
-                    <td>${tracking["authorized"]}</td>
-                    <td>${tracking["password"]}</td>
-                    <td>${tracking["ip"]}</td>
-                    <td>${h.formatTimestamp(tracking["date"], "YYYY/MM/DD HH:mm")}</td>
+                    <td>${tracking.path}</td>
+                    <td>${tracking.protected}</td>
+                    <td>${tracking.authorized}</td>
+                    <td>${tracking.password}</td>
+                    <td>${tracking.ip}</td>
+                    <td>${h.formatTimestamp(tracking.date, "YYYY/MM/DD HH:mm")}</td>
                 </tr>
                 <% i+=1 %>
             %endfor

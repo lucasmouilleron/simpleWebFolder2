@@ -125,27 +125,27 @@ class Server(Thread):
         if not ip.doesItemExists(path): return self._makeTemplate("not-found", path=path)
 
         item = self.ip.getItem(path, request)
-        isProtected, requiredPasswords, savedPassword, isAuthorized, lowerProtectedPath = item["protected"], item["passwords"], item["savedPassword"], item["isAuthorized"], item["lowerProtectedPath"]
+        if item is None: return self._makeTemplate("error", path=path, e="Can't get item")
 
         if request.form.get("password-submit", False):
             response = make_response()
-            self.ap.setUserPassword(lowerProtectedPath, request.form.get("password", ""), request, response)
+            self.ap.setUserPassword(item.lowerProtectedPath, request.form.get("password", ""), request, response)
             return self._redirect(path, response)
 
-        if h.TRACKING: tp.track(path, request, isProtected, isAuthorized, savedPassword)
-        if isAuthorized:
+        if h.TRACKING: tp.track(path, request, item.protected, item.isAuthorized, item.savedPassword)
+        if item.isAuthorized:
             if ip.isItemLeaf(path):
-                if item["forbidden"]: return self._makeTemplate("forbidden", path=path)
+                if item.forbidden: return self._makeTemplate("forbidden", path=path)
                 return send_from_directory(h.DATA_FOLDER, path)
             else:
-                if item["forbidden"]: return self._makeTemplate("forbidden", path=path)
-                if item["listingForbidden"]: return self._makeTemplate("forbidden", path=path)
-                if "download" in request.args and not item["downloadForbidden"]: return self._downloadAndDeleteFile(ip.getZipFile(path, request), "%s.zip" % (os.path.basename(path) if path != "" else "root"))
+                if item.forbidden: return self._makeTemplate("forbidden", path=path)
+                if item.listingForbidden: return self._makeTemplate("forbidden", path=path)
+                if "download" in request.args and not item.downloadForbidden: return self._downloadAndDeleteFile(ip.getZipFile(path, request), "%s.zip" % (os.path.basename(path) if path != "" else "root"))
                 alerts = []
                 containers, leafs = ip.getItems(path, request)
                 readme = ip.getReadme(path)
                 return self._makeTemplate("items", containers=containers, leafs=leafs, path=path, readme=readme, downloadAllowed=not self.ap.downloadForbidden(path), currentURLWithoutURI=path, alerts=alerts)
-        else: return self._makeTemplate("password", path=path, lowerProtectedPath=lowerProtectedPath)
+        else: return self._makeTemplate("password", path=path, lowerProtectedPath=item.lowerProtectedPath)
 
     ###################################################################################
     def _routeNoAdmin(self):
@@ -184,21 +184,20 @@ class Server(Thread):
             else: alerts.append(["File added", "The file %s has been added." % hint])
 
         item = self.ip.getItem(path, request)
-        isProtected, requiredPasswords = item["protected"], item["passwords"]
         containers, leafs = ip.getItems(path, request, asAdmin=True)
         isTmpFolder = self.ip.tmpFolder == path
         readme = ip.getReadme(path)
         subAlerts = []
-        if isProtected and len(requiredPasswords) > 1: subAlerts.append("Password protected, see passwords below.")
-        if isProtected and len(requiredPasswords) == 1: subAlerts.append("Password protected: %s" % requiredPasswords[0])
+        if item.protected and len(item.passwords) > 1: subAlerts.append("Password protected, see passwords below.")
+        if item.protected and len(item.passwords) == 1: subAlerts.append("Password protected: %s" % item.passwords[0])
         if isTmpFolder: subAlerts.append("Tmp folder.")
         if addAllowed: subAlerts.append("Upload allowed.")
-        if item["listingForbidden"]: subAlerts.append("Listing not allowed for non admin users.")
-        if item["showForbidden"]: subAlerts.append("Folder not shown for non admin users.")
-        if item["shareForbidden"]: subAlerts.append("Folder cannot be shared with Sares.")
-        if item["downloadForbidden"] and path != "": subAlerts.append("Folder not downloadable.")
+        if item.listingForbidden: subAlerts.append("Listing not allowed for non admin users.")
+        if item.showForbidden: subAlerts.append("Folder not shown for non admin users.")
+        if item.shareForbidden: subAlerts.append("Folder cannot be shared with Sares.")
+        if item.downloadForbidden and path != "": subAlerts.append("Folder not downloadable.")
         if len(subAlerts) > 0: alerts.append(["Special folder", "<br/>".join(subAlerts)])
-        response = make_response(self._makeTemplate("items-admin", isProtected=isProtected, passwords=sorted(requiredPasswords), containers=containers, leafs=leafs, path=path, readme=readme, alerts=alerts, addAllowed=addAllowed, isTmpFolder=isTmpFolder))
+        response = make_response(self._makeTemplate("items-admin", isProtected=item.protected, passwords=sorted(item.passwords), containers=containers, leafs=leafs, path=path, readme=readme, alerts=alerts, addAllowed=addAllowed, isTmpFolder=isTmpFolder))
         return response
 
     ###################################################################################

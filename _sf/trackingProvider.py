@@ -3,6 +3,20 @@
 ###################################################################################
 import os
 import helper as h
+from typing import List
+
+
+###################################################################################
+###################################################################################
+###################################################################################
+class tracking:
+    def __init__(self, path, password, authorized, ip, date, protected):
+        self.path = path
+        self.password = password
+        self.authorized = authorized
+        self.ip = ip
+        self.date = date
+        self.protected = protected
 
 
 ###################################################################################
@@ -38,7 +52,7 @@ class trackingProvider():
             if lh is not None: h.releaseLock(lh)
 
     ###################################################################################
-    def getTrackings(self, password=None, item=None, protected=None, maxItems=None):
+    def getTrackings(self, password=None, item=None, protected=None, maxItems=None) -> List[tracking]:
         trackingFile = h.makePath(self.basePath, ".tracking")
         lockFile = h.makePath(h.LOCKS_FOLDER, "_sfl_tracking")
         lh = None
@@ -55,7 +69,7 @@ class trackingProvider():
                     if protected == "no" and tProtected: continue
                 if password is not None and password.lower() not in d[2].lower(): continue
                 if item is not None and item.lower() not in d[0].lower(): continue
-                trackings.append({"path": d[0], "authorized": d[1], "password": d[2], "ip": d[3], "date": h.parseInt(d[4], 0), "protected": d[5]})
+                trackings.append(tracking(d[0], d[2], h.parseBool(d[1], False, trueValue="True"), d[3], h.parseInt(d[4], 0), h.parseBool(d[5], False, trueValue="True")))
                 i += 1
                 if maxItems is not None and i > maxItems: break
             return trackings
