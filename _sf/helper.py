@@ -22,6 +22,7 @@ import portalocker
 import time
 import base64
 import pwd
+from shutil import copyfile
 
 ###################################################################################
 SERVER_TIMEZONE = "Europe/Paris"
@@ -332,6 +333,14 @@ def parseInt(intString, defaultValue):
     except ValueError:
         return defaultValue
 
+################################################################################
+def delete(fileOrFolder):
+    if os.path.exists(fileOrFolder):
+        if os.path.isfile(fileOrFolder):
+            os.remove(fileOrFolder)
+        else:
+            shutil.rmtree(fileOrFolder)
+
 
 ################################################################################
 def listDirectoryItems(folder, onlyFiles=False, omitHiddenFiles=True, forbbidenItems=None):
@@ -383,6 +392,11 @@ def getLastExceptionAndTrace():
 def getFileSize(filePath):
     if not os.path.exists(filePath): return 0
     return os.path.getsize(filePath)
+
+################################################################################
+def getFileModified(filePath):
+    if not os.path.exists(filePath): return 0
+    return os.path.getmtime(filePath)
 
 
 ################################################################################

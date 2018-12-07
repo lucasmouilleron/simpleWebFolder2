@@ -6,6 +6,8 @@ import helper as h
 import authProvider as ap
 import markdown2
 import zipfile
+from threading import Thread
+import threading
 
 
 ###################################################################################
@@ -14,13 +16,14 @@ import zipfile
 class itemsProvider():
 
     ###################################################################################
-    def __init__(self, ap: ap.authProvider, basePath, maxZipSize=50e6, maxAddSize=20e6, tmpFolder=None, tmpFolderDuration=None, user=None):
+    def __init__(self, ap: ap.authProvider, basePath, maxZipSize=50e6, tmpFolder=None, tmpFolderDuration=7, user=None):
         self.basePath = os.path.abspath(basePath)
         self.maxZipSize = maxZipSize
         self.tmpFolder = tmpFolder.lstrip("/")
         self.tmpFolderDuration = tmpFolderDuration
         self.user = h.getUserID(user)
         self.ap = ap
+        self.cleanTmpThread = None
 
         if self.tmpFolder is not None:
             tmpPath = h.makePath(self.basePath, self.tmpFolder)
@@ -32,6 +35,12 @@ class itemsProvider():
             ap.setShowForbidden(self.tmpFolder)
             ap.setShareForbidden(self.tmpFolder)
             ap.setAddAllowed(self.tmpFolder)
+            self.cleanTmpThread = CleanTmp(tmpPath, tmpFolderDuration)
+            self.cleanTmpThread.start()
+
+    ###################################################################################
+    def stop(self):
+        if self.cleanTmpThread is not None: self.cleanTmpThread.interrupt()
 
     ###################################################################################
     def getFullPath(self, path):
@@ -135,3 +144,37 @@ class itemsProvider():
         fullPath = self.getFullPath(path)
         if not os.path.exists(fullPath): return False
         return os.path.isdir(self.getFullPath(path))
+
+
+###################################################################################
+###################################################################################
+###################################################################################
+class CleanTmp(Thread):
+
+    ###################################################################################
+    def __init__(self, tmpFolder, tmpDurationInDays):
+        Thread.__init__(self)
+        self._interrupt = False
+        self._exitEvent = threading.Event()
+        self.tmpFolder = tmpFolder
+        self.tmpDuration = tmpDurationInDays * 24 * 60 * 60
+
+    ###################################################################################
+    def run(self):
+        while not self._interrupt and not self._exitEvent.isSet():
+            try:
+                items = h.listDirectoryItems(self.tmpFolder)
+                for item in items:
+                    if h.getFileModified(item) + self.tmpDuration < h.now():
+                        h.delete(item)
+                        h.logInfo("Item too old deleted %s" % item)
+            except:
+                print(h.getLastExceptionAndTrace())
+            finally: self._exitEvent.wait(500)
+
+        h.logDebug("CleanTmp thread finished")
+
+    ###################################################################################
+    def interrupt(self):
+        self._interrupt = True
+        self._exitEvent.set()

@@ -364,6 +364,8 @@ if secondaryPort is not None:
     secondaryServer.start()
     h.logInfo("Secondary server started", secondaryPort)
 
-signal.pause()
-server.stop()
-if secondaryServer is not None: secondaryServer.stop()
+try: signal.pause()
+except:
+    server.stop()
+    if secondaryServer is not None: secondaryServer.stop()
+    ip.stop()
