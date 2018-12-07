@@ -39,7 +39,7 @@
         <input id="password" type="password" name="password" placeholder="Password"/>
         <input type="submit" name="password-submit" value="Login"/>
     </form>
-    <center>Contact us at <a href="mailto:${h.MAIL}">${h.MAIL}</a> if you have forgotten your password.</center>
+    <center>Contact us at <a href="mailto:${h.MAIL}">${h.MAIL}</a> if you have forgotten your password or need one.</center>
 </div>
 
 <div class="footer">${h.NAME} - ${h.CREDITS}</div>

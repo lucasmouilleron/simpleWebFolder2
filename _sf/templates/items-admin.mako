@@ -109,6 +109,9 @@
                     <th data-sort="string-ins">Name</th>
                     <th data-sort="string-ins" style="width:20%;">Last modified</th>
                     <th data-sort="int" style="width:10%;"># items</th>
+                    %if isTmpFolder:
+                        <th data-sort="int" style="width:10%;">Expiration</th>
+                    %endif
                     <th width="70">Actions</th>
                 </tr>
                 </thead>
@@ -137,6 +140,9 @@
                             <td onclick="location.href='${urlEncodedPath}'">${item["name"]}</td>
                             <td onclick="location.href='${urlEncodedPath}'">${h.formatTimestamp(item["lastModified"], "YYYY/MM/DD HH:mm")}</td>
                             <td onclick="location.href='${urlEncodedPath}'">${item["nbItems"]}</td>
+                            %if isTmpFolder:
+                                <td onclick="location.href='${urlEncodedPath}'">todo</td>
+                            %endif
                             <td class="actions">
                                 % if item["protected"]:
                                     <a data-toggle="tooltip" title="Copy link + password" class="link" data-clipboard-text="${itemURL} (password: ${item["passwords"][0]})"><i class="icon fas fa-link"></i></a>
@@ -171,6 +177,9 @@
                     <th data-sort="string-ins">Name</th>
                     <th data-sort="string-ins" style="width:20%;">Last modified</th>
                     <th data-sort="float" style="width:10%;">Size (mb)</th>
+                    %if isTmpFolder:
+                        <th data-sort="int" style="width:10%;">Expiration</th>
+                    %endif
                     <th width="70">Actions</th>
                 </tr>
                 </thead>
@@ -188,6 +197,9 @@
                             <td onclick="window.open('${urlEncodedPath}')">${item["name"]}</td>
                             <td onclick="window.open('${urlEncodedPath}')">${h.formatTimestamp(item["lastModified"], "YYYY/MM/DD HH:mm")}</td>
                             <td onclick="window.open('${urlEncodedPath}')">${sizeMB}</td>
+                            %if isTmpFolder:
+                                <td onclick="location.href='${urlEncodedPath}'">todo</td>
+                            %endif
                             <td class="actions">
                                 % if item["protected"]:
                                     <a data-toggle="tooltip" title="Copy link + password" class="link" data-clipboard-text="${itemURL} (password: ${item["passwords"][0]})"><i class="icon fas fa-link"></i></a>

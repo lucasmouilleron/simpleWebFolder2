@@ -83,6 +83,7 @@ class itemsProvider():
     def getItems(self, path, r=None, asAdmin=False, overrideListingForbidden=False, overrideNoShow=False):
         if not self.doesItemExists(path): return [], []
         if not overrideListingForbidden and not asAdmin and self.ap.listingForbidden(path): return [], []
+        containerIsTmpFolder = path.lstrip("/") == self.tmpFolder
         fullPath = self.getFullPath(path)
         items = h.listDirectoryItems(fullPath)
         itemsContainers = []
@@ -101,7 +102,9 @@ class itemsProvider():
             shareForbidden = self.ap.shareForbidden(itemPath)
             addAllowed = self.ap.isAddAllowed(itemPath)
             isTmpFolder = itemPath.lstrip("/") == self.tmpFolder
-            itemsContainers.append({"path": itemPath, "name": os.path.basename(item), "lastModified": os.stat(item).st_mtime, "nbItems": len(h.listDirectoryItems(item)), "isAuthorized": isAuthorized, "passwords": requiredPasswords, "protected": protected, "forbidden": isForbidden, "showForbidden": showForbidden, "listingForbidden": listingForbidden, "shareForbidden": shareForbidden, "isTmpFolder": isTmpFolder, "addAllowed": addAllowed})
+            expires = 0
+            if containerIsTmpFolder: expires = 1
+            itemsContainers.append({"path": itemPath, "name": os.path.basename(item), "lastModified": os.stat(item).st_mtime, "nbItems": len(h.listDirectoryItems(item)), "isAuthorized": isAuthorized, "passwords": requiredPasswords, "protected": protected, "forbidden": isForbidden, "showForbidden": showForbidden, "listingForbidden": listingForbidden, "shareForbidden": shareForbidden, "isTmpFolder": isTmpFolder, "addAllowed": addAllowed, "expires": expires})
         itemsLeafs = []
         for item in items:
             if not os.path.isfile(item): continue
@@ -112,7 +115,9 @@ class itemsProvider():
             if r is not None: protected, requiredPasswords, _, isAuthorized, lowerProtectedPath = self.ap.isAuthorized(itemPath, r)
             else: isAuthorized, requiredPasswords, protected = True, "", False
             if asAdmin: isAuthorized = True
-            itemsLeafs.append({"path": itemPath, "name": os.path.basename(item), "lastModified": os.stat(item).st_mtime, "extension": os.path.splitext(item)[-1].replace(".", ""), "size": os.path.getsize(item), "isAuthorized": isAuthorized, "passwords": requiredPasswords, "protected": protected, "forbidden": isForbidden})
+            expires = 0
+            if containerIsTmpFolder: expires = 1
+            itemsLeafs.append({"path": itemPath, "name": os.path.basename(item), "lastModified": os.stat(item).st_mtime, "extension": os.path.splitext(item)[-1].replace(".", ""), "size": os.path.getsize(item), "isAuthorized": isAuthorized, "passwords": requiredPasswords, "protected": protected, "forbidden": isForbidden, "expires": expires})
         return itemsContainers, itemsLeafs
 
     ###################################################################################
