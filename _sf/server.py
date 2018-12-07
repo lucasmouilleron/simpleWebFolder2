@@ -124,7 +124,8 @@ class Server(Thread):
 
         if not ip.doesItemExists(path): return self._makeTemplate("not-found", path=path)
 
-        isProtected, requiredPasswords, savedPassword, isAuthorized, lowerProtectedPath = ap.isAuthorized(path, request)
+        item = self.ip.getItem(path, request)
+        isProtected, requiredPasswords, savedPassword, isAuthorized, lowerProtectedPath = item["protected"], item["passwords"], item["savedPassword"], item["isAuthorized"], item["lowerProtectedPath"]
 
         if request.form.get("password-submit", False):
             response = make_response()
@@ -134,12 +135,12 @@ class Server(Thread):
         if h.TRACKING: tp.track(path, request, isProtected, isAuthorized, savedPassword)
         if isAuthorized:
             if ip.isItemLeaf(path):
-                if self.ap.isForbidden(path): return self._makeTemplate("forbidden", path=path)
+                if item["forbidden"]: return self._makeTemplate("forbidden", path=path)
                 return send_from_directory(h.DATA_FOLDER, path)
             else:
-                if self.ap.isForbidden(path): return self._makeTemplate("forbidden", path=path)
-                if self.ap.listingForbidden(path): return self._makeTemplate("forbidden", path=path)
-                if "download" in request.args and not self.ap.downloadForbidden(path): return self._downloadAndDeleteFile(ip.getZipFile(path, request), "%s.zip" % (os.path.basename(path) if path != "" else "root"))
+                if item["forbidden"]: return self._makeTemplate("forbidden", path=path)
+                if item["listingForbidden"]: return self._makeTemplate("forbidden", path=path)
+                if "download" in request.args and not item["downloadForbidden"]: return self._downloadAndDeleteFile(ip.getZipFile(path, request), "%s.zip" % (os.path.basename(path) if path != "" else "root"))
                 alerts = []
                 containers, leafs = ip.getItems(path, request)
                 readme = ip.getReadme(path)
@@ -178,11 +179,12 @@ class Server(Thread):
         if request.form.get("add-leaf", False):
             if not addAllowed: return self._makeTemplate("forbidden", path=path)
             file = request.files["file"]
-            result, hint = self.ip.addLead(path, file)
+            result, hint = self.ip.addLeaf(path, file)
             if not result: alerts.append(["Can't add file", "The file can't be added: %s." % hint])
             else: alerts.append(["File added", "The file %s has been added." % hint])
 
-        isProtected, requiredPasswords, _, _, _ = self.ap.isAuthorized(path, request)
+        item = self.ip.getItem(path, request)
+        isProtected, requiredPasswords = item["protected"], item["passwords"]
         containers, leafs = ip.getItems(path, request, asAdmin=True)
         isTmpFolder = self.ip.tmpFolder == path
         readme = ip.getReadme(path)
@@ -191,10 +193,10 @@ class Server(Thread):
         if isProtected and len(requiredPasswords) == 1: subAlerts.append("Password protected: %s" % requiredPasswords[0])
         if isTmpFolder: subAlerts.append("Tmp folder.")
         if addAllowed: subAlerts.append("Upload allowed.")
-        if self.ap.listingForbidden(path): subAlerts.append("Listing not allowed for non admin users.")
-        if self.ap.showForbidden(path): subAlerts.append("Folder not shown for non admin users.")
-        if self.ap.shareForbidden(path): subAlerts.append("Folder cannot be shared with Sares.")
-        if self.ap.downloadForbidden(path) and path != "": subAlerts.append("Folder not downloadable.")
+        if item["listingForbidden"]: subAlerts.append("Listing not allowed for non admin users.")
+        if item["showForbidden"]: subAlerts.append("Folder not shown for non admin users.")
+        if item["shareForbidden"]: subAlerts.append("Folder cannot be shared with Sares.")
+        if item["downloadForbidden"] and path != "": subAlerts.append("Folder not downloadable.")
         if len(subAlerts) > 0: alerts.append(["Special folder", "<br/>".join(subAlerts)])
         response = make_response(self._makeTemplate("items-admin", isProtected=isProtected, passwords=sorted(requiredPasswords), containers=containers, leafs=leafs, path=path, readme=readme, alerts=alerts, addAllowed=addAllowed, isTmpFolder=isTmpFolder))
         return response

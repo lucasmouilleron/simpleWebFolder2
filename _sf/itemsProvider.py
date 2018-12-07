@@ -80,10 +80,39 @@ class itemsProvider():
             raise (e)
 
     ###################################################################################
+    def getItem(self, path, r=None, asAdmin=False):
+        if not self.doesItemExists(path): return None
+        fullPath = h.makePath(self.basePath, path)
+        isLeaf = self.isItemLeaf(path)
+        isContainer = not isLeaf
+        if r is not None: protected, requiredPasswords, savedPassword, isAuthorized, lowerProtectedPath = self.ap.isAuthorized(path, r)
+        else: isAuthorized, requiredPasswords, protected, savedPassword, lowerProtectedPath = True, "", False, "", ""
+        if asAdmin: isAuthorized = True
+        if isLeaf:
+            extension = os.path.splitext(path)[-1].replace(".", "")
+            size = os.path.getsize(fullPath)
+            nbItems = 0
+            isTmpFolder = False
+        else:
+            extension = ""
+            size = 0
+            nbItems = len(h.listDirectoryItems(fullPath))
+            isTmpFolder = path.lstrip("/") == self.tmpFolder
+        isForbidden = self.ap.isForbidden(path)
+        listingForbidden = self.ap.listingForbidden(path)
+        shareForbidden = self.ap.shareForbidden(path)
+        showForbidden = self.ap.showForbidden(path)
+        addAllowed = self.ap.isAddAllowed(path)
+        downloadForbidden = self.ap.downloadForbidden(path)
+
+        expires = h.getFileModified(h.makePath(self.basePath, path)) + self.tmpFolderDuration
+        item = {"path": path, "name": os.path.basename(path), "lastModified": os.stat(fullPath).st_mtime, "nbItems": nbItems, "isAuthorized": isAuthorized, "passwords": requiredPasswords, "protected": protected, "forbidden": isForbidden, "showForbidden": showForbidden, "listingForbidden": listingForbidden, "downloadForbidden": downloadForbidden, "shareForbidden": shareForbidden, "isTmpFolder": isTmpFolder, "addAllowed": addAllowed, "expires": expires, "leaf": isLeaf, "container": isContainer, "size": size, "extension": extension, "savedPassword": savedPassword, "lowerProtectedPath": lowerProtectedPath}
+        return item
+
+    ###################################################################################
     def getItems(self, path, r=None, asAdmin=False, overrideListingForbidden=False, overrideNoShow=False):
         if not self.doesItemExists(path): return [], []
         if not overrideListingForbidden and not asAdmin and self.ap.listingForbidden(path): return [], []
-        containerIsTmpFolder = path.lstrip("/") == self.tmpFolder
         fullPath = self.getFullPath(path)
         items = h.listDirectoryItems(fullPath)
         itemsContainers = []
@@ -95,16 +124,7 @@ class itemsProvider():
             if not asAdmin and isForbidden: continue
             showForbidden = self.ap.showForbidden(itemPath)
             if not overrideNoShow and not asAdmin and showForbidden: continue
-            if r is not None: protected, requiredPasswords, _, isAuthorized, lowerProtectedPath = self.ap.isAuthorized(itemPath, r)
-            else: isAuthorized, requiredPasswords, protected = True, "", False
-            if asAdmin: isAuthorized = True
-            listingForbidden = self.ap.listingForbidden(itemPath)
-            shareForbidden = self.ap.shareForbidden(itemPath)
-            addAllowed = self.ap.isAddAllowed(itemPath)
-            isTmpFolder = itemPath.lstrip("/") == self.tmpFolder
-            expires = 0
-            if containerIsTmpFolder:  expires = h.getFileModified(h.makePath(self.basePath, itemPath)) + self.tmpFolderDuration
-            itemsContainers.append({"path": itemPath, "name": os.path.basename(item), "lastModified": os.stat(item).st_mtime, "nbItems": len(h.listDirectoryItems(item)), "isAuthorized": isAuthorized, "passwords": requiredPasswords, "protected": protected, "forbidden": isForbidden, "showForbidden": showForbidden, "listingForbidden": listingForbidden, "shareForbidden": shareForbidden, "isTmpFolder": isTmpFolder, "addAllowed": addAllowed, "expires": expires})
+            itemsContainers.append(self.getItem(itemPath, r, asAdmin))
         itemsLeafs = []
         for item in items:
             if not os.path.isfile(item): continue
@@ -112,16 +132,11 @@ class itemsProvider():
             if itemPath.lstrip("/").startswith("_sf"): continue
             isForbidden = self.ap.isForbidden(itemPath)
             if not asAdmin and isForbidden: continue
-            if r is not None: protected, requiredPasswords, _, isAuthorized, lowerProtectedPath = self.ap.isAuthorized(itemPath, r)
-            else: isAuthorized, requiredPasswords, protected = True, "", False
-            if asAdmin: isAuthorized = True
-            expires = 0
-            if containerIsTmpFolder:  expires = h.getFileModified(h.makePath(self.basePath, itemPath)) + self.tmpFolderDuration
-            itemsLeafs.append({"path": itemPath, "name": os.path.basename(item), "lastModified": os.stat(item).st_mtime, "extension": os.path.splitext(item)[-1].replace(".", ""), "size": os.path.getsize(item), "isAuthorized": isAuthorized, "passwords": requiredPasswords, "protected": protected, "forbidden": isForbidden, "expires": expires})
+            itemsLeafs.append(self.getItem(itemPath, r, asAdmin))
         return itemsContainers, itemsLeafs
 
     ###################################################################################
-    def addLead(self, path, file):
+    def addLeaf(self, path, file):
         try:
             bits = list(os.path.splitext(file.filename))
             ext = bits.pop()
