@@ -23,7 +23,7 @@ import time
 class Server(Thread):
 
     ###################################################################################
-    def __init__(self, ip: ip.itemsProvider, ap: ap.authProvider, sp: sp.sharesProvider, port, ssl=False, certificateKeyFile=None, certificateCrtFile=None, fullchainCrtFile="", aliases=None):
+    def __init__(self, ip: ip.itemsProvider, ap: ap.authProvider, sp: sp.sharesProvider, port, ssl=False, certificateKeyFile=None, certificateCrtFile=None, fullchainCrtFile="", aliases=None, maxUploadSize=None):
         Thread.__init__(self)
         self.app = Flask(__name__)
         self.ip = ip
@@ -36,6 +36,8 @@ class Server(Thread):
         self.fullchainCrtFile = fullchainCrtFile
         self.httpServer = None
         self.aliases = aliases
+
+        if maxUploadSize is not None: self.app.config["MAX_CONTENT_LENGTH"] = maxUploadSize
 
         self._addRoute("/hello", self._routeHello, ["GET"])
         self._addRouteRaw("/", self._routeItems, ["GET", "POST"], "index")
@@ -350,7 +352,7 @@ h.logInfo("Shares provider built")
 ip = ip.itemsProvider(ap, h.DATA_FOLDER, tmpFolder=h.CONFIG.get("tmp folder", None), tmpFolderDuration=h.CONFIG.get("tmp folder duration in days", None), user=h.USER)
 h.logInfo("Items provider built")
 
-server = Server(ip, ap, sp, h.PORT, h.SSL, h.CERTIFICATE_KEY_FILE, h.CERTIFICATE_CRT_FILE, h.FULLCHAIN_CRT_FILE, aliases=h.CONFIG.get("aliases", None))
+server = Server(ip, ap, sp, h.PORT, h.SSL, h.CERTIFICATE_KEY_FILE, h.CERTIFICATE_CRT_FILE, h.FULLCHAIN_CRT_FILE, aliases=h.CONFIG.get("aliases", None), maxUploadSize=h.CONFIG.get("max upload size", 20))
 server.start()
 h.logInfo("Server started", server.port, server.ssl)
 
