@@ -245,3 +245,11 @@ a.disabled:hover {
 td.actions a {
     margin-right:3px;
 }
+
+.warning {
+    color:red;
+}
+
+.readmore {
+    margin-top:5px;
+}

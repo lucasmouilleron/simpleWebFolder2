@@ -5,6 +5,7 @@
     <script src="${baseURL}/_sf_assets/stupidtable.js"></script>
     <script src="${baseURL}/_sf_assets/clipboard.js"></script>
     <script src="${baseURL}/_sf_assets/tooltipstr.js"></script>
+    <script src="${baseURL}/_sf_assets/readmore.js"></script>
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.0/css/all.css">
     <link rel="stylesheet" href="${baseURL}/_sf_assets/tooltipster.css">
     <link rel="stylesheet" href="${baseURL}/_sf_assets/tooltipster-theme.css">
@@ -238,6 +239,8 @@
             tableElt.find("tr:odd").removeClass("even");
         });
 
+        var readMoreOptions = {collapsedHeight: 50, moreLink: '<a href="#" class="readmore">View all</a>', lessLink: '<a href="#" class="readmore">Collapse</a>'};
+        $("#passwords").readmore(readMoreOptions);
         $("#search-item").keyup(function () {
             var itemSearch = this.value.toLowerCase();
             $(".leafs").hide();
@@ -262,6 +265,7 @@
 
         $("#search-password").keyup(function () {
             var passwordSearch = this.value.toLowerCase();
+            $("#passwords").readmore("destroy");
             $("#passwords span").hide();
             $("#no-found-passwords").hide();
             var found = 0;
@@ -273,6 +277,7 @@
                 }
             });
             if (found == 0) {$("#no-found-passwords").show();}
+            $("#passwords").readmore(readMoreOptions);
         });
 
     });
