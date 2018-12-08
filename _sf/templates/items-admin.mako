@@ -71,7 +71,7 @@
 
     %if len(passwords)>1:
         <div class="block section">
-            <div class="section-title">Passwords</div>
+            <div class="section-title">${len(passwords)} passwords</div>
             <form method="post" class="inline">
                 <input type="text" id="search-password" placeholder="search for (partial) password" spellcheck="false" autocorrect="off" autocapitalize="none"/>
             </form>
