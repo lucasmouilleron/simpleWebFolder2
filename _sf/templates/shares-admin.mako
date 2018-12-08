@@ -50,7 +50,7 @@
     %if filterShareID !="":
         <div class="section-title">Shares found</div>
     %else:
-        <div class="section-title">Latest ${maxShares} shares</div>
+        <div class="section-title">Latest ${min(maxShares, len(shares))} shares</div>
     %endif
 
     <table>
