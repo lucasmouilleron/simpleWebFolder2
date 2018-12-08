@@ -29,7 +29,7 @@
 <div class="block section">
     <div class="section-title">Protected area, please authenticate</div>
     <form method="post">
-        <input id="password" type="password" name="password" placeholder="Password"/>
+        <input id="password-share" type="password" name="password-share" placeholder="Password"/>
         <input type="submit" name="password-submit" value="Login"/>
     </form>
 </div>
@@ -38,7 +38,7 @@
 
 <script>
     $(document).ready(function () {
-        $("#password").focus();
+        $("#password-share").focus();
     });
 </script>
 

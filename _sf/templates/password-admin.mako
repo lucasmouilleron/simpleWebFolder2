@@ -25,7 +25,7 @@
 <div class="block section">
     <div class="section-title">Admin area, please authenticate</div>
     <form method="post">
-        <input id="password" type="password" name="password" placeholder="Password"/>
+        <input id="password-admin" type="password" name="password-admin" placeholder="Password"/>
         <input type="submit" name="password-submit" value="Login"/>
     </form>
 </div>
@@ -34,7 +34,7 @@
 
 <script>
     $(document).ready(function () {
-        $("#password").focus();
+        $("#password-admin").focus();
     });
 </script>
 

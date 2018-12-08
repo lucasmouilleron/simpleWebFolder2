@@ -159,7 +159,7 @@ class Server(Thread):
 
         if request.form.get("password-submit", False):
             response = make_response()
-            self.ap.setAdminPassword(request.form.get("password", ""), request, response)
+            self.ap.setAdminPassword(request.form.get("password-admin", ""), request, response)
             return self._redirect("/admin", response)
 
         if not self.ap.isAdmin(request): return self._makeTemplate("password-admin")
@@ -231,7 +231,7 @@ class Server(Thread):
         defaultShareID = request.form.get("defaultShareID", h.uniqueIDSmall())
         duration = request.form.get("duration", "")
         durationInSecs = h.parseInt(duration, 0) * 24 * 60 * 60
-        password = request.form.get("password", "")
+        password = request.form.get("password-share-add", "")
         shareSubmit = request.form.get("create-share-submit", False)
         shareForceSubmit = request.form.get("create-share-force-submit", False)
         needForce = False
@@ -259,7 +259,7 @@ class Server(Thread):
 
         if request.form.get("password-submit", False):
             response = make_response()
-            self.ap.setSharePassword(shareID, request.form.get("password", ""), request, response)
+            self.ap.setSharePassword(shareID, request.form.get("password-share", ""), request, response)
             return self._redirect("/share=%s" % shareID, response)
 
         isAdmin = self.ap.isAdmin(request)

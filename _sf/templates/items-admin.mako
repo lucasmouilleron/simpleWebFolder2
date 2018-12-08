@@ -62,7 +62,7 @@
         <div class="block section">
             <div class="section-title">Add a password</div>
             <form method="post" class="inline">
-                <input type="text" name="new-password" placeholder="password to add"/>
+                <input type="text" name="new-password" placeholder="password to add" spellcheck="false" autocorrect="off" autocapitalize="none"/>
                 <label></label><input type="submit" name="add-password-submit" value="Add password" style="width:150px;"/>
             </form>
         </div>
@@ -72,7 +72,7 @@
         <div class="block section">
             <div class="section-title">Passwords</div>
             <form method="post" class="inline">
-                <input type="text" id="search-password" placeholder="search for (partial) password"/>
+                <input type="text" id="search-password" placeholder="search for (partial) password" spellcheck="false" autocorrect="off" autocapitalize="none"/>
             </form>
             <div id="passwords">
                 <% currentURL = h.urlEncode(h.makePath(rootURL, path))%>

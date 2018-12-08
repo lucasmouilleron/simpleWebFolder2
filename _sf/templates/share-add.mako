@@ -47,10 +47,10 @@
 
     <form method="post">
         <input readonly type="text" placeholder="${path}"/>
-        <input type="text" id="shareID" name="shareID" placeholder="Share ID* (default: ${defaultShareID})" value="${shareID}"/>
+        <input type="text" id="shareID" name="shareID" placeholder="Share ID* (default: ${defaultShareID})" value="${shareID}" spellcheck="false" autocorrect="off" autocapitalize="none"/>
         <input type="hidden" name="defaultShareID" value="${defaultShareID}"/>
-        <input type="text" name="duration" placeholder="Duration in days" value="${duration}"/>
-        <input type="password" name="password" placeholder="Password" value=""/>
+        <input type="text" name="duration" placeholder="Duration in days" value="${duration}" spellcheck="false" autocorrect="off" autocapitalize="none"/>
+        <input type="password" name="password-share-add" placeholder="Password" value="" autocomplete="new-password"/>
         % if needForce:
             <input type="submit" name="create-share-force-submit" value="Override share"/>
         %else:
