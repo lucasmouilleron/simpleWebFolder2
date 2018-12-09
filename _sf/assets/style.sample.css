@@ -253,3 +253,7 @@ td.actions a {
 .readmore {
     margin-top:5px;
 }
+
+strong {
+    font-weight: bold;
+}
