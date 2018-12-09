@@ -49,6 +49,12 @@
         </div>
     %endfor
 
+    % if readme is not None:
+        <div class="block section">
+            <div class="readme-content">${readme}</div>
+        </div>
+    % endif
+
     %if addAllowed:
         <div class="block section">
             <div class="section-title">Add a file</div>
@@ -94,11 +100,7 @@
         </div>
     %endif
 
-    % if readme is not None:
-        <div class="block section">
-            <div class="readme-content">${readme}</div>
-        </div>
-    % endif
+
 
     % if len(containers)>0:
         <div class="containers section">

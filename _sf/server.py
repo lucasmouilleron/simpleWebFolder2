@@ -186,7 +186,7 @@ class Server(Thread):
         item = self.ip.getItem(path, request)
         containers, leafs = ip.getItems(path, request, asAdmin=True)
         isTmpFolder = self.ip.tmpFolder == path
-        readme = ip.getReadme(path)
+        readme = ip.getReadmeAdmin(path)
         subAlerts = []
         if item.protected and len(item.passwords) > 1: subAlerts.append("Password protected, see passwords below.")
         if item.protected and len(item.passwords) == 1: subAlerts.append("Password protected: %s" % item.passwords[0])

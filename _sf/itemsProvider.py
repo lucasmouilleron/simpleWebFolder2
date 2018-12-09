@@ -82,6 +82,12 @@ class itemsProvider():
         return markdown2.markdown(h.readFromFile(readmeFile))
 
     ###################################################################################
+    def getReadmeAdmin(self, path):
+        readmeFile = h.makePath(self.getFullPath(path), "README.admin.md")
+        if not os.path.exists(readmeFile): return self.getReadme(path)
+        return markdown2.markdown(h.readFromFile(readmeFile))
+
+    ###################################################################################
     def getZipFile(self, path, r):
         addedSize = 0
         if not self.doesItemExists(path): return None
