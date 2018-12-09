@@ -144,7 +144,7 @@ class authProvider():
         lh = None
         try:
             lh = h.getLockShared(h.makePath(h.LOCKS_FOLDER, "_sf_password_%s" % h.clean(path)), 5)
-            requiredPasswords = [p for p in h.readFromFile(h.makePath(self.basePath, lowerProtectedPath, ".password")).split("\n") if p != ""]
+            requiredPasswords = sorted([p for p in h.readFromFile(h.makePath(self.basePath, lowerProtectedPath, ".password")).split("\n") if p != ""])
             savedPassword = self.getUserPassword(lowerProtectedPath, r)
             return (True, requiredPasswords, savedPassword, savedPassword in requiredPasswords, lowerProtectedPath)
         finally:
