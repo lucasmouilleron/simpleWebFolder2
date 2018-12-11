@@ -6,6 +6,7 @@ import helper as h
 from typing import List
 import requests as rq
 import json
+import threading
 
 
 ###################################################################################
@@ -42,17 +43,22 @@ class trackingProvider():
         try:
             if ip in self.locationDone: return self.locationDone[ip]
             apiURL = "http://api.ipapi.com/%s?access_key=%s" % (ip, self.locationAPIKey)
-            result = rq.get(apiURL)
+            result = rq.get(apiURL, timeout=3)
             result.encoding = "utf8"
-            location = json.loads(result.text)["country_name"]
-            if location is None: location = ip
+            result = json.loads(result.text)
+            country, region = result["country_code"], result["region_code"]
+            if country is None: location = ip
+            else: location = "%s, %s" % (country, region)
             self.locationDone[ip] = location
             return location
-        except:
-            return ip
+        except: return ip
 
     ###################################################################################
     def track(self, path, r, isProtected, isAuthotirzed, passwordProvided):
+        threading.Thread(target=self._doTrack, args=(path, r.remote_addr, isProtected, isAuthotirzed, passwordProvided)).start()
+
+    ###################################################################################
+    def _doTrack(self, path, address, isProtected, isAuthotirzed, passwordProvided):
         trackingFile = h.makePath(self.basePath, ".tracking")
         headers = ["path", "authorized", "password", "ip", "date", "protected", "location"]
         lh = None
@@ -66,10 +72,9 @@ class trackingProvider():
                 offset = int(nbLines / 2)
                 if offset > 0: h.writeToCSV(datas[offset:nbLines - offset], trackingFile, headers=headers, append=False)
 
-            address = r.remote_addr
             if self.locationEnabled: location = self._getLocationFromIP(address)
             else: location = address
-            h.writeToCSV([[path, isAuthotirzed, passwordProvided if passwordProvided is not None else "", r.remote_addr, h.now(), isProtected, location]], trackingFile, headers=headers, append=True)
+            h.writeToCSV([[path, isAuthotirzed, passwordProvided if passwordProvided is not None else "", address, h.now(), isProtected, location]], trackingFile, headers=headers, append=True)
             if self.user is not None: h.changeFileOwner(trackingFile, self.user)
 
         finally:

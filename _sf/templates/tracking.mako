@@ -57,12 +57,12 @@
         <thead>
         <tr>
             <th data-sort="string-ins">Item</th>
-            <th data-sort="string-ins" width="100">Protected</th>
-            <th data-sort="string-ins" width="100">Authorized</th>
+            <th data-sort="string-ins" width="80">Protected</th>
+            <th data-sort="string-ins" width="80">Authorized</th>
             <th data-sort="string-ins" width="200">Password</th>
-            <th data-sort="string-ins" width="140">IP</th>
-            <th data-sort="string-ins" width="140">Location</th>
-            <th data-sort="string-ins" width="160">Date</th>
+            <th data-sort="string-ins" width="120">IP</th>
+            <th data-sort="string-ins" width="120">Location</th>
+            <th data-sort="string-ins" width="150">Date</th>
         </tr>
         </thead>
         <tbody>
@@ -74,8 +74,8 @@
                     <td>${tracking.protected}</td>
                     <td>${tracking.authorized}</td>
                     <td>${tracking.password}</td>
-                    <td>${tracking.location}</td>
                     <td>${tracking.ip}</td>
+                    <td>${tracking.location}</td>
                     <td>${h.formatTimestamp(tracking.date, "YYYY/MM/DD HH:mm")}</td>
                 </tr>
                 <% i+=1 %>
