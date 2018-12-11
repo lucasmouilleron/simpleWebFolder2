@@ -347,7 +347,7 @@ h.displaySplash()
 ap = ap.authProvider(h.DATA_FOLDER, h.CONFIG.get("admin password", ""), h.FORBIDEN_ITEMS)
 h.logInfo("Auth provider built")
 
-tp = tp.trackingProvider(h.DATA_FOLDER, user=h.USER)
+tp = tp.trackingProvider(h.DATA_FOLDER, user=h.USER, locationEnabled=h.TRACKING_IP_GEOLOC, locationAPIKey=h.CONFIG.get("ip geoloc api key", ""))
 h.logInfo("Tracking provider built")
 
 sp = sp.sharesProvider(h.makePath(h.DATA_FOLDER, "_sf_shares"), user=h.USER)

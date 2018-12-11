@@ -13,5 +13,7 @@
   "user": "lucas",
   "tmp folder": "/tmp",
   "tmp folder duration in days": 5,
+  "ip geoloc": false,
+  "ip geoloc api key":"todo",
   "aliases": {}
 }
