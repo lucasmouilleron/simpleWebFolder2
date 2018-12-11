@@ -35,15 +35,18 @@ class trackingProvider():
         self.user = h.getUserID(user)
         self.locationEnabled = locationEnabled
         self.locationAPIKey = locationAPIKey
+        self.locationDone = {}
 
     ###################################################################################
     def _getLocationFromIP(self, ip):
         try:
+            if ip in self.locationDone: return self.locationDone[ip]
             apiURL = "http://api.ipapi.com/%s?access_key=%s" % (ip, self.locationAPIKey)
             result = rq.get(apiURL)
             result.encoding = "utf8"
             location = json.loads(result.text)["country_name"]
-            if location is None: return ip
+            if location is None: location = ip
+            self.locationDone[ip] = location
             return location
         except:
             return ip
