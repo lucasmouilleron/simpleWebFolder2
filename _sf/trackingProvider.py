@@ -36,12 +36,11 @@ class trackingProvider():
         self.user = h.getUserID(user)
         self.locationEnabled = locationEnabled
         self.locationAPIKey = locationAPIKey
-        self.locationDone = {}
 
     ###################################################################################
     def _getLocationFromIP(self, ip):
         try:
-            if ip in self.locationDone: return self.locationDone[ip]
+            if ip in h.IP_LOCATIONS_DONE: return h.IP_LOCATIONS_DONE[ip]
             apiURL = "http://api.ipapi.com/%s?access_key=%s" % (ip, self.locationAPIKey)
             result = rq.get(apiURL, timeout=3)
             result.encoding = "utf8"
@@ -49,13 +48,9 @@ class trackingProvider():
             country, region = result["country_code"], result["region_code"]
             if country is None: location = ip
             else: location = "%s, %s" % (country, region)
-            self.locationDone[ip] = location
+            h.IP_LOCATIONS_DONE[ip] = location
             return location
         except: return ip
-
-    ###################################################################################
-    def track(self, path, r, isProtected, isAuthotirzed, passwordProvided):
-        threading.Thread(target=self._doTrack, args=(path, r.remote_addr, isProtected, isAuthotirzed, passwordProvided)).start()
 
     ###################################################################################
     def _doTrack(self, path, address, isProtected, isAuthotirzed, passwordProvided):
@@ -79,6 +74,10 @@ class trackingProvider():
 
         finally:
             if lh is not None: h.releaseLock(lh)
+
+    ###################################################################################
+    def track(self, path, r, isProtected, isAuthotirzed, passwordProvided):
+        threading.Thread(target=self._doTrack, args=(path, r.remote_addr, isProtected, isAuthotirzed, passwordProvided)).start()
 
     ###################################################################################
     def getTrackings(self, password=None, item=None, protected=None, maxItems=None) -> List[tracking]:

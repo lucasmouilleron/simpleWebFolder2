@@ -350,7 +350,7 @@ h.logInfo("Auth provider built")
 tp = tp.trackingProvider(h.DATA_FOLDER, user=h.USER, locationEnabled=h.TRACKING_IP_GEOLOC, locationAPIKey=h.CONFIG.get("ip geoloc api key", ""))
 h.logInfo("Tracking provider built")
 
-sp = sp.sharesProvider(h.makePath(h.DATA_FOLDER, "_sf_shares"), user=h.USER)
+sp = sp.sharesProvider(h.makePath(h.DATA_FOLDER, "_sf_shares"), user=h.USER, locationEnabled=h.TRACKING_IP_GEOLOC, locationAPIKey=h.CONFIG.get("ip geoloc api key", ""))
 h.logInfo("Shares provider built")
 
 ip = ip.itemsProvider(ap, h.DATA_FOLDER, tmpFolder=h.CONFIG.get("tmp folder", None), tmpFolderDuratioInDaysn=h.CONFIG.get("tmp folder duration in days", None), user=h.USER)

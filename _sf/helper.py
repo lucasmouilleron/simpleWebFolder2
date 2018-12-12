@@ -65,6 +65,9 @@ CSV_SEP = ";"
 CSV_SEP_SAFE = "---"
 
 ###################################################################################
+IP_LOCATIONS_DONE = {}
+
+###################################################################################
 consoleHandler = logging.StreamHandler()
 consoleHandler.setFormatter(coloredlogs.ColoredFormatter(fmt="%(asctime)s - %(levelname)s - %(message)s"))
 logging.getLogger(LOG_LOGGER).addHandler(consoleHandler)

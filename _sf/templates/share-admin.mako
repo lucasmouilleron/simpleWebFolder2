@@ -64,8 +64,9 @@
     <table>
         <thead>
         <tr>
-            <th data-sort="string-ins" width="200">IP</th>
-            <th data-sort="string-ins" width="160">Date</th>
+            <th data-sort="string-ins" width="120">IP</th>
+            <th data-sort="string-ins" width="120">Location</th>
+            <th data-sort="string-ins" width="150">Date</th>
             <th data-sort="string-ins">Item</th>
         </tr>
         </thead>
@@ -75,6 +76,7 @@
                 <% evenClass = "even" if i % 2 == 1 else "odd" %>
                 <tr class="${evenClass}">
                     <td>${view["ip"]}</td>
+                    <td>${view["location"]}</td>
                     <td>${h.formatTimestamp(view["date"], "YYYY/MM/DD HH:mm")}</td>
                     <td>${view["item"]}</td>
                 </tr>
