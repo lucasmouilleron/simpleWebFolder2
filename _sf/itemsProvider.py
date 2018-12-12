@@ -180,11 +180,13 @@ class itemsProvider():
     ###################################################################################
     def addLeaf(self, path, file):
         try:
+            if not self.doesItemExists(path): return False, "Container does not exists"
             bits = list(os.path.splitext(file.filename))
             ext = bits.pop()
             filename = "%s%s" % ("".join(bits), ext)
             if self.isItemLeaf(h.makePath(path, filename)): return False, "Item already exists"
             if self.isItemContainer(h.makePath(path, filename)): return False, "Item already exists"
+
             file.save(h.makePath(self.basePath, path, filename))
             return True, filename
         except:

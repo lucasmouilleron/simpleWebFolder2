@@ -272,9 +272,9 @@ class Server(Thread):
         sharePassword = s.password
         shareBasePath = s.file
         path = h.makePath(shareBasePath, subPath).rstrip("/")
+        if not ip.doesItemExists(path): return self._makeTemplate("not-found", path=path)
         displayPath = path.replace(shareBasePath, shareID)
         if sharePassword != "" and not isAdmin and not self.ap.isShareAuthorized(s, request): return self._makeTemplate("share-password", displayPath=displayPath, share=s)
-        if not ip.doesItemExists(path): return self._makeTemplate("not-found", path=path)
         if ip.isItemLeaf(path): return send_from_directory(h.DATA_FOLDER, path)
         else:
             alerts = []
