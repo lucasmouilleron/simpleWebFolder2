@@ -96,9 +96,9 @@ class authProvider():
     ###################################################################################
     def addNewPassword(self, path, password):
         if password is None: return False
-        lh = None
+        lh, lf = None, h.makePath(h.LOCKS_FOLDER, "_sfl_password_%s" % h.clean(path))
         try:
-            lh = h.getLockExclusive(h.makePath(h.LOCKS_FOLDER, "_sf_password_%s" % h.clean(path)), 5)
+            lh = h.getLockExclusive(lf, 5)
             passwordFile = h.makePath(self.basePath, path, ".password")
             if os.path.exists(passwordFile): requiredPasswords = [p for p in h.readFromFile(passwordFile).split("\n") if p != ""]
             else: requiredPasswords = []
@@ -141,9 +141,9 @@ class authProvider():
     def isAuthorized(self, path, r: request):
         lowerProtectedPath = self.getLowerProtectedPath(path)
         if (lowerProtectedPath == False): return (False, [], "", True, False)
-        lh = None
+        lh, lf = None, h.makePath(h.LOCKS_FOLDER, "_sfl_password_%s" % h.clean(path))
         try:
-            lh = h.getLockShared(h.makePath(h.LOCKS_FOLDER, "_sf_password_%s" % h.clean(path)), 5)
+            lh = h.getLockShared(lf, 5)
             requiredPasswords = sorted([p for p in h.readFromFile(h.makePath(self.basePath, lowerProtectedPath, ".password")).split("\n") if p != ""])
             savedPassword = self.getUserPassword(lowerProtectedPath, r)
             return (True, requiredPasswords, savedPassword, savedPassword in requiredPasswords, lowerProtectedPath)

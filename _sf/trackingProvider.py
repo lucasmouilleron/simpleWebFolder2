@@ -56,9 +56,9 @@ class trackingProvider():
     def _doTrack(self, path, address, isProtected, isAuthotirzed, passwordProvided):
         trackingFile = h.makePath(self.basePath, ".tracking")
         headers = ["path", "authorized", "password", "ip", "date", "protected", "location"]
-        lh = None
+        lh, lf = None, h.makePath(h.LOCKS_FOLDER, "_sfl_tracking")
         try:
-            lh = h.getLockExclusive(h.makePath(h.LOCKS_FOLDER, "_sfl_tracking"), 5)
+            lh = h.getLockExclusive(lf, 5)
             trackingFileSize = h.getFileSize(trackingFile)
             if trackingFileSize > self.maxSize:
                 h.logInfo("Tracking file too big, splitting in 2", trackingFileSize, self.maxSize)
@@ -82,10 +82,9 @@ class trackingProvider():
     ###################################################################################
     def getTrackings(self, password=None, item=None, protected=None, maxItems=None) -> List[tracking]:
         trackingFile = h.makePath(self.basePath, ".tracking")
-        lockFile = h.makePath(h.LOCKS_FOLDER, "_sfl_tracking")
-        lh = None
+        lh, lf = None, h.makePath(h.LOCKS_FOLDER, "_sfl_tracking")
         try:
-            lh = h.getLockShared(lockFile, 5)
+            lh = h.getLockShared(lf, 5)
             if not os.path.exists(trackingFile): return []
             datas = h.readCSV(trackingFile)
             trackings = []

@@ -22,7 +22,7 @@ import portalocker
 import time
 import base64
 import pwd
-from shutil import copyfile
+import shutil
 
 ###################################################################################
 SERVER_TIMEZONE = "Europe/Paris"
@@ -51,7 +51,7 @@ TRACKING = CONFIG.get("tracking", False)
 TRACKING_IP_GEOLOC = CONFIG.get("ip geoloc", False)
 SHARING = CONFIG.get("sharing", False)
 TMP_FOLDER = CONFIG.get("tmp folder", "/tmp")
-LOCKS_FOLDER = CONFIG.get("locks folder", TMP_FOLDER)
+LOCKS_FOLDER = CONFIG.get("locks folder", TMP_FOLDER + "/_sf_locks")
 USER = CONFIG.get("user", None)
 ###################################################################################
 LOG_FORMAT = "%(asctime)-15s - %(levelname)-7s - %(message)s"
@@ -77,7 +77,10 @@ if STORE_LOG:
     fileHandler = logging.handlers.RotatingFileHandler(LOG_FILENAME, maxBytes=10e6, backupCount=5)
     fileHandler.setFormatter(logging.Formatter(LOG_FORMAT))
     logging.getLogger(LOG_LOGGER).addHandler(fileHandler)
+
+################################################################################
 if not os.path.exists(DATA_FOLDER): os.mkdir(DATA_FOLDER)
+if not os.path.exists(LOCKS_FOLDER): os.mkdir(LOCKS_FOLDER)
 
 
 ################################################################################
@@ -341,10 +344,8 @@ def parseInt(intString, defaultValue):
 ################################################################################
 def delete(fileOrFolder):
     if os.path.exists(fileOrFolder):
-        if os.path.isfile(fileOrFolder):
-            os.remove(fileOrFolder)
-        else:
-            shutil.rmtree(fileOrFolder)
+        if os.path.isfile(fileOrFolder): os.remove(fileOrFolder)
+        else: shutil.rmtree(fileOrFolder)
 
 
 ################################################################################

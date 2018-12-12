@@ -82,9 +82,9 @@ class sharesProvider():
         path = path.lstrip("/").rstrip("/")
         sharePath = h.makePath(self.sharesPath, shareID)
         password = "" if password is None else password
-        lh = None
+        lh, lf = None, h.makePath(h.LOCKS_FOLDER, "_sfl_share%s" % h.clean(shareID))
         try:
-            lh = h.getLockExclusive(h.makePath(h.LOCKS_FOLDER, "_sf_share%s" % h.clean(shareID)), 5)
+            lh = h.getLockExclusive(lf, 5)
             s = share(shareID, h.now(), path, [], password, duration)
             h.writeJsonFile(sharePath, {"ID": s.ID, "file": s.file, "creation": s.creation, "views": s.views, "duration": s.duration, "password": s.password})
             if self.user is not None: h.changeFileOwner(sharePath, self.user)
@@ -99,9 +99,9 @@ class sharesProvider():
     def getShare(self, shareID, r=None, subPath=None, asAdmin=False):
         sharePath = h.makePath(self.sharesPath, shareID)
         if not os.path.exists(sharePath): return None, None
-        lh = None
+        lh, lf = None, h.makePath(h.LOCKS_FOLDER, "_sfl_share%s" % h.clean(shareID))
         try:
-            lh = h.getLockShared(h.makePath(h.LOCKS_FOLDER, "_sf_share%s" % h.clean(shareID)), 5)
+            lh = h.getLockShared(lf, 5)
             shareJson = h.loadJsonFile(sharePath)
             s = share(shareJson["ID"], shareJson["creation"], shareJson["file"], shareJson.get("views", []), shareJson.get("password"), shareJson.get("duration", 0))
             if not asAdmin and s.duration > 0 and s.duration + s.creation < h.now(): rs, rh = None, "Share has expired"
@@ -120,9 +120,9 @@ class sharesProvider():
     def removeShare(self, shareID):
         sharePath = h.makePath(self.sharesPath, shareID)
         if not os.path.exists(sharePath): raise Exception("Unknown share", shareID)
-        lh = None
+        lh, lf = None, h.makePath(h.LOCKS_FOLDER, "_sfl_share%s" % h.clean(shareID))
         try:
-            lh = h.getLockExclusive(h.makePath(h.LOCKS_FOLDER, "_sf_share%s" % h.clean(shareID)), 5)
+            lh = h.getLockExclusive(lf, 5)
             os.remove(sharePath)
             return True
         finally:
@@ -138,9 +138,9 @@ class sharesProvider():
 
     ###################################################################################
     def saveShare(self, s: share):
-        lh = None
+        lh, lf = None, h.makePath(h.LOCKS_FOLDER, "_sfl_share%s" % h.clean(s.ID))
         try:
-            lh = h.getLockExclusive(h.makePath(h.LOCKS_FOLDER, "_sf_share%s" % h.clean(s.ID)), 5)
+            lh = h.getLockExclusive(lf, 5)
             sharePath = h.makePath(self.sharesPath, s.ID)
             h.writeJsonFile(sharePath, {"ID": s.ID, "file": s.file, "creation": s.creation, "views": s.views, "duration": s.duration, "password": s.password})
             if self.user is not None: h.changeFileOwner(sharePath, self.user)
