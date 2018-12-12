@@ -72,8 +72,14 @@ class itemsProvider():
         if self.cleanTmpThread is not None: self.cleanTmpThread.interrupt()
 
     ###################################################################################
+    def _isFullPathWithinBaseFolder(self, fullPath):
+        return self.basePath.rstrip("/") in fullPath
+
+    ###################################################################################
     def getFullPath(self, path):
-        return os.path.abspath(h.makePath(self.basePath, path))
+        fullPath = os.path.abspath(h.makePath(self.basePath, path))
+        if not self._isFullPathWithinBaseFolder(fullPath): return self.basePath
+        return fullPath
 
     ###################################################################################
     def getReadme(self, path):
