@@ -118,7 +118,6 @@ class authProvider():
 
     ###################################################################################
     def setUserPassword(self, path, password, r, response=None):
-        print(path, password, r, response)
         cookieKey = "_sf_pass_%s" % h.clean(path if path != "" else "-")
         r.cookies = dict(r.cookies)
         r.cookies[cookieKey] = password
