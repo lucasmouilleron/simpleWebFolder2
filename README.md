@@ -1,5 +1,7 @@
 # SimpleWebFolder
 
+![Screenshot](http://grabs.lucasmouilleron.com/Screenshot%202018-12-13%20at%2022.26.43.png)
+
 ## Features
 - List files and folders
 - Nice layout
