@@ -32,7 +32,7 @@
 
 <div class="block section">
     <div class="section-title">Filter</div>
-    <form method="post" class="inline">
+    <form method="post" class="inline" action="tracking">
         <label>Limit</label>
         <select name="maxItems">
             <option ${"SELECTED" if maxItems == "500" else ""}>500</option>

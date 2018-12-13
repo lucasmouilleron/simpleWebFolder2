@@ -24,7 +24,7 @@
 
 <div class="block section">
     <div class="section-title">Admin area, please authenticate</div>
-    <form method="post">
+    <form method="post" action="${baseURL}/admin">
         <input id="password-admin" type="password" name="password-admin" placeholder="Password"/>
         <input type="submit" name="password-submit" value="Login"/>
     </form>

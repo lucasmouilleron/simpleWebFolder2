@@ -35,7 +35,7 @@
 
 <div class="block section">
     <div class="section-title">Protected area, please authenticate</div>
-    <form method="post">
+    <form method="post" action="${baseURL}/${path}">
         <input id="password" type="password" name="password" placeholder="Password"/>
         <input type="submit" name="password-submit" value="Login"/>
     </form>

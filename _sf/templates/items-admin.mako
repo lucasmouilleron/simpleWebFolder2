@@ -58,7 +58,7 @@
     %if editAllowed:
         <div class="block section">
             <div class="section-title">Add a file</div>
-            <form method="post" enctype="multipart/form-data" class="inline">
+            <form method="post" enctype="multipart/form-data" class="inline" action="${baseURL}/${path}">
                 <input type="file" name="file">
                 <label></label><input type="submit" name="add-leaf" value="Upload">
             </form>
@@ -68,7 +68,7 @@
     %if isProtected:
         <div class="block section">
             <div class="section-title">Add a password</div>
-            <form method="post" class="inline">
+            <form method="post" class="inline" action="${baseURL}/${path}">
                 <input type="text" name="new-password" placeholder="password to add" spellcheck="false" autocorrect="off" autocapitalize="none"/>
                 <label></label><input type="submit" name="add-password-submit" value="Add password" style="width:150px;"/>
             </form>
@@ -78,7 +78,7 @@
     %if len(passwords)>1:
         <div class="block section">
             <div class="section-title">${len(passwords)} passwords</div>
-            <form method="post" class="inline">
+            <form method="post" class="inline" action="${baseURL}/${path}">
                 <input type="text" id="search-password" placeholder="search for (partial) password" spellcheck="false" autocorrect="off" autocapitalize="none"/>
             </form>
             <div id="passwords">
@@ -94,7 +94,7 @@
     %if len(containers)+len(leafs)>10:
         <div class="block section">
             <div class="section-title">Filter items</div>
-            <form method="post" class="inline">
+            <form method="post" class="inline" action="${baseURL}/${path}">
                 <input type="text" id="search-item" placeholder="search for (partial) item"/>
             </form>
         </div>

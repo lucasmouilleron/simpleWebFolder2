@@ -14,6 +14,7 @@ import authProvider as ap
 import trackingProvider as tp
 import sharesProvider as sp
 import os
+
 import time
 
 
@@ -172,13 +173,13 @@ class Server(Thread):
 
         alerts = []
 
+        if request.args.get("deleted") is not None:
+            alerts.append(["Item deleted", "The item /%s has been removed." % request.args.get("deleted")])
+
         if request.args.get("remove") is not None:
             if not self.ap.isEditAllowed(self.ip.getParent(path)): return self._makeTemplate("forbidden", path=path)
-            if not self.ip.remove(path): alerts.append(["Can't delete item", "The item %s can't be removed." % path])
-            else:
-                path = self.ip.getParent(path)
-                alerts.append(["Item deleted", "The item %s has been removed." % path])
-                return self._redirect(path)
+            if not self.ip.remove(path): alerts.append(["Can't delete item", "The item /%s can't be removed." % path])
+            else: return self._redirect(self.ip.getParent(path), queryArgs={"deleted": path})
 
         if ip.isItemLeaf(path): return send_from_directory(h.DATA_FOLDER, path)
 
@@ -309,8 +310,10 @@ class Server(Thread):
         return result
 
     ###################################################################################
-    def _redirect(self, path, response=None):
+    def _redirect(self, path, response=None, queryArgs=None):
         if response is None: response = make_response()
+        if queryArgs is None: queryArgs = {}
+        if len(queryArgs) > 0: path = h.updateQueryParams(path, queryArgs)
         response.headers["Location"] = path
         response._status_code = 302
         response._status = "302 FOUND"
