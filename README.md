@@ -26,5 +26,6 @@
     
 ## TODO
 - Clean shares
+- Better locks
 - Clean locks
 - Track and clean tracking periodicly to file (and not on the fly)

@@ -24,12 +24,12 @@ class authProvider():
         return r.cookies.get("_sf_admin_pass", "_not_set") == self.adminPassword
 
     ###################################################################################
-    def isAddAllowed(self, path):
-        return h.isfile(h.makePath(self.basePath, path, ".addallowed"))
+    def isEditAllowed(self, path):
+        return h.isfile(h.makePath(self.basePath, path, ".editallowed"))
 
     ###################################################################################
-    def setAddAllowed(self, path):
-        h.writeToFile(h.makePath(self.basePath, path, ".addallowed"), "")
+    def setEditAllowed(self, path):
+        h.writeToFile(h.makePath(self.basePath, path, ".editallowed"), "")
 
     ###################################################################################
     def isForbidden(self, path):

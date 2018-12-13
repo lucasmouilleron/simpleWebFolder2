@@ -169,15 +169,28 @@ class Server(Thread):
     ###################################################################################
     def _routeItemsAdmin(self, path):
         if not ip.doesItemExists(path): return self._makeTemplate("not-found", path=path)
-        if ip.isItemLeaf(path): return send_from_directory(h.DATA_FOLDER, path)
-        addAllowed = self.ap.isAddAllowed(path)
+
         alerts = []
+
+        if request.args.get("remove") is not None:
+            if not self.ap.isEditAllowed(self.ip.getParent(path)): return self._makeTemplate("forbidden", path=path)
+            if not self.ip.remove(path): alerts.append(["Can't delete item", "The item %s can't be removed." % path])
+            else:
+                path = self.ip.getParent(path)
+                alerts.append(["Item deleted", "The item %s has been removed." % path])
+                return self._redirect(path)
+
+        if ip.isItemLeaf(path): return send_from_directory(h.DATA_FOLDER, path)
+
+        editAllowed = self.ap.isEditAllowed(path)
+
         if request.form.get("add-password-submit", False):
             passwordToAdd = request.form.get("new-password", None)
             if self.ap.addNewPassword(path, passwordToAdd): alerts.append(["Password added", "The password %s has been added." % passwordToAdd])
             else: alerts.append(["Can't add password", "The password %s could not be added." % passwordToAdd])
+
         if request.form.get("add-leaf", False):
-            if not addAllowed: return self._makeTemplate("forbidden", path=path)
+            if not editAllowed: return self._makeTemplate("forbidden", path=path)
             file = request.files["file"]
             result, hint = self.ip.addLeaf(path, file)
             if not result: alerts.append(["Can't add file", "The file can't be added: %s." % hint])
@@ -191,13 +204,13 @@ class Server(Thread):
         if item.protected and len(item.passwords) > 1: subAlerts.append("Password protected, see passwords below.")
         if item.protected and len(item.passwords) == 1: subAlerts.append("Password protected: %s" % item.passwords[0])
         if isTmpFolder: subAlerts.append("Tmp folder.")
-        if addAllowed: subAlerts.append("Upload allowed.")
+        if editAllowed: subAlerts.append("Edit/upload allowed.")
         if item.listingForbidden: subAlerts.append("Listing not allowed for non admin users.")
         if item.showForbidden: subAlerts.append("Folder not shown for non admin users.")
         if item.shareForbidden: subAlerts.append("Folder cannot be shared with Sares.")
         if item.downloadForbidden and path != "": subAlerts.append("Folder not downloadable.")
         if len(subAlerts) > 0: alerts.append(["Special folder", "<br/>".join(subAlerts)])
-        response = make_response(self._makeTemplate("items-admin", isProtected=item.protected, passwords=sorted(item.passwords), containers=containers, leafs=leafs, path=path, readme=readme, alerts=alerts, addAllowed=addAllowed, isTmpFolder=isTmpFolder))
+        response = make_response(self._makeTemplate("items-admin", isProtected=item.protected, passwords=sorted(item.passwords), containers=containers, leafs=leafs, path=path, readme=readme, alerts=alerts, editAllowed=editAllowed, isTmpFolder=isTmpFolder))
         return response
 
     ###################################################################################

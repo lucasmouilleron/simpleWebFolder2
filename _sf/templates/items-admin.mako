@@ -55,7 +55,7 @@
         </div>
     % endif
 
-    %if addAllowed:
+    %if editAllowed:
         <div class="block section">
             <div class="section-title">Add a file</div>
             <form method="post" enctype="multipart/form-data" class="inline">
@@ -122,7 +122,7 @@
                 <tr>
                     <% i = 0 %>
                     % for item in containers:
-                        <% folderClass="fa-folder-plus" if item.addAllowed else "fa-folder"%>
+                        <% folderClass="fa-folder-plus" if item.editAllowed else "fa-folder"%>
                         <% evenClass = "even" if i % 2 == 1 else "odd" %>
                         <% urlEncodedPath = h.urlEncode(item.path)%>
                         <% shareURLEncoded=h.encode(item.path)%>
@@ -134,7 +134,7 @@
                         <% if item.listingForbidden: tooltipTitle.append("no listing")%>
                         <% if item.shareForbidden: tooltipTitle.append("no share")%>
                         <% if item.isTmpFolder: tooltipTitle.append("tmp folder")%>
-                        <% if item.addAllowed: tooltipTitle.append("upload allowed")%>
+                        <% if item.editAllowed: tooltipTitle.append("edit/upload allowed")%>
                         <% itemSpecial = len(tooltipTitle)>0 %>
                         <% toggleTooltip = "tooltip-left" if itemSpecial else ""%>
                         <% isAllowedClass = "disabled" if itemSpecial else ""%>
@@ -160,6 +160,9 @@
                                     %else:
                                         <a data-toggle="tooltip" title="Can't share" class="link disabled"><i class="icon fas fa-share-alt-square"></i></a>
                                     % endif
+                                % endif
+                                % if editAllowed:
+                                    <a data-toggle="tooltip" title="Remove" class="confirmation" href="${urlEncodedPath}?remove"><i class="icon fas fa-trash"></i></a>
                                 % endif
                             </td>
                         </tr>
@@ -212,6 +215,9 @@
                                 % if h.SHARING and not isTmpFolder:
                                     <a data-toggle="tooltip" title="Create share" href="${rootURL}/create-share=${shareURLEncoded}" target="_shares"><i class="icon fas fa-share-alt-square"></i></a>
                                 % endif
+                                % if editAllowed:
+                                    <a data-toggle="tooltip" title="Remove" class="confirmation" href="${urlEncodedPath}?remove"><i class="icon fas fa-trash"></i></a>
+                                % endif
                             </td>
                         </tr>
                         <% i+=1 %>
@@ -230,6 +236,10 @@
         var clipboard = new ClipboardJS(".link");
         clipboard.on('success', function (e) {
             alert("Link " + e.text + " copied to clipboard")
+        });
+
+        $('.confirmation').on('click', function () {
+            return confirm('Are you sure?');
         });
 
         $('[data-toggle="tooltip"]').tooltipster({theme: "tooltipster-borderless", animationDuration: 200, delay: 20, side: "bottom"});

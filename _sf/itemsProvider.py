@@ -15,7 +15,7 @@ from typing import List
 ###################################################################################
 ###################################################################################
 class item:
-    def __init__(self, path, name, lastModified, isAuthorized, protected, forbidden, showForbidden, listingForbidden, downloadForbidden, shareForbidden, isTmpFolder, addAllowed, leaf, container, lowerProtectedPath, nbItems=0, passwords=[], expires=0, size=0, extension="", savedPassword=""):
+    def __init__(self, path, name, lastModified, isAuthorized, protected, forbidden, showForbidden, listingForbidden, downloadForbidden, shareForbidden, isTmpFolder, editAllowed, leaf, container, lowerProtectedPath, nbItems=0, passwords=[], expires=0, size=0, extension="", savedPassword=""):
         self.path = path
         self.name = name
         self.lastModified = lastModified
@@ -29,7 +29,7 @@ class item:
         self.downloadForbidden = downloadForbidden
         self.shareForbidden = shareForbidden
         self.isTmpFolder = isTmpFolder
-        self.addAllowed = addAllowed
+        self.editAllowed = editAllowed
         self.expires = expires
         self.leaf = leaf
         self.container = container
@@ -63,7 +63,7 @@ class itemsProvider():
             ap.setDownloadForbidden(self.tmpFolder)
             ap.setShowForbidden(self.tmpFolder)
             ap.setShareForbidden(self.tmpFolder)
-            ap.setAddAllowed(self.tmpFolder)
+            ap.setEditAllowed(self.tmpFolder)
             self.cleanTmpThread = CleanTmp(tmpPath, self.tmpFolderDuration)
             self.cleanTmpThread.start()
 
@@ -143,11 +143,11 @@ class itemsProvider():
         listingForbidden = self.ap.listingForbidden(path)
         shareForbidden = self.ap.shareForbidden(path)
         showForbidden = self.ap.showForbidden(path)
-        addAllowed = self.ap.isAddAllowed(path)
+        editAllowed = self.ap.isEditAllowed(path)
         downloadForbidden = self.ap.downloadForbidden(path)
         expires = h.getFileModified(h.makePath(self.basePath, path)) + self.tmpFolderDuration
 
-        return item(path, os.path.basename(path), os.stat(fullPath).st_mtime, isAuthorized, protected, isForbidden, showForbidden, listingForbidden, downloadForbidden, shareForbidden, isTmpFolder, addAllowed, isLeaf, isContainer, lowerProtectedPath, nbItems, requiredPasswords, expires, size, extension, savedPassword)
+        return item(path, os.path.basename(path), os.stat(fullPath).st_mtime, isAuthorized, protected, isForbidden, showForbidden, listingForbidden, downloadForbidden, shareForbidden, isTmpFolder, editAllowed, isLeaf, isContainer, lowerProtectedPath, nbItems, requiredPasswords, expires, size, extension, savedPassword)
 
     ###################################################################################
     def getItems(self, path, r=None, asAdmin=False, overrideListingForbidden=False, overrideNoShow=False) -> (List[item], List[item]):
@@ -178,12 +178,17 @@ class itemsProvider():
         return itemsContainers, itemsLeafs
 
     ###################################################################################
+    def getPotentialLeafName(self, file):
+        bits = list(os.path.splitext(file.filename))
+        ext = bits.pop()
+        filename = "%s%s" % ("".join(bits), ext)
+        return filename
+
+    ###################################################################################
     def addLeaf(self, path, file):
         try:
             if not self.doesItemExists(path): return False, "Container does not exists"
-            bits = list(os.path.splitext(file.filename))
-            ext = bits.pop()
-            filename = "%s%s" % ("".join(bits), ext)
+            filename = self.getPotentialLeafName(file)
             if self.isItemLeaf(h.makePath(path, filename)): return False, "Item already exists"
             if self.isItemContainer(h.makePath(path, filename)): return False, "Item already exists"
 
@@ -192,6 +197,13 @@ class itemsProvider():
         except:
             le, lt = h.getLastExceptionAndTrace()
             return False, le
+
+    ###################################################################################
+    def remove(self, path):
+        if self.doesItemExists(path) and self.ap.isEditAllowed(self.getParent(path)):
+            h.delete(self.getFullPath(path))
+            return True
+        else: return False
 
     ###################################################################################
     def doesItemExists(self, path):
@@ -208,6 +220,10 @@ class itemsProvider():
         fullPath = self.getFullPath(path)
         if not os.path.exists(fullPath): return False
         return os.path.isdir(self.getFullPath(path))
+
+    ###################################################################################
+    def getParent(self, path):
+        return os.path.dirname(path)
 
 
 ###################################################################################
