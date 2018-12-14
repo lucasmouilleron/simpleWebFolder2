@@ -186,7 +186,7 @@ class Server(Thread):
         editAllowed = self.ap.isEditAllowed(path)
 
         if request.form.get("add-password-submit", False):
-            passwordToAdd = request.form.get("new-password", None)
+            passwordToAdd = request.form.get("new-password", None).strip()
             if self.ap.addNewPassword(path, passwordToAdd): alerts.append(["Password added", "The password %s has been added." % passwordToAdd])
             else: alerts.append(["Can't add password", "The password %s could not be added." % passwordToAdd])
 
