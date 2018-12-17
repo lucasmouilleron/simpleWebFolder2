@@ -14,8 +14,9 @@ import authProvider as ap
 import trackingProvider as tp
 import sharesProvider as sp
 import os
-
+import threading
 import time
+from threading import Lock
 
 
 ###################################################################################
@@ -38,6 +39,11 @@ class Server(Thread):
         self.httpServer = None
         self.aliases = aliases
         self.maxUploadSize = maxUploadSize
+
+        self.firewallIPs = {}
+        self.firewallNbHits = 50
+        self.firewallWindowSize = 2
+        self.firewallLock = Lock()
 
         if self.maxUploadSize is not None: self.app.config["MAX_CONTENT_LENGTH"] = self.maxUploadSize
 
@@ -79,9 +85,41 @@ class Server(Thread):
         return r
 
     ###################################################################################
+    def _firewall(self, r: request):
+        if len(self.firewallIPs) > 1000: threading.Thread(target=self._firewallCleanup).start()
+        try:
+            self.firewallLock.acquire()
+            userIP = r.remote_addr
+            if not userIP in self.firewallIPs: self.firewallIPs[userIP] = []
+            hits = self.firewallIPs[userIP]
+            hits.append(h.now())
+            if len(hits) < self.firewallNbHits: return True, ""
+            windowStart = h.now() - self.firewallWindowSize
+            hits = [hit for hit in hits if hit >= windowStart]
+            self.firewallIPs[userIP] = hits
+            if len(hits) >= self.firewallNbHits: return False, "Too many requests"
+            return True, ""
+        except: return True, ""
+        finally:
+            if self.firewallLock.locked(): self.firewallLock.release()
+
+    ###################################################################################
+    def _firewallCleanup(self):
+        try:
+            self.firewallLock.acquire()
+            for k in list(self.firewallIPs):
+                ips = self.firewallIPs[k]
+                if len(ips) == 0: self.firewallIPs.pop(k)
+                elif ips[-1] < h.now() - self.firewallWindowSize: self.firewallIPs.pop(k)
+        finally:
+            if self.firewallLock.locked(): self.firewallLock.release()
+
+    ###################################################################################
     def _addRoute(self, rule, callback, methods=["GET"], endpoint=None, noCache=True):
         def callbackReal(*args, **kwargs):
             try:
+                passed, hint = self._firewall(request)
+                if not passed: return Template(filename=h.makePath(h.ROOT_FOLDER, "templates", "error.mako"), lookup=self.tplLookup).render(e=hint, **self._makeBaseNamspace(), le=None, lt=None)
                 r = jsonify(callback(*args, **kwargs))
                 if noCache: r = self._noCache(r)
                 return r
@@ -96,6 +134,8 @@ class Server(Thread):
     def _addRouteRaw(self, rule, callback, methods, endpoint=None, noCache=False):
         def callbackReal(*args, **kwargs):
             try:
+                passed, hint = self._firewall(request)
+                if not passed: return Template(filename=h.makePath(h.ROOT_FOLDER, "templates", "error.mako"), lookup=self.tplLookup).render(e=hint, **self._makeBaseNamspace(), le=None, lt=None)
                 r = callback(*args, **kwargs)
                 if noCache: r = self._noCache(r)
                 return r
