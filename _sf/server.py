@@ -159,7 +159,7 @@ class Server(Thread):
 
     ###################################################################################
     def _routeItems(self, path="/"):
-        path = self._aliasPath(path.rstrip("/"))
+        path = h.cleanPath(self._aliasPath(path))
 
         if self.ap.isAdmin(request): return self._routeAdmin(path)
 
@@ -196,7 +196,7 @@ class Server(Thread):
 
     ###################################################################################
     def _routeAdmin(self, path="/"):
-        path = path.rstrip("/")
+        path = h.cleanPath(path)
 
         if request.form.get("password-submit", False):
             response = make_response()
@@ -317,7 +317,7 @@ class Server(Thread):
             return self._redirect("/share=%s" % shareID, response)
 
         isAdmin = self.ap.isAdmin(request)
-        subPath = os.path.normpath(shareIDAndPath.replace(shareID, "")).lstrip("/").rstrip("/").lstrip(".")
+        subPath = h.cleanPath(os.path.normpath(shareIDAndPath.replace(shareID, ""))).lstrip(".")
         s, hint = self.sp.getShare(shareID, asAdmin=isAdmin, r=request, subPath=subPath)
         if s is None: raise Exception("Can't get Share %s, %s" % (shareID, hint))
 
@@ -325,7 +325,7 @@ class Server(Thread):
 
         sharePassword = s.password
         shareBasePath = s.file
-        path = h.makePath(shareBasePath, subPath).rstrip("/")
+        path = h.cleanPath(h.makePath(shareBasePath, subPath))
         if not ip.doesItemExists(path): return self._makeTemplate("not-found", path=path)
         displayPath = path.replace(shareBasePath, shareID)
         if sharePassword != "" and not isAdmin and not self.ap.isShareAuthorized(s, request): return self._makeTemplate("share-password", displayPath=displayPath, share=s)
@@ -369,6 +369,7 @@ class Server(Thread):
 
     ###################################################################################
     def _aliasPath(self, path):
+        path = h.cleanPath(path)
         if self.aliases is None: return path
         return self.aliases.get(path, path)
 
@@ -428,3 +429,4 @@ except:
     server.stop()
     if secondaryServer is not None: secondaryServer.stop()
     ip.stop()
+    tp.stop()

@@ -314,6 +314,11 @@ def getDaysList(dayFromTS, dayToTS, timezone):
 
 
 ################################################################################
+def makeKeyFromArguments(*args):
+    return "--".join(str(arg) for arg in args)
+
+
+################################################################################
 def makePath(*args):
     args = [arg.rstrip("/") for arg in args]
     return '/'.join(str(x) for x in args)
@@ -484,3 +489,8 @@ def updateQueryParams(url, params):
     query.update(params)
     url_parts[4] = urlencode(query)
     return urlparse.urlunparse(url_parts)
+
+
+###################################################################################
+def cleanPath(path):
+    return path.lstrip("/").rstrip("/").replace('//', '/', 1)

@@ -73,28 +73,32 @@ class itemsProvider():
 
     ###################################################################################
     def _isFullPathWithinBaseFolder(self, fullPath):
-        return self.basePath.rstrip("/") in fullPath
+        return h.cleanPath(self.basePath) in fullPath
 
     ###################################################################################
     def getFullPath(self, path):
+        path = h.cleanPath(path)
         fullPath = os.path.abspath(h.makePath(self.basePath, path))
         if not self._isFullPathWithinBaseFolder(fullPath): return self.basePath
         return fullPath
 
     ###################################################################################
     def getReadme(self, path):
+        path = h.cleanPath(path)
         readmeFile = h.makePath(self.getFullPath(path), "README.md")
         if not os.path.exists(readmeFile): return None
         return markdown2.markdown(h.readFromFile(readmeFile))
 
     ###################################################################################
     def getReadmeAdmin(self, path):
+        path = h.cleanPath(path)
         readmeFile = h.makePath(self.getFullPath(path), "README.admin.md")
         if not os.path.exists(readmeFile): return self.getReadme(path)
         return markdown2.markdown(h.readFromFile(readmeFile))
 
     ###################################################################################
     def getZipFile(self, path, r):
+        path = h.cleanPath(path)
         addedSize = 0
         if not self.doesItemExists(path): return None
         fullPath = self.getFullPath(path)
@@ -122,6 +126,7 @@ class itemsProvider():
 
     ###################################################################################
     def getItem(self, path, r=None, asAdmin=False) -> item:
+        path = h.cleanPath(path)
         if not self.doesItemExists(path): return None
         fullPath = h.makePath(self.basePath, path)
         isLeaf = self.isItemLeaf(path)
@@ -151,6 +156,7 @@ class itemsProvider():
 
     ###################################################################################
     def getItems(self, path, r=None, asAdmin=False, overrideListingForbidden=False, overrideNoShow=False) -> (List[item], List[item]):
+        path = h.cleanPath(path)
         if not self.doesItemExists(path): return [], []
         if not overrideListingForbidden and not asAdmin and self.ap.listingForbidden(path): return [], []
         fullPath = self.getFullPath(path)
@@ -186,6 +192,7 @@ class itemsProvider():
 
     ###################################################################################
     def addLeaf(self, path, file):
+        path = h.cleanPath(path)
         try:
             if not self.doesItemExists(path): return False, "Container does not exists"
             filename = self.getPotentialLeafName(file)
@@ -200,6 +207,7 @@ class itemsProvider():
 
     ###################################################################################
     def remove(self, path):
+        path = h.cleanPath(path)
         if self.doesItemExists(path) and self.ap.isEditAllowed(self.getParent(path)):
             h.delete(self.getFullPath(path))
             return True
@@ -207,22 +215,26 @@ class itemsProvider():
 
     ###################################################################################
     def doesItemExists(self, path):
+        path = h.cleanPath(path)
         return os.path.exists(self.getFullPath(path))
 
     ###################################################################################
     def isItemLeaf(self, path):
+        path = h.cleanPath(path)
         fullPath = self.getFullPath(path)
         if not os.path.exists(fullPath): return False
         return os.path.isfile(fullPath)
 
     ###################################################################################
     def isItemContainer(self, path):
+        path = h.cleanPath(path)
         fullPath = self.getFullPath(path)
         if not os.path.exists(fullPath): return False
         return os.path.isdir(self.getFullPath(path))
 
     ###################################################################################
     def getParent(self, path):
+        path = h.cleanPath(path)
         return os.path.dirname(path)
 
 
