@@ -132,7 +132,7 @@ class trackingProvider():
                 if item is not None and item.lower() not in t.path.lower(): continue
                 finalTrackings.append(t)
                 i += 1
-                if maxItems is not None and i > maxItems: break
+                if maxItems is not None and i >= maxItems: break
             return finalTrackings
         finally: self.trackingsLock.release()
 
