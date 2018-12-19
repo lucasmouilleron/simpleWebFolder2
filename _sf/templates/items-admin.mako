@@ -139,12 +139,12 @@
                         <% toggleTooltip = "tooltip-left" if itemSpecial else ""%>
                         <% isAllowedClass = "disabled" if itemSpecial else ""%>
                         <tr class="item ${evenClass}" data-item="${item.name}" data-toggle="${toggleTooltip}" title="${", ".join(tooltipTitle)}">
-                            <td onclick="location.href='${urlEncodedPath}'"><i class="icon fas ${folderClass} ${isAllowedClass}"></i></td>
-                            <td onclick="location.href='${urlEncodedPath}'">${item.name}</td>
-                            <td onclick="location.href='${urlEncodedPath}'">${h.formatTimestamp(item.lastModified, "YYYY/MM/DD HH:mm")}</td>
-                            <td onclick="location.href='${urlEncodedPath}'">${item.nbItems}</td>
+                            <td onclick="location.href='${baseURL}/${urlEncodedPath}'"><i class="icon fas ${folderClass} ${isAllowedClass}"></i></td>
+                            <td onclick="location.href='${baseURL}/${urlEncodedPath}'">${item.name}</td>
+                            <td onclick="location.href='${baseURL}/${urlEncodedPath}'">${h.formatTimestamp(item.lastModified, "YYYY/MM/DD HH:mm")}</td>
+                            <td onclick="location.href='${baseURL}/${urlEncodedPath}'">${item.nbItems}</td>
                             %if isTmpFolder:
-                                <td onclick="location.href='${urlEncodedPath}'">${h.formatTimestamp(item.expires,"YYYY/MM/DD HH:mm")}</td>
+                                <td onclick="location.href='$${baseURL}/{urlEncodedPath}'">${h.formatTimestamp(item.expires,"YYYY/MM/DD HH:mm")}</td>
                             %endif
                             <td class="actions">
                                 % if item.protected:
@@ -162,7 +162,7 @@
                                     % endif
                                 % endif
                                 % if editAllowed:
-                                    <a data-toggle="tooltip" title="Remove" class="confirmation" href="${urlEncodedPath}?remove"><i class="icon fas fa-trash"></i></a>
+                                    <a data-toggle="tooltip" title="Remove" class="confirmation" href="${baseURL}/${urlEncodedPath}?remove"><i class="icon fas fa-trash"></i></a>
                                 % endif
                             </td>
                         </tr>
@@ -199,12 +199,12 @@
                         <% shareURLEncoded=h.encode(item.path)%>
                         <% itemURL = h.urlEncode(h.makePath(rootURL , item.path.lstrip("/"))) %>
                         <tr class="item ${evenClass}" data-item="${item.name}">
-                            <td onclick="window.open('${urlEncodedPath}')"><i class="icon ${h.EXTENSIONS_CLASSES.get(item.extension, h.EXTENSIONS_CLASSES["default"])}"></i></td>
-                            <td onclick="window.open('${urlEncodedPath}')">${item.name}</td>
-                            <td onclick="window.open('${urlEncodedPath}')">${h.formatTimestamp(item.lastModified, "YYYY/MM/DD HH:mm")}</td>
-                            <td onclick="window.open('${urlEncodedPath}')">${sizeMB}</td>
+                            <td onclick="window.open('${baseURL}/${urlEncodedPath}')"><i class="icon ${h.EXTENSIONS_CLASSES.get(item.extension, h.EXTENSIONS_CLASSES["default"])}"></i></td>
+                            <td onclick="window.open('${baseURL}/${urlEncodedPath}')">${item.name}</td>
+                            <td onclick="window.open('${baseURL}/${urlEncodedPath}')">${h.formatTimestamp(item.lastModified, "YYYY/MM/DD HH:mm")}</td>
+                            <td onclick="window.open('${baseURL}/${urlEncodedPath}')">${sizeMB}</td>
                             %if isTmpFolder:
-                                <td onclick="location.href='${urlEncodedPath}'">${h.formatTimestamp(item.expires,"YYYY/MM/DD HH:mm")}</td>
+                                <td onclick="location.href='${baseURL}/${urlEncodedPath}'">${h.formatTimestamp(item.expires,"YYYY/MM/DD HH:mm")}</td>
                             %endif
                             <td class="actions">
                                 % if item.protected:
@@ -216,7 +216,7 @@
                                     <a data-toggle="tooltip" title="Create share" href="${rootURL}/create-share=${shareURLEncoded}" target="_shares"><i class="icon fas fa-share-alt-square"></i></a>
                                 % endif
                                 % if editAllowed:
-                                    <a data-toggle="tooltip" title="Remove" class="confirmation" href="${urlEncodedPath}?remove"><i class="icon fas fa-trash"></i></a>
+                                    <a data-toggle="tooltip" title="Remove" class="confirmation" href="$${baseURL}/{urlEncodedPath}?remove"><i class="icon fas fa-trash"></i></a>
                                 % endif
                             </td>
                         </tr>

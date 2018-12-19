@@ -69,7 +69,7 @@
                         <% evenClass = "even" if i % 2 == 1 else "odd" %>
                         <% urlEncodedURL = h.urlEncode(item.path)%>
                         <% isAllowedClass = "disabled" if not item.isAuthorized else ""%>
-                        <tr onclick="location.href='${urlEncodedURL}'" class="${evenClass}">
+                        <tr onclick="location.href='${baseURL}/${urlEncodedURL}'" class="${evenClass}">
                             <td><i class="icon fas fa-folder ${isAllowedClass}"></i></td>
                             <td>${item.name}</td>
                             <td>${h.formatTimestamp(item.lastModified, "YYYY/MM/DD HH:mm")}</td>
@@ -101,7 +101,7 @@
                         <% evenClass = "even" if i % 2 == 1 else "odd"%>
                         <% sizeMB = h.floatFormat(item.size/1048576,1)%>
                         <% urlEncodedURL = h.urlEncode(item.path)%>
-                        <tr onclick="window.open('${urlEncodedURL}')" class="${evenClass}">
+                        <tr onclick="window.open('${baseURL}/${urlEncodedURL}')" class="${evenClass}">
                             <td><i class="icon ${h.EXTENSIONS_CLASSES.get(item.extension, h.EXTENSIONS_CLASSES["default"])}"></i></td>
                             <td>${item.name}</td>
                             <td>${h.formatTimestamp(item.lastModified, "YYYY/MM/DD HH:mm")}</td>
