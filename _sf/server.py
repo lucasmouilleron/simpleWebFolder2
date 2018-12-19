@@ -17,6 +17,7 @@ import os
 import threading
 import time
 from threading import Lock
+import json
 
 
 ###################################################################################
@@ -25,12 +26,13 @@ from threading import Lock
 class Server(Thread):
 
     ###################################################################################
-    def __init__(self, ip: ip.itemsProvider, ap: ap.authProvider, sp: sp.sharesProvider, port, ssl=False, certificateKeyFile=None, certificateCrtFile=None, fullchainCrtFile="", aliases=None, maxUploadSize=None):
+    def __init__(self, ip: ip.itemsProvider, ap: ap.authProvider, sp: sp.sharesProvider, tp: tp.trackingProvider, port, ssl=False, certificateKeyFile=None, certificateCrtFile=None, fullchainCrtFile="", aliases=None, maxUploadSize=None):
         Thread.__init__(self)
         self.app = Flask(__name__)
         self.ip = ip
         self.ap = ap
         self.sp = sp
+        self.tp = tp
         self.port = port
         self.ssl = ssl
         self.certificateKeyFile = certificateKeyFile
@@ -48,6 +50,7 @@ class Server(Thread):
         if self.maxUploadSize is not None: self.app.config["MAX_CONTENT_LENGTH"] = self.maxUploadSize
 
         self._addRoute("/hello", self._routeHello, ["GET"])
+        self._addRoute("/infos", self._routeInfos, ["GET"])
         self._addRouteRaw("/", self._routeItems, ["GET", "POST"], "index")
         self._addRouteRaw("/<path:path>", self._routeItems, ["GET", "POST"], noCache=True)
         self._addRouteRaw("/_sf_assets/<path:path>", self._routeAssets, ["GET"])
@@ -152,6 +155,11 @@ class Server(Thread):
     ###################################################################################
     def _routeHello(self):
         return {"result": 200, "world": h.now(), "version": h.dictionnaryDeepGet(h.CONFIG, "version", default=0)}
+
+    ###################################################################################
+    def _routeInfos(self):
+        if request.headers.get("password") != ap.adminPassword: return {"result": 403}
+        return {"result": 200, "version": h.dictionnaryDeepGet(h.CONFIG, "version", default=0), "trackings": [t.__dict__ for t in self.tp.getTrackings(maxItems=5e3)]}
 
     ###################################################################################
     def _routeAssets(self, path):
@@ -413,7 +421,7 @@ h.logInfo("Shares provider built")
 ip = ip.itemsProvider(ap, h.DATA_FOLDER, tmpFolder=h.CONFIG.get("tmp folder", None), tmpFolderDuratioInDaysn=h.CONFIG.get("tmp folder duration in days", None), user=h.USER)
 h.logInfo("Items provider built")
 
-server = Server(ip, ap, sp, h.PORT, h.SSL, h.CERTIFICATE_KEY_FILE, h.CERTIFICATE_CRT_FILE, h.FULLCHAIN_CRT_FILE, aliases=h.CONFIG.get("aliases", None), maxUploadSize=h.CONFIG.get("max upload size", 20e6))
+server = Server(ip, ap, sp, tp, h.PORT, h.SSL, h.CERTIFICATE_KEY_FILE, h.CERTIFICATE_CRT_FILE, h.FULLCHAIN_CRT_FILE, aliases=h.CONFIG.get("aliases", None), maxUploadSize=h.CONFIG.get("max upload size", 20e6))
 server.start()
 h.logInfo("Server started", server.port, server.ssl)
 
