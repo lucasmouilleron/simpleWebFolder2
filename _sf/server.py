@@ -49,8 +49,8 @@ class Server(Thread):
 
         if self.maxUploadSize is not None: self.app.config["MAX_CONTENT_LENGTH"] = self.maxUploadSize
 
-        self._addRoute("/hello", self._routeHello, ["GET"])
-        self._addRoute("/infos", self._routeInfos, ["GET"])
+        self._addRoute("/_hello", self._routeHello, ["GET"])
+        self._addRoute("/_infos", self._routeInfos, ["GET"])
         self._addRouteRaw("/", self._routeItems, ["GET", "POST"], "index")
         self._addRouteRaw("/<path:path>", self._routeItems, ["GET", "POST"], noCache=True)
         self._addRouteRaw("/_sf_assets/<path:path>", self._routeAssets, ["GET"])
@@ -159,7 +159,7 @@ class Server(Thread):
     ###################################################################################
     def _routeInfos(self):
         if request.headers.get("password") != ap.adminPassword: return {"result": 403}
-        return {"result": 200, "version": h.dictionnaryDeepGet(h.CONFIG, "version", default=0), "trackings": [t.__dict__ for t in self.tp.getTrackings(maxItems=5e3)]}
+        return {"result": 200, "version": h.dictionnaryDeepGet(h.CONFIG, "version", default=0), "trackings": [t.__dict__ for t in self.tp.getTrackings(maxItems=5e3)], "hits": [t.date for t in self.tp.getTrackings()]}
 
     ###################################################################################
     def _routeAssets(self, path):

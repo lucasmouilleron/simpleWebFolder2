@@ -25,6 +25,7 @@ import pwd
 import urllib.parse as urlparse
 from urllib.parse import urlencode
 import shutil
+from collections import OrderedDict
 
 ###################################################################################
 SERVER_TIMEZONE = "Europe/Paris"
@@ -277,7 +278,7 @@ def getDateTimeFromTimestamp(timestamp, timezone):
 
 
 ################################################################################
-def parseDate(dateString, dateFormat, timezone):
+def parseDate(dateString, dateFormat, timezone=SERVER_TIMEZONE):
     if not timezone: return arrow.get(dateString, dateFormat).timestamp
     else: return arrow.get(dateString, dateFormat).replace(tzinfo=dateutil.tz.gettz(timezone)).timestamp
 
@@ -494,3 +495,22 @@ def updateQueryParams(url, params):
 ###################################################################################
 def cleanPath(path):
     return path.lstrip("/").rstrip("/").replace('//', '/', 1)
+
+################################################################################
+def groupItemsByKey(items, keyFunction):
+    itemsDict = OrderedDict()
+    itemsWithIndexesDict = OrderedDict()
+    for index in range(len(items)):
+        item = items[index]
+        itemKey = keyFunction(item)
+        if not itemKey in itemsDict: itemsDict[itemKey] = []
+        if not itemKey in itemsWithIndexesDict: itemsWithIndexesDict[itemKey] = []
+        itemsDict[itemKey].append(item)
+        itemsWithIndexesDict[itemKey].append({"item": item, "index": index})
+    return itemsDict, itemsWithIndexesDict
+
+################################################################################
+def getYearMonthDayFromTimestamp(timestamp, timezone=SERVER_TIMEZONE):
+    tsDateTime = datetime.datetime.fromtimestamp(timestamp, tz=dateutil.tz.gettz(timezone))
+    return 10000 * tsDateTime.year + 100 * tsDateTime.month + tsDateTime.day
+
