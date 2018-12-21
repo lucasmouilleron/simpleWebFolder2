@@ -159,7 +159,11 @@ class Server(Thread):
     ###################################################################################
     def _routeInfos(self):
         if request.headers.get("password") != ap.adminPassword: return {"result": 403}
-        return {"result": 200, "version": h.dictionnaryDeepGet(h.CONFIG, "version", default=0), "trackings": [t.__dict__ for t in self.tp.getTrackings(maxItems=5e3)], "hits": [t.date for t in self.tp.getTrackings()]}
+        allTrackings = self.tp.getTrackings()
+        hitsByItems, _ = h.groupItemsByKey(allTrackings, lambda d: d.path)
+        hitsByItems = {k: [hit.date for hit in hitsByItems[k]] for k in hitsByItems}
+        hits = [t.date for t in allTrackings]
+        return {"result": 200, "version": h.dictionnaryDeepGet(h.CONFIG, "version", default=0), "trackings": [t.__dict__ for t in self.tp.getTrackings(maxItems=5e3)], "hits": hits, "hitsByItems": hitsByItems}
 
     ###################################################################################
     def _routeAssets(self, path):
