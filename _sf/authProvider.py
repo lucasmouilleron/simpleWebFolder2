@@ -115,12 +115,14 @@ class authProvider():
         lh, lf = None, h.makePath(h.LOCKS_FOLDER, "_sfl_password_%s" % h.clean(path))
         try:
             passwordFile = h.makePath(self.basePath, path, ".password")
-            requiredPasswords = self.getPasswords(path)
+            requiredPasswords = list(self.getPasswords(path))
             requiredPasswords.append(password)
             lh = h.getLockExclusive(lf, 5)
             h.writeToFile(passwordFile, "\n".join(list(set(requiredPasswords))))
             return True
-        except: return False
+        except:
+            print(h.getLastExceptionAndTrace())
+            return False
         finally:
             if lh is not None: h.releaseLock(lh)
 
@@ -170,7 +172,7 @@ class authProvider():
 
             lh = h.getLockShared(lf, 5)
             passwords = [p for p in h.readFromFile(h.makePath(self.basePath, path, ".password")).split("\n") if p != ""]
-            self.passwordsCache[passwordsCacheKey] = {"passwords": set(passwords), "date": h.getFileModified(passwordsFile)}
+            self.passwordsCache[passwordsCacheKey] = {"passwords": passwords, "date": h.getFileModified(passwordsFile)}
             return passwords
         finally:
             self.passwordsLock.release()
