@@ -160,7 +160,7 @@ class authProvider():
     def getPasswords(self, path):
         path = h.cleanPath(path)
         passwordsFile = h.makePath(self.basePath, path, ".password")
-        if not os.path.exists(passwordsFile): return []
+        if not os.path.exists(passwordsFile): return set()
         passwordsCacheKey = h.makeKeyFromArguments(path)
         lh, lf = None, h.makePath(h.LOCKS_FOLDER, "_sfl_password_%s" % h.clean(path))
         try:
@@ -171,7 +171,7 @@ class authProvider():
                     return pc["passwords"]
 
             lh = h.getLockShared(lf, 5)
-            passwords = [p for p in h.readFromFile(h.makePath(self.basePath, path, ".password")).split("\n") if p != ""]
+            passwords = set([p for p in h.readFromFile(h.makePath(self.basePath, path, ".password")).split("\n") if p != ""])
             self.passwordsCache[passwordsCacheKey] = {"passwords": passwords, "date": h.getFileModified(passwordsFile)}
             return passwords
         finally:
