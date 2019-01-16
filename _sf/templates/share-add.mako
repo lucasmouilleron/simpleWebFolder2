@@ -8,11 +8,13 @@
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.0/css/all.css">
     <link rel="stylesheet" href="${baseURL}/_sf_assets/tooltipster.css">
     <link rel="stylesheet" href="${baseURL}/_sf_assets/tooltipster-theme.css">
-    <link rel="stylesheet" href="${baseURL}/_sf_assets/style.css?ck=2">
+    <link rel="stylesheet" href="${baseURL}/_sf_assets/style.css?ck=3">
     <title>${h.NAME} - Admin - Add share - ${path}</title>
 </head>
 
 <body>
+
+<div class="admin-section">Admin section</div>
 
 <div class="header">
     <a href="${baseURL}/shares">
