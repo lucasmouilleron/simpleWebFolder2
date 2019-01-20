@@ -181,10 +181,11 @@ class authProvider():
     ###################################################################################
     def isAuthorized(self, path, r: request):
         lowerProtectedPath = self.getLowerProtectedPath(path)
-        if (lowerProtectedPath == False): return (False, [], "", True, False)
+        if (lowerProtectedPath == False): return (False, [], "", True, False, False)
+        protectedFromParent = path != lowerProtectedPath
         requiredPasswords = self.getPasswords(lowerProtectedPath)
         savedPassword = self.getUserPassword(lowerProtectedPath, r)
-        return (True, sorted(requiredPasswords), savedPassword, savedPassword in requiredPasswords, lowerProtectedPath)
+        return (True, sorted(requiredPasswords), savedPassword, savedPassword in requiredPasswords, lowerProtectedPath, protectedFromParent)
 
     ###################################################################################
     def isShareAuthorized(self, s: sp.share, r: request):

@@ -70,16 +70,22 @@
     %if isProtected:
         <div class="block section">
             <div class="section-title">Add a password</div>
-            <form method="post" class="inline" action="${baseURL}/${path}">
-                <input type="text" name="new-password" placeholder="password to add" spellcheck="false" autocorrect="off" autocapitalize="none"/>
-                <label></label><input type="submit" name="add-password-submit" value="Add password" style="width:150px;"/>
-            </form>
+            %if not isProtectedFromParent:
+                <form method="post" class="inline" action="${baseURL}/${path}">
+                    <input type="text" name="new-password" placeholder="password to add" spellcheck="false" autocorrect="off" autocapitalize="none"/>
+                    <label></label><input type="submit" name="add-password-submit" value="Add password" style="width:150px;"/>
+                </form>
+            %else:
+                Protected from parent folder, can't add password from this folder.
+            %endif
         </div>
     %endif
 
     %if len(passwords)>1:
         <div class="block section">
-            <div class="section-title">${len(passwords)} passwords</div>
+            <div class="section-title">
+                ${len(passwords)} passwords
+            </div>
             <form method="post" class="inline" action="${baseURL}/${path}">
                 <input type="text" id="search-password" placeholder="search for (partial) password" spellcheck="false" autocorrect="off" autocapitalize="none"/>
             </form>

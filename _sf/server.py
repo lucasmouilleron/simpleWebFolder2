@@ -263,7 +263,7 @@ class Server(Thread):
         if item.shareForbidden: subAlerts.append("Folder cannot be shared with Sares.")
         if item.downloadForbidden and path != "": subAlerts.append("Folder not downloadable.")
         if len(subAlerts) > 0: alerts.append(["Special folder", "<br/>".join(subAlerts)])
-        response = make_response(self._makeTemplate("items-admin", isProtected=item.protected, passwords=sorted(item.passwords), containers=containers, leafs=leafs, path=path, readme=readme, alerts=alerts, editAllowed=editAllowed, isTmpFolder=isTmpFolder))
+        response = make_response(self._makeTemplate("items-admin", isProtected=item.protected,isProtectedFromParent=item.protectedFromParent, passwords=sorted(item.passwords), containers=containers, leafs=leafs, path=path, readme=readme, alerts=alerts, editAllowed=editAllowed, isTmpFolder=isTmpFolder))
         return response
 
     ###################################################################################

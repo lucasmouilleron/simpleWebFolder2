@@ -15,7 +15,7 @@ from typing import List
 ###################################################################################
 ###################################################################################
 class item:
-    def __init__(self, path, name, lastModified, isAuthorized, protected, forbidden, showForbidden, listingForbidden, downloadForbidden, shareForbidden, isTmpFolder, editAllowed, leaf, container, lowerProtectedPath, nbItems=0, passwords=[], expires=0, size=0, extension="", savedPassword=""):
+    def __init__(self, path, name, lastModified, isAuthorized, protected, forbidden, showForbidden, listingForbidden, downloadForbidden, shareForbidden, isTmpFolder, editAllowed, leaf, container, lowerProtectedPath, nbItems=0, passwords=[], expires=0, size=0, extension="", savedPassword="", protectedFromParent=False):
         self.path = path
         self.name = name
         self.lastModified = lastModified
@@ -23,6 +23,7 @@ class item:
         self.isAuthorized = isAuthorized
         self.passwords = passwords
         self.protected = protected
+        self.protectedFromParent = protectedFromParent
         self.forbidden = forbidden
         self.showForbidden = showForbidden
         self.listingForbidden = listingForbidden
@@ -131,8 +132,8 @@ class itemsProvider():
         fullPath = h.makePath(self.basePath, path)
         isLeaf = self.isItemLeaf(path)
         isContainer = not isLeaf
-        if r is not None: protected, requiredPasswords, savedPassword, isAuthorized, lowerProtectedPath = self.ap.isAuthorized(path, r)
-        else: isAuthorized, requiredPasswords, protected, savedPassword, lowerProtectedPath = True, "", False, "", ""
+        if r is not None: protected, requiredPasswords, savedPassword, isAuthorized, lowerProtectedPath, protectedFromParent = self.ap.isAuthorized(path, r)
+        else: isAuthorized, requiredPasswords, protected, savedPassword, lowerProtectedPath, protectedFromParent = True, "", False, "", "", False
         if asAdmin: isAuthorized = True
         if isLeaf:
             extension = os.path.splitext(path)[-1].replace(".", "")
@@ -152,7 +153,7 @@ class itemsProvider():
         downloadForbidden = self.ap.downloadForbidden(path)
         expires = h.getFileModified(h.makePath(self.basePath, path)) + self.tmpFolderDuration
 
-        return item(path, os.path.basename(path), os.stat(fullPath).st_mtime, isAuthorized, protected, isForbidden, showForbidden, listingForbidden, downloadForbidden, shareForbidden, isTmpFolder, editAllowed, isLeaf, isContainer, lowerProtectedPath, nbItems, requiredPasswords, expires, size, extension, savedPassword)
+        return item(path, os.path.basename(path), os.stat(fullPath).st_mtime, isAuthorized, protected, isForbidden, showForbidden, listingForbidden, downloadForbidden, shareForbidden, isTmpFolder, editAllowed, isLeaf, isContainer, lowerProtectedPath, nbItems, requiredPasswords, expires, size, extension, savedPassword, protectedFromParent)
 
     ###################################################################################
     def getItems(self, path, r=None, asAdmin=False, overrideListingForbidden=False, overrideNoShow=False) -> (List[item], List[item]):
