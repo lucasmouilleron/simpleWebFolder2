@@ -59,7 +59,7 @@ class sharesProvider():
         else:
             view["ip"] = "unk"
             view["location"] = "unk"
-        if subPath is not None: view["item"] = h.makePath(s.file, subPath)
+        if subPath is not None: view["item"] = h.makePath(s.file, subPath).rstrip("/")
         views.append(view)
         views = sorted(views, key=lambda v: v["date"])[::-1]
         s.views = views
