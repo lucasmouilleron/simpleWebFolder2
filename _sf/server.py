@@ -333,7 +333,7 @@ class Server(Thread):
         s, hint = self.sp.getShare(shareID, asAdmin=isAdmin, r=request, subPath=subPath)
         if s is None: raise Exception("Can't get Share %s, %s" % (shareID, hint))
 
-        if isAdmin: return self._makeTemplate("share-admin", shareID=shareID, share=s)
+        if isAdmin and request.args.get("view") is None: return self._makeTemplate("share-admin", shareID=shareID, share=s)
 
         sharePassword = s.password
         shareBasePath = s.file
