@@ -186,6 +186,7 @@ class Server(Thread):
             return self._redirect(path, response)
 
         if h.TRACKING: tp.track(path, request, item.protected, item.isAuthorized, item.savedPassword)
+        alerts = []
         if item.isAuthorized:
             if ip.isItemLeaf(path):
                 if item.forbidden: return self._makeTemplate("forbidden", path=path)
@@ -194,11 +195,14 @@ class Server(Thread):
                 if item.forbidden: return self._makeTemplate("forbidden", path=path)
                 if item.listingForbidden: return self._makeTemplate("forbidden", path=path)
                 if "download" in request.args and not item.downloadForbidden: return self._downloadAndDeleteFile(ip.getZipFile(path, request), "%s.zip" % (os.path.basename(path) if path != "" else "root"))
-                alerts = []
                 containers, leafs = ip.getItems(path, request)
                 readme = ip.getReadme(path)
                 return self._makeTemplate("items", containers=containers, leafs=leafs, path=path, readme=readme, downloadAllowed=not self.ap.downloadForbidden(path), currentURLWithoutURI=path, alerts=alerts)
-        else: return self._makeTemplate("password", path=path, lowerProtectedPath=item.lowerProtectedPath)
+        else:
+            if item.protected:
+                if item.savedPassword is not None and item.savedPassword != "": alerts.append(["Can't authenticate", "The password you provided (%s) is not valid." % item.savedPassword])
+                else: alerts.append(["Can't authenticate", "You did not provide a password."])
+            return self._makeTemplate("password", path=path, lowerProtectedPath=item.lowerProtectedPath, alerts=alerts)
 
     ###################################################################################
     def _routeNoAdmin(self):
@@ -263,7 +267,7 @@ class Server(Thread):
         if item.shareForbidden: subAlerts.append("Folder cannot be shared with Sares.")
         if item.downloadForbidden and path != "": subAlerts.append("Folder not downloadable.")
         if len(subAlerts) > 0: alerts.append(["Special folder", "<br/>".join(subAlerts)])
-        response = make_response(self._makeTemplate("items-admin", isProtected=item.protected,isProtectedFromParent=item.protectedFromParent, passwords=sorted(item.passwords), containers=containers, leafs=leafs, path=path, readme=readme, alerts=alerts, editAllowed=editAllowed, isTmpFolder=isTmpFolder))
+        response = make_response(self._makeTemplate("items-admin", isProtected=item.protected, isProtectedFromParent=item.protectedFromParent, passwords=sorted(item.passwords), containers=containers, leafs=leafs, path=path, readme=readme, alerts=alerts, editAllowed=editAllowed, isTmpFolder=isTmpFolder))
         return response
 
     ###################################################################################

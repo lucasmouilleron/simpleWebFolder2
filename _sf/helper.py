@@ -496,6 +496,7 @@ def updateQueryParams(url, params):
 def cleanPath(path):
     return path.lstrip("/").rstrip("/").replace('//', '/', 1)
 
+
 ################################################################################
 def groupItemsByKey(items, keyFunction):
     itemsDict = OrderedDict()
@@ -509,8 +510,8 @@ def groupItemsByKey(items, keyFunction):
         itemsWithIndexesDict[itemKey].append({"item": item, "index": index})
     return itemsDict, itemsWithIndexesDict
 
+
 ################################################################################
 def getYearMonthDayFromTimestamp(timestamp, timezone=SERVER_TIMEZONE):
     tsDateTime = datetime.datetime.fromtimestamp(timestamp, tz=dateutil.tz.gettz(timezone))
     return 10000 * tsDateTime.year + 100 * tsDateTime.month + tsDateTime.day
-

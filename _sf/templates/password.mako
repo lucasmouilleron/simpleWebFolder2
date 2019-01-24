@@ -33,6 +33,14 @@
     <div class="page">/${path}</div>
 </div>
 
+
+    %for alert in alerts:
+        <div class="alert">
+            <h2>${alert[0]}</h2>
+            <p>${alert[1]}</p>
+        </div>
+    %endfor
+
 <div class="block section">
     <div class="section-title">Protected area, please authenticate</div>
     <form method="post" action="${baseURL}/${path}">
