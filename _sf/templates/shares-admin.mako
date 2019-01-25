@@ -40,6 +40,19 @@
         </div>
     %endfor
 
+    %if shareAdded is not None:
+        <div class="alert">
+            <h2>Share created</h2>
+            <p>The share <i>${shareAdded.ID}</i> has been created for <i>${shareAdded.file}</i>.<br/>
+                % if shareAdded.password!="":
+                    <a class="link" data-clipboard-text="${rootURL}/share=${h.urlEncode(shareAdded.ID)} (password: ${shareAdded.password})">Copy link + password</a>
+                %else:
+                    <a class="link" data-clipboard-text="${rootURL}/share=${h.urlEncode(shareAdded.ID)}">Copy link</a>
+                %endif
+            </p>
+        </div>
+    %endif
+
 <div class="block section">
     <div class="section-title">Share lookup</div>
     <form method="post" action="/shares" class="inline">
@@ -87,7 +100,7 @@
                     <td class="actions">
                         <% shareIDEncoded = h.urlEncode(share.ID)%>
                         % if share.password!="":
-                            <a class="link" data-clipboard-text="${rootURL}/share=${shareIDEncoded} (password: ${share.password})" data-toggle="tooltip" title="Copy link"><i class="icon fas fa-link"></i></a>
+                            <a class="link" data-clipboard-text="${rootURL}/share=${shareIDEncoded} (password: ${share.password})" data-toggle="tooltip" title="Copy link + password"><i class="icon fas fa-link"></i></a>
                         %else:
                             <a class="link" data-clipboard-text="${rootURL}/share=${shareIDEncoded}" data-toggle="tooltip" title="Copy link"><i class="icon fas fa-link"></i></a>
                         % endif

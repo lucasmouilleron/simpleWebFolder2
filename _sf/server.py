@@ -278,12 +278,12 @@ class Server(Thread):
         return self._makeTemplate("tracking", trackings=tp.getTrackings(password if password != "" else None, item if item != "" else None, protected, h.parseInt(maxItems, None)), password=password, item=item, maxItems=maxItems, protected=protected)
 
     ###################################################################################
-    def _routeShares(self, alerts=None):
+    def _routeShares(self, alerts=None, shareAdded=None):
         if alerts is None: alerts = []
         if not self.ap.isAdmin(request): return self._redirect("/admin")
         maxShares = 50
         filterShareID = request.form.get("filterShareID", "")
-        return self._makeTemplate("shares-admin", shares=self.sp.listShares(filterShareID, maxShares=maxShares), alerts=alerts, maxShares=maxShares, filterShareID=filterShareID)
+        return self._makeTemplate("shares-admin", shares=self.sp.listShares(filterShareID, maxShares=maxShares), alerts=alerts, maxShares=maxShares, filterShareID=filterShareID, shareAdded=shareAdded)
 
     ###################################################################################
     def _routeShareRemove(self, shareID):
@@ -314,8 +314,8 @@ class Server(Thread):
                 if not sp.shareExists(shareID) or shareForceSubmit:
                     share, hint = self.sp.addShare(shareID, path, durationInSecs, password)
                     if share is not None:
-                        alerts.append(["Share created", "The Share %s has been created for %s" % (shareID, path)])
-                        return self._routeShares(alerts)
+                        # alerts.append(["Share created", "The Share %s has been created for %s" % (shareID, path)])
+                        return self._routeShares(alerts, shareAdded=share)
                     else: alerts.append(["Can't create Share", "Share %s could not be created. Hint: %s" % (shareID, hint)])
                 else:
                     alerts.append(["Can't create Share", "The Share ID %s is alread used for %s." % (shareID, path)])
