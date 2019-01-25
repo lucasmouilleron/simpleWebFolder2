@@ -36,6 +36,7 @@
 <div class="share section">
     <div class="section-title">Share ${share.ID}</div>
     <% shareExpires = "Never" if share.duration==0 else h.formatTimestamp(share.duration+share.creation, "YYYY/MM/DD HH:mm")%>
+    <% shareIDEncoded = h.urlEncode(share.ID)%>
     <table>
         <thead>
         <tr>
@@ -45,6 +46,7 @@
             <th>Expiration</th>
             <th>Password</th>
             <th># views</th>
+            <th width="70">Actions</th>
         </tr>
         </thead>
         <tbody>
@@ -56,6 +58,14 @@
             <td>${shareExpires}</td>
             <td>${share.password}</td>
             <td>${len(share.views)}</td>
+            <td>
+                % if share.password!="":
+                    <a class="link" data-clipboard-text="${rootURL}/share=${shareIDEncoded} (password: ${share.password})" data-toggle="tooltip" title="Copy link + password"><i class="icon fas fa-link"></i></a>
+                %else:
+                    <a class="link" data-clipboard-text="${rootURL}/share=${shareIDEncoded}" data-toggle="tooltip" title="Copy link"><i class="icon fas fa-link"></i></a>
+                % endif
+                <a data-toggle="tooltip" title="Remove" class="confirmation" href="${rootURL}/remove-share=${shareIDEncoded}"><i class="icon fas fa-trash"></i></a>
+            </td>
         </tr>
         </tbody>
     </table>
@@ -94,6 +104,15 @@
 <script>
     $(document).ready(function () {
         window.name = "_share_${share.ID}";
+
+        $('.confirmation').on('click', function () {
+            return confirm('Are you sure?');
+        });
+
+        var clipboard = new ClipboardJS(".link");
+        clipboard.on('success', function (e) {
+            alert("Link " + e.text + " copied to clipboard")
+        });
 
         $('[data-toggle="tooltip"]').tooltipster({theme: "tooltipster-borderless", animationDuration: 200, delay: 20, side: "bottom"});
         var table = $("table").stupidtable();

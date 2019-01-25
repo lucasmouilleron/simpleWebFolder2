@@ -86,19 +86,20 @@
                 <% shareURL = "ok"%>
                 <% evenClass = "even" if i % 2 == 1 else "odd"%>
                 <% shareExpires = "Never" if share.duration==0 else h.formatTimestamp(share.duration+share.creation, "YYYY/MM/DD HH:mm")%>
+                <% shareIDEncoded = h.urlEncode(share.ID)%>
                 <tr class="${evenClass}">
-                    <td>${share.ID}</td>
-                    <td onclick="window.open('/${share.file}')"><a>${share.file}</a></td>
-                    <td>${shareExpires}</td>
-                    <td>${share.password}</td>
-                    <td>${len(share.views)}</td>
+                    <td onclick="window.open('${rootURL}/share=${shareIDEncoded}')">${share.ID}</td>
+                    <td onclick="window.open('${rootURL}/share=${shareIDEncoded}')">${share.file}</td>
+                    <td onclick="window.open('${rootURL}/share=${shareIDEncoded}')">${shareExpires}</td>
+                    <td onclick="window.open('${rootURL}/share=${shareIDEncoded}')">${share.password}</td>
+                    <td onclick="window.open('${rootURL}/share=${shareIDEncoded}')">${len(share.views)}</td>
                     <td>
                         %if len(share.views)>0:
                         ${h.formatTimestamp(share.views[-1]["date"], "YYYY/MM/DD HH:mm")}
                         %endif
                     </td>
                     <td class="actions">
-                        <% shareIDEncoded = h.urlEncode(share.ID)%>
+
                         % if share.password!="":
                             <a class="link" data-clipboard-text="${rootURL}/share=${shareIDEncoded} (password: ${share.password})" data-toggle="tooltip" title="Copy link + password"><i class="icon fas fa-link"></i></a>
                         %else:
