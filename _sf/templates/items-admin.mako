@@ -6,6 +6,7 @@
     <script src="${baseURL}/_sf_assets/clipboard.js"></script>
     <script src="${baseURL}/_sf_assets/tooltipstr.js"></script>
     <script src="${baseURL}/_sf_assets/readmore.js"></script>
+    <script src="${baseURL}/_sf_assets/cookie.js"></script>
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.0/css/all.css">
     <link rel="stylesheet" href="${baseURL}/_sf_assets/tooltipster.css">
     <link rel="stylesheet" href="${baseURL}/_sf_assets/tooltipster-theme.css">
@@ -53,7 +54,7 @@
 
     % if readme is not None:
         <div class="block section">
-            <div class="readme-content">${readme}</div>
+            <div class="readme-content" id="readme-admin">${readme}</div>
         </div>
     % endif
 
@@ -240,6 +241,12 @@
 <script>
     $(document).ready(function () {
         window.name = "_files";
+
+        var adminViewCount = Cookies.get("admin-${path}");
+        if (adminViewCount === undefined) adminViewCount = 0;
+        adminViewCount++;
+        Cookies.set("admin-${path}", adminViewCount);
+        if (adminViewCount > 5) {$("#readme-admin").readmore({collapsedHeight: 40});}
 
         var clipboard = new ClipboardJS(".link");
         clipboard.on('success', function (e) {
