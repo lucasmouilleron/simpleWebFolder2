@@ -43,8 +43,8 @@ class Server(Thread):
         self.maxUploadSize = maxUploadSize
 
         self.firewallIPs = {}
-        self.firewallNbHits = 50
-        self.firewallWindowSize = 2
+        self.firewallNbHits = 150
+        self.firewallWindowSize = 10
         self.firewallLock = Lock()
 
         if self.maxUploadSize is not None: self.app.config["MAX_CONTENT_LENGTH"] = self.maxUploadSize
@@ -93,14 +93,21 @@ class Server(Thread):
         try:
             self.firewallLock.acquire()
             userIP = r.remote_addr
-            if not userIP in self.firewallIPs: self.firewallIPs[userIP] = []
-            hits = self.firewallIPs[userIP]
+            if not userIP in self.firewallIPs: self.firewallIPs[userIP] = {"banned": 0, "hits": []}
+            f = self.firewallIPs[userIP]
+            now = h.now()
+            banned = f["banned"]
+            if now < banned: return False, "Too many requests, banned for %s seconds" % (banned - now)
+            hits = f["hits"]
             hits.append(h.now())
             if len(hits) < self.firewallNbHits: return True, ""
-            windowStart = h.now() - self.firewallWindowSize
+            windowStart = now - self.firewallWindowSize
             hits = [hit for hit in hits if hit >= windowStart]
-            self.firewallIPs[userIP] = hits
-            if len(hits) >= self.firewallNbHits: return False, "Too many requests"
+            f["hits"] = hits
+            if len(hits) >= self.firewallNbHits:
+                f["banned"] = now + 1 * self.firewallWindowSize
+                h.logWarning("IP added to firewall", userIP)
+                return False, "Too many requests, banned for %s seconds" % (banned - now)
             return True, ""
         except: return True, ""
         finally:
