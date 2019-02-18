@@ -51,7 +51,7 @@ class Server(Thread):
 
         self._addRoute("/_hello", self._routeHello, ["GET"])
         self._addRoute("/_infos", self._routeInfos, ["GET"])
-        self._addRoute("/ping", self._routePing, ["GET"])
+        self._addRoute("/_ping", self._routePing, ["GET"])
         self._addRouteRaw("/", self._routeItems, ["GET", "POST"], "index")
         self._addRouteRaw("/<path:path>", self._routeItems, ["GET", "POST"], noCache=True)
         self._addRouteRaw("/_sf_assets/<path:path>", self._routeAssets, ["GET"])
