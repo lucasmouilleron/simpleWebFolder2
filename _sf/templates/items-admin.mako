@@ -71,13 +71,15 @@
     %if isProtected:
         <div class="block section">
             <div class="section-title">Add a password</div>
-            %if not isProtectedFromParent:
+            % if isProtectedFromParent:
+                Protected from parent folder, can't add password from this folder.
+            % elif passwordAddForbidden:
+                Can't edit password of this folder.
+            % else:
                 <form method="post" class="inline" action="${baseURL}/${path}">
                     <input type="text" name="new-password" placeholder="password to add" spellcheck="false" autocorrect="off" autocapitalize="none"/>
                     <label></label><input type="submit" name="add-password-submit" value="Add password" style="width:150px;"/>
                 </form>
-            %else:
-                Protected from parent folder, can't add password from this folder.
             %endif
         </div>
     %endif

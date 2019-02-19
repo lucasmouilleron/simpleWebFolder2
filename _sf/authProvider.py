@@ -85,6 +85,11 @@ class authProvider():
         return h.isfile(h.makePath(self.basePath, path, ".noshare"))
 
     ###################################################################################
+    def passwordAddForbidden(self, path):
+        path = h.cleanPath(path)
+        return h.isfile(h.makePath(self.basePath, path, ".nopasswordadd"))
+
+    ###################################################################################
     def setShareForbidden(self, path):
         path = h.cleanPath(path)
         h.writeToFile(h.makePath(self.basePath, path, ".noshare"), "")
@@ -112,6 +117,7 @@ class authProvider():
     def addNewPassword(self, path, password):
         path = h.cleanPath(path)
         if password is None: return False
+        if self.passwordAddForbidden(path): return False
         lh, lf = None, h.makePath(h.LOCKS_FOLDER, "_sfl_password_%s" % h.clean(path))
         try:
             passwordFile = h.makePath(self.basePath, path, ".password")
