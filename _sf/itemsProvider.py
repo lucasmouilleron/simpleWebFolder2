@@ -15,7 +15,7 @@ from typing import List
 ###################################################################################
 ###################################################################################
 class item:
-    def __init__(self, path, name, lastModified, isAuthorized, protected, forbidden, showForbidden, listingForbidden, downloadForbidden, shareForbidden, passwordAddForbidden, isTmpFolder, editAllowed, leaf, container, lowerProtectedPath, nbItems=0, passwords=[], expires=0, size=0, extension="", savedPassword="", protectedFromParent=False):
+    def __init__(self, path, name, lastModified, isAuthorized, protected, forbidden, showForbidden, listingForbidden, downloadForbidden, shareForbidden, passwordEditForbidden, isTmpFolder, editAllowed, leaf, container, lowerProtectedPath, nbItems=0, passwords=[], expires=0, size=0, extension="", savedPassword="", protectedFromParent=False):
         self.path = path
         self.name = name
         self.lastModified = lastModified
@@ -28,7 +28,7 @@ class item:
         self.showForbidden = showForbidden
         self.listingForbidden = listingForbidden
         self.downloadForbidden = downloadForbidden
-        self.passwordAddForbidden = passwordAddForbidden
+        self.passwordEditForbidden = passwordEditForbidden
         self.shareForbidden = shareForbidden
         self.isTmpFolder = isTmpFolder
         self.editAllowed = editAllowed
@@ -152,10 +152,10 @@ class itemsProvider():
         showForbidden = self.ap.showForbidden(path)
         editAllowed = self.ap.isEditAllowed(path)
         downloadForbidden = self.ap.downloadForbidden(path)
-        passwordAddForbidden = self.ap.passwordAddForbidden(path)
+        passwordEditForbidden = self.ap.passwordEditForbidden(path)
         expires = h.getFileModified(h.makePath(self.basePath, path)) + self.tmpFolderDuration
 
-        return item(path, os.path.basename(path), os.stat(fullPath).st_mtime, isAuthorized, protected, isForbidden, showForbidden, listingForbidden, downloadForbidden, shareForbidden, passwordAddForbidden, isTmpFolder, editAllowed, isLeaf, isContainer, lowerProtectedPath, nbItems, requiredPasswords, expires, size, extension, savedPassword, protectedFromParent)
+        return item(path, os.path.basename(path), os.stat(fullPath).st_mtime, isAuthorized, protected, isForbidden, showForbidden, listingForbidden, downloadForbidden, shareForbidden, passwordEditForbidden, isTmpFolder, editAllowed, isLeaf, isContainer, lowerProtectedPath, nbItems, requiredPasswords, expires, size, extension, savedPassword, protectedFromParent)
 
     ###################################################################################
     def getItems(self, path, r=None, asAdmin=False, overrideListingForbidden=False, overrideNoShow=False) -> (List[item], List[item]):

@@ -73,7 +73,7 @@
             <div class="section-title">Add a password</div>
             % if isProtectedFromParent:
                 Protected from parent folder, can't add password from this folder.
-            % elif passwordAddForbidden:
+            % elif passwordEditForbidden:
                 Can't edit password of this folder.
             % else:
                 <form method="post" class="inline" action="${baseURL}/${path}">
@@ -110,7 +110,6 @@
             </form>
         </div>
     %endif
-
 
 
     % if len(containers)>0:
