@@ -95,7 +95,7 @@
                     <td onclick="window.open('${rootURL}/share=${shareIDEncoded}')">${len(share.views)}</td>
                     <td>
                         %if len(share.views)>0:
-                        ${h.formatTimestamp(share.views[-1]["date"], "YYYY/MM/DD HH:mm")}
+                        ${h.formatTimestamp(share.views[0]["date"], "YYYY/MM/DD HH:mm")}
                         %endif
                     </td>
                     <td class="actions">
