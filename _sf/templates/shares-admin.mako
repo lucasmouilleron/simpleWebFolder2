@@ -73,10 +73,10 @@
         <tr>
             <th data-sort="string-ins">ID</th>
             <th data-sort="string-ins">File</th>
-            <th data-sort="string-ins" width="160">Expiration</th>
+            <th data-sort="string-ins" width="130">Expiration</th>
             <th data-sort="string-ins">Password</th>
             <th data-sort="int" width="50"># views</th>
-            <th data-sort="string-ins" width="160">Latest</th>
+            <th data-sort="string-ins" width="180">Latest</th>
             <th width="70">Actions</th>
         </tr>
         </thead>
@@ -95,7 +95,7 @@
                     <td onclick="window.open('${rootURL}/share=${shareIDEncoded}')">${len(share.views)}</td>
                     <td>
                         %if len(share.views)>0:
-                        ${h.formatTimestamp(share.views[0]["date"], "YYYY/MM/DD HH:mm")}
+                        ${h.formatTimestamp(share.views[0]["date"], "YYYY/MM/DD HH:mm")} ${share.views[0].get("tag","")}
                         %endif
                     </td>
                     <td class="actions">
