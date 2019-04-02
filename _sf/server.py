@@ -121,7 +121,7 @@ class Server(Thread):
             for k in list(self.firewallIPs):
                 ips = self.firewallIPs[k]
                 if len(ips) == 0: self.firewallIPs.pop(k)
-                elif ips[-1] < h.now() - self.firewallWindowSize: self.firewallIPs.pop(k)
+                elif ips["hits"][-1] < h.now() - self.firewallWindowSize: self.firewallIPs.pop(k)
         finally:
             if self.firewallLock.locked(): self.firewallLock.release()
 
