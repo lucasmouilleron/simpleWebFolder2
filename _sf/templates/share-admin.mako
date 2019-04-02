@@ -78,6 +78,7 @@
         <tr>
             <th data-sort="string-ins" width="120">IP</th>
             <th data-sort="string-ins" width="120">Location</th>
+            <th data-sort="string-ins" width="120">Tag</th>
             <th data-sort="string-ins" width="150">Date</th>
             <th data-sort="string-ins">Item</th>
         </tr>
@@ -89,6 +90,7 @@
                 <tr class="${evenClass}">
                     <td>${view["ip"]}</td>
                     <td>${view["location"]}</td>
+                    <td>${view.get("tag","")}</td>
                     <td>${h.formatTimestamp(view["date"], "YYYY/MM/DD HH:mm")}</td>
                     <td>${view["item"]}</td>
                 </tr>

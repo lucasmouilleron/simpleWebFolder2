@@ -26,6 +26,7 @@ import urllib.parse as urlparse
 from urllib.parse import urlencode
 import shutil
 from collections import OrderedDict
+from urllib import parse
 
 ###################################################################################
 SERVER_TIMEZONE = "Europe/Paris"
@@ -515,3 +516,9 @@ def groupItemsByKey(items, keyFunction):
 def getYearMonthDayFromTimestamp(timestamp, timezone=SERVER_TIMEZONE):
     tsDateTime = datetime.datetime.fromtimestamp(timestamp, tz=dateutil.tz.gettz(timezone))
     return 10000 * tsDateTime.year + 100 * tsDateTime.month + tsDateTime.day
+
+
+################################################################################
+def getURLParams(url):
+    try: return dict(parse.parse_qsl(parse.urlsplit(url).query))
+    except: return {}

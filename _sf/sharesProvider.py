@@ -50,7 +50,7 @@ class sharesProvider():
         except: return ip
 
     ###################################################################################
-    def _doAddView(self, s: share, subPath, address):
+    def _doAddView(self, s: share, subPath, address, tag):
         views = s.views
         view = {"date": h.now()}
         if address is not None:
@@ -59,6 +59,7 @@ class sharesProvider():
         else:
             view["ip"] = "unk"
             view["location"] = "unk"
+        if tag is not None: view["tag"] = tag
         if subPath is not None: view["item"] = h.makePath(s.file, subPath).rstrip("/")
         views.append(view)
         views = sorted(views, key=lambda v: v["date"])[::-1]
@@ -108,7 +109,9 @@ class sharesProvider():
             else: rs, rh = s, "ok"
             h.releaseLock(lh)
             lh = None
-            if not asAdmin: self.addView(s, subPath, r.remote_addr if r is not None else None)
+            tag = None
+            if r is not None: tag = h.getURLParams(r.url).get("t", None)
+            if not asAdmin: self.addView(s, subPath, r.remote_addr if r is not None else None, tag)
             return rs, rh
         except:
             le, lt = h.getLastExceptionAndTrace()
@@ -133,8 +136,8 @@ class sharesProvider():
         return os.path.exists(h.makePath(self.sharesPath, shareID))
 
     ###################################################################################
-    def addView(self, s: share, subpath, address):
-        threading.Thread(target=self._doAddView, args=(s, subpath, address)).start()
+    def addView(self, s: share, subpath, address, tag):
+        threading.Thread(target=self._doAddView, args=(s, subpath, address, tag)).start()
 
     ###################################################################################
     def saveShare(self, s: share):
