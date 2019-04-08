@@ -70,6 +70,7 @@ class trackingProvider():
             self.trackingsLock.acquire()
             trackingFile = h.makePath(self.basePath, ".tracking")
             tmpTrackingFile = h.makePath(self.basePath, ".tracking.tmp")
+            h.logDebug("Saving trackings saved to file", len(self.trackings), trackingFile)
             headers, datas = ["path", "authorized", "password", "ip", "date", "protected", "location"], []
             for t in self.trackings: datas.append([t.path, t.authorized, t.password, t.ip, t.date, t.protected, t.location])
             h.writeToCSV(datas, tmpTrackingFile, headers=headers, append=True)
