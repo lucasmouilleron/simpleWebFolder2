@@ -64,7 +64,7 @@
             <th data-sort="string-ins" width="200">Password</th>
             <th data-sort="string-ins" width="120">IP</th>
             <th data-sort="string-ins" width="120">Location</th>
-            <th data-sort="string-ins" width="150">Date</th>
+            <th data-sort="string-ins" width="200">Date</th>
         </tr>
         </thead>
         <tbody>
@@ -72,7 +72,7 @@
             % for tracking in trackings:
                 <% evenClass = "even" if i % 2 == 1 else "odd" %>
                 <tr class="${evenClass}">
-                    <td>${tracking.path}</td>
+                    <td style="max-width:400px;word-wrap: break-word;">${tracking.path}</td>
                     <td>${tracking.protected}</td>
                     <td>${tracking.authorized}</td>
                     <td>${tracking.password}</td>
