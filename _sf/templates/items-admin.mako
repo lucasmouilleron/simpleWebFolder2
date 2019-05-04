@@ -3,10 +3,10 @@
 <head>
     <script src="${baseURL}/_sf_assets/jquery.js"></script>
     <script src="${baseURL}/_sf_assets/stupidtable.js"></script>
-    <script src="${baseURL}/_sf_assets/clipboard.js"></script>
     <script src="${baseURL}/_sf_assets/tooltipstr.js"></script>
     <script src="${baseURL}/_sf_assets/readmore.js"></script>
     <script src="${baseURL}/_sf_assets/cookie.js"></script>
+    <script src="${baseURL}/_sf_assets/helpers.js"></script>
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.0/css/all.css">
     <link rel="stylesheet" href="${baseURL}/_sf_assets/tooltipster.css">
     <link rel="stylesheet" href="${baseURL}/_sf_assets/tooltipster-theme.css">
@@ -93,7 +93,7 @@
             <div id="passwords">
                 <% currentURL = h.urlEncode(h.makePath(rootURL, path))%>
                 %for password in passwords:
-                    <span data-password="${password}">${password} <a data-toggle="tooltip" title="Copy link + password" class="link" data-clipboard-text="${currentURL} (password: ${password})"><i class="icon fas fa-link"></i></a></span>
+                    <span data-password="${password}">${password} <a data-toggle="tooltip" title="Copy link" class="link copy-link" data-url="${currentURL}" data-password="${password}"><i class="icon fas fa-link"></i></a></span>
                 %endfor
                 <div id="no-found-passwords" style="display:none">No password found</div>
             </div>
@@ -155,10 +155,8 @@
                                 <td onclick="location.href='$${baseURL}/{urlEncodedPath}'">${h.formatTimestamp(item.expires,"YYYY/MM/DD HH:mm")}</td>
                             %endif
                             <td class="actions">
-                                % if item.protected:
-                                    <a data-toggle="tooltip" title="Copy link + password" class="link" data-clipboard-text="${itemURL} (password: ${item.passwords[0]})"><i class="icon fas fa-link"></i></a>
-                                %elif not item.listingForbidden:
-                                    <a data-toggle="tooltip" title="Copy link" class="link" data-clipboard-text="${itemURL}"><i class="icon fas fa-link"></i></a>
+                                % if item.protected or not item.listingForbidden:
+                                    <a data-toggle="tooltip" title="Copy link" class="link copy-link" data-url="${itemURL}" data-password="${item.passwords[0] if len(item.passwords)>0 else ""}"><i class="icon fas fa-link"></i></a>
                                 %else:
                                     <a data-toggle="tooltip" title="Can't copy link" class="link disabled"><i class="icon fas fa-link"></i></a>
                                 % endif
@@ -215,11 +213,7 @@
                                 <td onclick="location.href='${baseURL}/${urlEncodedPath}'">${h.formatTimestamp(item.expires,"YYYY/MM/DD HH:mm")}</td>
                             %endif
                             <td class="actions">
-                                % if item.protected:
-                                    <a data-toggle="tooltip" title="Copy link + password" class="link" data-clipboard-text="${itemURL} (password: ${item.passwords[0]})"><i class="icon fas fa-link"></i></a>
-                                %else:
-                                    <a data-toggle="tooltip" title="Copy link" class="link" data-clipboard-text="${itemURL}"><i class="icon fas fa-link"></i></a>
-                                % endif
+                                <a data-toggle="tooltip" title="Copy link" class="link copy-link" data-url="${itemURL}" data-password="${item.passwords[0] if len(item.passwords)>0 else ""}"><i class="icon fas fa-link"></i></a>
                                 % if h.SHARING and not isTmpFolder:
                                     <a data-toggle="tooltip" title="Create share" href="${rootURL}/create-share=${shareURLEncoded}" target="_shares"><i class="icon fas fa-share-alt-square"></i></a>
                                 % endif
@@ -246,11 +240,6 @@
         adminViewCount++;
         Cookies.set("admin-${path}", adminViewCount);
         if (adminViewCount > 5) {$("#readme-admin").readmore({collapsedHeight: 40});}
-
-        var clipboard = new ClipboardJS(".link");
-        clipboard.on('success', function (e) {
-            alert("Link " + e.text + " copied to clipboard")
-        });
 
         $('.confirmation').on('click', function () {
             return confirm('Are you sure?');
@@ -304,6 +293,15 @@
             });
             if (found == 0) {$("#no-found-passwords").show();}
             $("#passwords").readmore(readMoreOptions);
+        });
+
+        $(".copy-link").on("click", function () {
+            var url = $(this).attr("data-url");
+            var password = $(this).attr("data-password");
+            var hasPassword = password !== "";
+            var copied = hasPassword ? url + " (password: " + password + ")" : url;
+            copyStringToClipboard(copied);
+            window.alert("Link " + copied + " to clipboard.");
         });
 
     });

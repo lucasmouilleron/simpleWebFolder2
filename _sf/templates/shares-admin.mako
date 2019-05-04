@@ -4,7 +4,7 @@
     <script src="${baseURL}/_sf_assets/jquery.js"></script>
     <script src="${baseURL}/_sf_assets/stupidtable.js"></script>
     <script src="${baseURL}/_sf_assets/tooltipstr.js"></script>
-    <script src="${baseURL}/_sf_assets/helper.js"></script>
+    <script src="${baseURL}/_sf_assets/helpers.js"></script>
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.0/css/all.css">
     <link rel="stylesheet" href="${baseURL}/_sf_assets/tooltipster.css">
     <link rel="stylesheet" href="${baseURL}/_sf_assets/tooltipster-theme.css">
@@ -129,7 +129,6 @@
         $(".copy-link").on("click", function () {
             var url = $(this).attr("data-url");
             var password = $(this).attr("data-password");
-            console.log(password);
             var hasPassword = password !== "";
             var copied = hasPassword ? url + " (password: " + password + ")" : url;
             copyStringToClipboard(copied);
@@ -138,7 +137,7 @@
             url = url + "?t=" + cleanStringForURL(result);
             copied = hasPassword ? url + " (password: " + password + ")" : url;
             copyStringToClipboard(copied);
-            alert("Link " + copied + " to clipboard");
+            window.alert("Link " + copied + " to clipboard");
         });
     });
 </script>
