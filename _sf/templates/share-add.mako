@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="${baseURL}/_sf_assets/tooltipster.css">
     <link rel="stylesheet" href="${baseURL}/_sf_assets/tooltipster-theme.css">
     <link rel="stylesheet" href="${baseURL}/_sf_assets/style.css?ck=3">
+    <link rel="icon" href="${baseURL}/_sf_assets/icon.png">
     <title>${h.NAME} - Admin - Add share - ${path}</title>
 </head>
 
