@@ -3,8 +3,8 @@
 <head>
     <script src="${baseURL}/_sf_assets/jquery.js"></script>
     <script src="${baseURL}/_sf_assets/stupidtable.js"></script>
-    <script src="${baseURL}/_sf_assets/clipboard.js"></script>
     <script src="${baseURL}/_sf_assets/tooltipstr.js"></script>
+    <script src="${baseURL}/_sf_assets/helper.js"></script>
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.0/css/all.css">
     <link rel="stylesheet" href="${baseURL}/_sf_assets/tooltipster.css">
     <link rel="stylesheet" href="${baseURL}/_sf_assets/tooltipster-theme.css">
@@ -59,11 +59,7 @@
             <td>${share.password}</td>
             <td>${len(share.views)}</td>
             <td>
-                % if share.password!="":
-                    <a class="link" data-clipboard-text="${rootURL}/share=${shareIDEncoded} (password: ${share.password})" data-toggle="tooltip" title="Copy link + password"><i class="icon fas fa-link"></i></a>
-                %else:
-                    <a class="link" data-clipboard-text="${rootURL}/share=${shareIDEncoded}" data-toggle="tooltip" title="Copy link"><i class="icon fas fa-link"></i></a>
-                % endif
+                <a class="link copy-link" data-url="${rootURL}/share=${shareIDEncoded}" data-password="${share.password}" data-toggle="tooltip" title="Copy link"><i class="icon fas fa-link"></i></a>
                 <a data-toggle="tooltip" title="Remove" class="confirmation" href="${rootURL}/remove-share=${shareIDEncoded}"><i class="icon fas fa-trash"></i></a>
             </td>
         </tr>
@@ -111,10 +107,6 @@
             return confirm('Are you sure?');
         });
 
-        var clipboard = new ClipboardJS(".link");
-        clipboard.on('success', function (e) {
-            alert("Link " + e.text + " copied to clipboard")
-        });
 
         $('[data-toggle="tooltip"]').tooltipster({theme: "tooltipster-borderless", animationDuration: 200, delay: 20, side: "bottom"});
         var table = $("table").stupidtable();
@@ -122,6 +114,20 @@
             var tableElt = data.$th.parent().parent().parent();
             tableElt.find("tr:even").addClass("even");
             tableElt.find("tr:odd").removeClass("even");
+        });
+
+        $(".copy-link").on("click", function () {
+            var url = $(this).attr("data-url");
+            var password = $(this).attr("data-password");
+            var hasPassword = password !== "";
+            var copied = hasPassword ? url + " (password: " + password + ")" : url;
+            copyStringToClipboard(copied);
+            var result = window.prompt("Link " + copied + " to clipboard.\n\nWant to add a tag ?");
+            if (result == null || result === "") return;
+            url = url + "?t=" + cleanStringForURL(result);
+            copied = hasPassword ? url + " (password: " + password + ")" : url;
+            copyStringToClipboard(copied);
+            alert("Link " + copied + " to clipboard");
         });
     });
 </script>
