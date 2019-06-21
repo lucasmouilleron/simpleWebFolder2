@@ -439,7 +439,7 @@ h.logInfo("Tracking provider built")
 sp = sp.sharesProvider(h.makePath(h.DATA_FOLDER, "_sf_shares"), user=h.USER, locationEnabled=h.TRACKING_IP_GEOLOC, locationAPIKey=h.CONFIG.get("ip geoloc api key", ""))
 h.logInfo("Shares provider built")
 
-ip = ip.itemsProvider(ap, h.DATA_FOLDER, tmpFolder=h.CONFIG.get("tmp folder", None), tmpFolderDuratioInDaysn=h.CONFIG.get("tmp folder duration in days", None), user=h.USER)
+ip = ip.itemsProvider(ap, h.DATA_FOLDER, tmpFolder=h.CONFIG.get("tmp folder", None), tmpFolderDuratioInDaysn=h.CONFIG.get("tmp folder duration in days", None), user=h.USER, hiddenItems=h.HIDDEN_ITEMS)
 h.logInfo("Items provider built")
 
 server = Server(ip, ap, sp, tp, h.PORT, h.SSL, h.CERTIFICATE_KEY_FILE, h.CERTIFICATE_CRT_FILE, h.FULLCHAIN_CRT_FILE, aliases=h.CONFIG.get("aliases", None), maxUploadSize=h.CONFIG.get("max upload size", 20e6))

@@ -30,7 +30,8 @@ from urllib import parse
 
 ###################################################################################
 SERVER_TIMEZONE = "Europe/Paris"
-FORBIDEN_ITEMS = [".", "..", ".tracking", ".password", ".nopassword", ".nolist", ".noshow", ".nodownload", ".DS_Store", "Icon\r", ".htaccess", "README.md", "README.admin.md", ".git", ".idea", ".gitignore", "robots.txt"]
+FORBIDEN_ITEMS = [".", "..", ".tracking", ".password", ".nopassword", ".nolist", ".noshow", ".nodownload", ".DS_Store", "Icon\r", ".htaccess", "README.md", "README.admin.md", ".git", ".idea", ".gitignore"]
+HIDDEN_ITEMS = ["robots.txt"]
 EXTENSIONS_CLASSES = {"default": "fas fa-file", "html": "fas fa-file-code", "jpg": "fas fa-file-image", "gif": "fas fa-file-image", "png": "fas fa-file-image", "pdf": "fas fa-file-pdf", "ppt": "fas fa-file-powerpoint", "pptx": "fas fa-file-powerpoint", "doc": "fas fa-file-word", "docx": "fas fa-file-word", "xls": "fas fa-file-excel", "xlsx": "fas fa-file-excel", "avi": "fas fa-file-video", "mov": "fas fa-file-video", "mp4": "fas fa-file-video", "wav": "fas fa-file-audio", "mp3": "fas fa-file-audio", "zip": "fas fa-file-archive", "tgz": "fas fa-file-archive"}
 ###################################################################################
 ROOT_FOLDER = os.path.dirname(os.path.realpath(__file__))

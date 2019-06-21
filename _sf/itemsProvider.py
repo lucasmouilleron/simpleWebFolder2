@@ -47,7 +47,9 @@ class item:
 class itemsProvider():
 
     ###################################################################################
-    def __init__(self, ap: ap.authProvider, basePath, maxZipSize=50e6, tmpFolder=None, tmpFolderDuratioInDaysn=7, user=None):
+    def __init__(self, ap: ap.authProvider, basePath, maxZipSize=50e6, tmpFolder=None, tmpFolderDuratioInDaysn=7, user=None, hiddenItems=None):
+        if hiddenItems is None: hiddenItems = []
+        self.hiddenItems = set(hiddenItems)
         self.basePath = os.path.abspath(basePath)
         self.maxZipSize = maxZipSize
         self.tmpFolder = tmpFolder.lstrip("/")
@@ -178,6 +180,7 @@ class itemsProvider():
         itemsLeafs = []
         for item in items:
             if not os.path.isfile(item): continue
+            if self.isHiddenForListings(item): continue
             itemPath = item.replace(self.basePath, "")
             if itemPath.lstrip("/").startswith("_sf"): continue
             isForbidden = self.ap.isForbidden(itemPath)
@@ -185,6 +188,10 @@ class itemsProvider():
             i = self.getItem(itemPath, r, asAdmin)
             if i is not None: itemsLeafs.append(i)
         return itemsContainers, itemsLeafs
+
+    ###################################################################################
+    def isHiddenForListings(self, item):
+        return os.path.basename(item) in self.hiddenItems
 
     ###################################################################################
     def getPotentialLeafName(self, file):
