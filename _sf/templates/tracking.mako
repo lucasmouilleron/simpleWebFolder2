@@ -59,12 +59,12 @@
         <thead>
         <tr>
             <th data-sort="string-ins">Item</th>
-            <th data-sort="string-ins" width="80">Protected</th>
-            <th data-sort="string-ins" width="80">Authorized</th>
-            <th data-sort="string-ins" width="200">Password</th>
+            <th data-sort="string-ins" width="70">Protected</th>
+            <th data-sort="string-ins" width="70">Authorized</th>
+            <th data-sort="string-ins" width="140">Password</th>
             <th data-sort="string-ins" width="120">IP</th>
             <th data-sort="string-ins" width="120">Location</th>
-            <th data-sort="string-ins" width="200">Date</th>
+            <th data-sort="string-ins" width="140">Date</th>
         </tr>
         </thead>
         <tbody>
@@ -73,8 +73,8 @@
                 <% evenClass = "even" if i % 2 == 1 else "odd" %>
                 <tr class="${evenClass}">
                     <td style="max-width:400px;word-wrap: break-word;">${tracking.path}</td>
-                    <td>${tracking.protected}</td>
-                    <td>${tracking.authorized}</td>
+                    <td style="text-align: center">${tracking.protected}</td>
+                    <td style="text-align: center">${tracking.authorized}</td>
                     <td>${tracking.password}</td>
                     <td>${tracking.ip}</td>
                     <td>${tracking.location}</td>
