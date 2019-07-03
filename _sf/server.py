@@ -360,7 +360,7 @@ class Server(Thread):
         isProtected = sharePassword != ""
         isAuthorized, savedPassword = self.ap.isShareAuthorized(s, request)
 
-        if h.TRACKING and not isAdmin: self.tp.track(path, request, isProtected, isAuthorized, savedPassword, shareID)
+        if h.TRACKING and not isAdmin: self.tp.track(path, request, isProtected, isAuthorized, savedPassword, shareID, s.tag)
 
         if isProtected and not isAdmin and not isAuthorized: return self._makeTemplate("share-password", displayPath=displayPath, share=s)
         if ip.isItemLeaf(path): return send_from_directory(h.DATA_FOLDER, path)

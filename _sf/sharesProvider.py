@@ -12,13 +12,14 @@ import threading
 ###################################################################################
 ###################################################################################
 class share:
-    def __init__(self, ID, creation, file, views, password, duration):
+    def __init__(self, ID, creation, file, views, password, duration, tag=None):
         self.ID = ID
         self.creation = creation
         self.file = file
         self.views = views
         self.password = password
         self.duration = duration
+        self.tag = tag
 
 
 ###################################################################################
@@ -109,9 +110,8 @@ class sharesProvider():
             else: rs, rh = s, "ok"
             h.releaseLock(lh)
             lh = None
-            tag = None
-            if r is not None: tag = h.getURLParams(r.url).get("t", None)
-            if not asAdmin: self.addView(s, subPath, r.remote_addr if r is not None else None, tag)
+            if r is not None: rs.tag = h.getURLParams(r.url).get("t", None)
+            if not asAdmin: self.addView(s, subPath, r.remote_addr if r is not None else None, rs.tag)
             return rs, rh
         except:
             le, lt = h.getLastExceptionAndTrace()
