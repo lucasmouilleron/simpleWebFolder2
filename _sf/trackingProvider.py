@@ -100,10 +100,11 @@ class trackingProvider():
         except: return ip
 
     ###################################################################################
-    def _doTrack(self, path, address, isProtected, isAuthotirzed, passwordProvided):
+    def _doTrack(self, path, address, isProtected, isAuthotirzed, passwordProvided, shareID):
         try:
             self.trackingsLock.acquire()
             path = h.cleanPath(path)
+            if shareID is not None: path = "%s - sid: %s"%(path, shareID)
             if self.locationEnabled: location = self._getLocationFromIP(address)
             else: location = address
             self.trackings.append(tracking(path, passwordProvided if passwordProvided is not None else "", isAuthotirzed, address, h.now(), isProtected, location))
@@ -116,8 +117,8 @@ class trackingProvider():
         finally: self.trackingsLock.release()
 
     ###################################################################################
-    def track(self, path, r, isProtected, isAuthotirzed, passwordProvided):
-        threading.Thread(target=self._doTrack, args=(path, r.remote_addr, isProtected, isAuthotirzed, passwordProvided)).start()
+    def track(self, path, r, isProtected, isAuthotirzed, passwordProvided, shareID=None):
+        threading.Thread(target=self._doTrack, args=(path, r.remote_addr, isProtected, isAuthotirzed, passwordProvided, shareID)).start()
 
     ###################################################################################
     def getTrackings(self, password=None, item=None, protected=None, maxItems=None) -> List[tracking]:

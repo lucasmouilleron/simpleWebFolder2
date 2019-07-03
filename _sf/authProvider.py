@@ -195,7 +195,8 @@ class authProvider():
 
     ###################################################################################
     def isShareAuthorized(self, s: sp.share, r: request):
-        return s.password == r.cookies.get("_sf_share_pass_%s" % s.ID, "_no_set")
+        savedPassword = r.cookies.get("_sf_share_pass_%s" % s.ID, None)
+        return s.password == savedPassword, savedPassword
 
     ###################################################################################
     def setSharePassword(self, shareID, password, r, response=None):

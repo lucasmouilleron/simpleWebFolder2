@@ -197,7 +197,7 @@ class Server(Thread):
             self.ap.setUserPassword(item.lowerProtectedPath, request.form.get("password", ""), request, response)
             return self._redirect(path, response)
 
-        if h.TRACKING: tp.track(path, request, item.protected, item.isAuthorized, item.savedPassword)
+        if h.TRACKING: self.tp.track(path, request, item.protected, item.isAuthorized, item.savedPassword)
         alerts = []
         if item.isAuthorized:
             if ip.isItemLeaf(path):
@@ -288,7 +288,7 @@ class Server(Thread):
         if not h.TRACKING: return self._redirect("/admin")
         if not self.ap.isAdmin(request): return self._redirect("/admin")
         maxItems, password, item, protected = request.form.get("maxItems", "500"), request.form.get("password", ""), request.form.get("item", ""), request.form.get("protected", "yes")
-        return self._makeTemplate("tracking", trackings=tp.getTrackings(password if password != "" else None, item if item != "" else None, protected, h.parseInt(maxItems, None)), password=password, item=item, maxItems=maxItems, protected=protected)
+        return self._makeTemplate("tracking", trackings=self.tp.getTrackings(password if password != "" else None, item if item != "" else None, protected, h.parseInt(maxItems, None)), password=password, item=item, maxItems=maxItems, protected=protected)
 
     ###################################################################################
     def _routeShares(self, alerts=None, shareAdded=None):
@@ -357,7 +357,12 @@ class Server(Thread):
         path = h.cleanPath(h.makePath(shareBasePath, subPath))
         if not ip.doesItemExists(path): return self._makeTemplate("not-found", path=path)
         displayPath = path.replace(shareBasePath, shareID)
-        if sharePassword != "" and not isAdmin and not self.ap.isShareAuthorized(s, request): return self._makeTemplate("share-password", displayPath=displayPath, share=s)
+        isProtected = sharePassword != ""
+        isAuthorized, savedPassword = self.ap.isShareAuthorized(s, request)
+
+        if h.TRACKING and not isAdmin: self.tp.track(path, request, isProtected, isAuthorized, savedPassword, shareID)
+
+        if isProtected and not isAdmin and not isAuthorized: return self._makeTemplate("share-password", displayPath=displayPath, share=s)
         if ip.isItemLeaf(path): return send_from_directory(h.DATA_FOLDER, path)
         else:
             alerts = []
