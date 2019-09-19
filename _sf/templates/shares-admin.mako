@@ -44,7 +44,7 @@
     %if shareAdded is not None:
         <div class="alert">
             <h2>Share created</h2>
-            <p>The share <i>${shareAdded.ID}</i> has been created for <i>${shareAdded.file}</i>.<br/>
+            <p>The share <i>${shareAdded.ID}</i> has been created for <i>${shareAdded.files}</i>.<br/>
                 <a class="link copy-link" data-url="${rootURL}/share=${h.urlEncode(shareAdded.ID)}" data-password="${shareAdded.password}">Copy link</a>
             </p>
         </div>
@@ -69,7 +69,7 @@
         <thead>
         <tr>
             <th data-sort="string-ins">ID</th>
-            <th data-sort="string-ins">File</th>
+            <th data-sort="string-ins">Files</th>
             <th data-sort="string-ins" width="130">Expiration</th>
             <th data-sort="string-ins">Password</th>
             <th data-sort="int" width="50"># views</th>
@@ -84,9 +84,10 @@
                 <% evenClass = "even" if i % 2 == 1 else "odd"%>
                 <% shareExpires = "Never" if share.duration==0 else h.formatTimestamp(share.duration+share.creation, "YYYY/MM/DD HH:mm")%>
                 <% shareIDEncoded = h.urlEncode(share.ID)%>
+                <% files = ", ".join(share.files)%>
                 <tr class="${evenClass}">
                     <td onclick="window.open('${rootURL}/share=${shareIDEncoded}')">${share.ID}</td>
-                    <td onclick="window.open('${rootURL}/share=${shareIDEncoded}')">${share.file}</td>
+                    <td onclick="window.open('${rootURL}/share=${shareIDEncoded}')">${files}</td>
                     <td onclick="window.open('${rootURL}/share=${shareIDEncoded}')">${shareExpires}</td>
                     <td onclick="window.open('${rootURL}/share=${shareIDEncoded}')">${share.password}</td>
                     <td onclick="window.open('${rootURL}/share=${shareIDEncoded}')">${len(share.views)}</td>

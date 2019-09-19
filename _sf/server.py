@@ -52,6 +52,8 @@ class Server(Thread):
         self._addRoute("/_hello", self._routeHello, ["GET"])
         self._addRoute("/_infos", self._routeInfos, ["GET"])
         self._addRoute("/_ping", self._routePing, ["GET"])
+        self._addRoute("/_list", self._routeList, ["GET"])
+        self._addRoute("/_list/<path:path>", self._routeList, ["GET"])
         self._addRouteRaw("/", self._routeItems, ["GET", "POST"], "index")
         self._addRouteRaw("/<path:path>", self._routeItems, ["GET", "POST"], noCache=True)
         self._addRouteRaw("/_sf_assets/<path:path>", self._routeAssets, ["GET"])
@@ -163,6 +165,15 @@ class Server(Thread):
     ###################################################################################
     def _routeHello(self):
         return {"result": 200, "world": h.now(), "version": h.dictionnaryDeepGet(h.CONFIG, "version", default=0)}
+
+    ###################################################################################
+    def _routeList(self, path="/"):
+        if request.headers.get("password") != ap.adminPassword: return {"result": 403}
+        path = h.cleanPath(self._aliasPath(path))
+        if not ip.doesItemExists(path): return {"result": 500, "error": "path %s does not exist" % path}
+        containers, leafs = ip.getItems(path, request)
+        containers, leafs = [c.__dict__ for c in containers], [l.__dict__ for l in leafs]
+        return {"result": 200, "path": path, "containers": containers, "leafs": leafs}
 
     ###################################################################################
     def _routeInfos(self):
@@ -310,6 +321,7 @@ class Server(Thread):
         if self.ap.shareForbidden(path): return self._makeTemplate("forbidden", path=path)
         alerts = []
         path = h.decode(path)
+        paths = [path]  # todo multi
         shareID = request.form.get("shareID", "")
         defaultShareID = request.form.get("defaultShareID", h.uniqueIDSmall())
         duration = request.form.get("duration", "")
@@ -325,7 +337,7 @@ class Server(Thread):
             if shareID == "": alerts.append(["Can't create Share", "Share ID provided is invalid."])
             else:
                 if not sp.shareExists(shareID) or shareForceSubmit:
-                    share, hint = self.sp.addShare(shareID, path, durationInSecs, password)
+                    share, hint = self.sp.addShare(shareID, paths, durationInSecs, password)
                     if share is not None:
                         # alerts.append(["Share created", "The Share %s has been created for %s" % (shareID, path)])
                         return self._routeShares(alerts, shareAdded=share)
@@ -347,27 +359,55 @@ class Server(Thread):
 
         isAdmin = self.ap.isAdmin(request)
         subPath = h.cleanPath(os.path.normpath(shareIDAndPath.replace(shareID, ""))).lstrip(".")
-        s, hint = self.sp.getShare(shareID, asAdmin=isAdmin, r=request, subPath=subPath)
+
+        s, hint = self.sp.getShare(shareID, asAdmin=isAdmin, r=request)
         if s is None: raise Exception("Can't get Share %s, %s" % (shareID, hint))
 
-        if isAdmin and request.args.get("view") is None: return self._makeTemplate("share-admin", shareID=shareID, share=s)
+        baseFilesIndexes = {s.files[i].split("/")[-1]: i for i in range(len(s.files))}
+        subPathBits = subPath.split("/")
+        if len(s.files) == 1: baseFile, indexFile = None, 0
+        elif subPath == "": baseFile, indexFile = None, -1
+        else:
+            baseFile = subPathBits.pop(0)
+            indexFile = baseFilesIndexes.get(baseFile, -2)
+
+        if not isAdmin: self.sp.addView(s, h.makePath(*subPathBits), baseFile, request.remote_addr if request is not None else None, s.tag)
+        if indexFile == -2: return self._makeTemplate("not-found", path="%s" % shareID)
+        if isAdmin and request.args.get("view") is None:
+            return self._makeTemplate("share-admin", shareID=shareID, share=s)
+
+        if indexFile == -1: path, displayPath, shareBasePath = "", shareID, ""
+        else:
+            shareBasePath = s.files[indexFile]
+            path = h.cleanPath(h.makePath(shareBasePath, *subPathBits))
+            if baseFile is not None: shareBasePath = shareBasePath.replace(baseFile, "")
+            displayPath = shareID
+            if baseFile is not None: displayPath = h.makePath(displayPath, baseFile)
+            if subPath != "": displayPath = h.makePath(displayPath, *subPathBits)
 
         sharePassword = s.password
-        shareBasePath = s.file
-        path = h.cleanPath(h.makePath(shareBasePath, subPath))
-        if not ip.doesItemExists(path): return self._makeTemplate("not-found", path=path)
-        displayPath = path.replace(shareBasePath, shareID)
         isProtected = sharePassword != ""
         isAuthorized, savedPassword = self.ap.isShareAuthorized(s, request)
-
         if h.TRACKING and not isAdmin: self.tp.track(path, request, isProtected, isAuthorized, savedPassword, shareID, s.tag)
-
+        if not ip.doesItemExists(path): return self._makeTemplate("not-found", path=displayPath)
         if isProtected and not isAdmin and not isAuthorized: return self._makeTemplate("share-password", displayPath=displayPath, share=s)
-        if ip.isItemLeaf(path): return send_from_directory(h.DATA_FOLDER, path)
+
+        if indexFile == -1:
+            isLeaf, readme = False, None
+            containers, leafs = [], []
+            for file in s.files:
+                item = ip.getItem(file)
+                item.path = item.path.split("/")[-1]
+                if ip.isItemContainer(file): containers.append(item)
+                else: leafs.append(item)
         else:
-            alerts = []
-            containers, leafs = self.ip.getItems(path, overrideListingForbidden=True, overrideNoShow=True)
-            return self._makeTemplate("share", displayPath=displayPath, shareBasePath=shareBasePath, subPath=subPath, share=s, containers=containers, leafs=leafs, alerts=alerts, readme=ip.getReadme(path))
+            isLeaf = ip.isItemLeaf(path)
+            if not isLeaf:
+                containers, leafs = self.ip.getItems(path, overrideListingForbidden=True, overrideNoShow=True)
+                readme = ip.getReadme(path)
+            else: containers, leafs, readme = None, None, None
+        if isLeaf:  return send_from_directory(h.DATA_FOLDER, path)
+        else: return self._makeTemplate("share", displayPath=displayPath, shareBasePath=shareBasePath, subPath=subPath, share=s, containers=containers, leafs=leafs, alerts=[], readme=readme, indexFile=indexFile)
 
     ###################################################################################
     def _makeBaseNamspace(self):

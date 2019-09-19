@@ -23,7 +23,7 @@
 <div class="name"><a href="${baseURL}/">${h.NAME}</a></div>
 
 <div class="navigation section">
-    <div class="page">${displayPath}</div>
+    <div class="page">/${displayPath}</div>
 </div>
 
 <div class="block section">

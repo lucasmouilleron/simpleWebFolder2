@@ -12,10 +12,10 @@ import threading
 ###################################################################################
 ###################################################################################
 class share:
-    def __init__(self, ID, creation, file, views, password, duration, tag=None):
+    def __init__(self, ID, creation, files, views, password, duration, tag=None):
         self.ID = ID
         self.creation = creation
-        self.file = file
+        self.files = files
         self.views = views
         self.password = password
         self.duration = duration
@@ -51,7 +51,7 @@ class sharesProvider():
         except: return ip
 
     ###################################################################################
-    def _doAddView(self, s: share, subPath, address, tag):
+    def _doAddView(self, s: share, subPath, baseFile, address, tag):
         views = s.views
         view = {"date": h.now()}
         if address is not None:
@@ -61,7 +61,8 @@ class sharesProvider():
             view["ip"] = "unk"
             view["location"] = "unk"
         if tag is not None: view["tag"] = tag
-        if subPath is not None: view["item"] = h.makePath(s.file, subPath).rstrip("/")
+        if subPath is not None:
+            view["item"] = h.makePath(baseFile if baseFile is not None else "", subPath).rstrip("/")
         views.append(view)
         views = sorted(views, key=lambda v: v["date"])[::-1]
         s.views = views
@@ -80,15 +81,15 @@ class sharesProvider():
         else: return shares
 
     ###################################################################################
-    def addShare(self, shareID, path, duration, password):
-        path = path.lstrip("/").rstrip("/")
+    def addShare(self, shareID, paths, duration, password):
+        paths = [path.lstrip("/").rstrip("/") for path in paths]
         sharePath = h.makePath(self.sharesPath, shareID)
         password = "" if password is None else password
         lh, lf = None, h.makePath(h.LOCKS_FOLDER, "_sfl_share%s" % h.clean(shareID))
         try:
             lh = h.getLockExclusive(lf, 5)
-            s = share(shareID, h.now(), path, [], password, duration)
-            h.writeJsonFile(sharePath, {"ID": s.ID, "file": s.file, "creation": s.creation, "views": s.views, "duration": s.duration, "password": s.password})
+            s = share(shareID, h.now(), paths, [], password, duration)
+            h.writeJsonFile(sharePath, {"ID": s.ID, "files": s.files, "creation": s.creation, "views": s.views, "duration": s.duration, "password": s.password})
             if self.user is not None: h.changeFileOwner(sharePath, self.user)
             return s, "ok"
         except:
@@ -98,20 +99,25 @@ class sharesProvider():
             if lh is not None: h.releaseLock(lh)
 
     ###################################################################################
-    def getShare(self, shareID, r=None, subPath=None, asAdmin=False):
+    def getShare(self, shareID, r=None, asAdmin=False):
         sharePath = h.makePath(self.sharesPath, shareID)
         if not os.path.exists(sharePath): return None, None
         lh, lf = None, h.makePath(h.LOCKS_FOLDER, "_sfl_share%s" % h.clean(shareID))
         try:
             lh = h.getLockShared(lf, 5)
             shareJson = h.loadJsonFile(sharePath)
-            s = share(shareJson["ID"], shareJson["creation"], shareJson["file"], shareJson.get("views", []), shareJson.get("password"), shareJson.get("duration", 0))
+            files = shareJson.get("files", None)
+            if files is None:
+                files = shareJson.get("file", None)
+                if files is not None: files = [files]
+            s = share(shareJson["ID"], shareJson["creation"], files, shareJson.get("views", []), shareJson.get("password"), shareJson.get("duration", 0))
             if not asAdmin and s.duration > 0 and s.duration + s.creation < h.now(): rs, rh = None, "Share has expired"
             else: rs, rh = s, "ok"
             h.releaseLock(lh)
             lh = None
+            if rs is None: return rs, rh
             if r is not None: rs.tag = h.getURLParams(r.url).get("t", None)
-            if not asAdmin: self.addView(s, subPath, r.remote_addr if r is not None else None, rs.tag)
+
             return rs, rh
         except:
             le, lt = h.getLastExceptionAndTrace()
@@ -136,8 +142,8 @@ class sharesProvider():
         return os.path.exists(h.makePath(self.sharesPath, shareID))
 
     ###################################################################################
-    def addView(self, s: share, subpath, address, tag):
-        threading.Thread(target=self._doAddView, args=(s, subpath, address, tag)).start()
+    def addView(self, s: share, subpath, baseFile, address, tag):
+        threading.Thread(target=self._doAddView, args=(s, subpath, baseFile, address, tag)).start()
 
     ###################################################################################
     def saveShare(self, s: share):
@@ -145,7 +151,7 @@ class sharesProvider():
         try:
             lh = h.getLockExclusive(lf, 5)
             sharePath = h.makePath(self.sharesPath, s.ID)
-            h.writeJsonFile(sharePath, {"ID": s.ID, "file": s.file, "creation": s.creation, "views": s.views, "duration": s.duration, "password": s.password})
+            h.writeJsonFile(sharePath, {"ID": s.ID, "files": s.files, "creation": s.creation, "views": s.views, "duration": s.duration, "password": s.password})
             if self.user is not None: h.changeFileOwner(sharePath, self.user)
             return True
         except:

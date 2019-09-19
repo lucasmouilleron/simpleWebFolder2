@@ -27,6 +27,7 @@ from urllib.parse import urlencode
 import shutil
 from collections import OrderedDict
 from urllib import parse
+import re
 
 ###################################################################################
 SERVER_TIMEZONE = "Europe/Paris"
@@ -86,6 +87,16 @@ if STORE_LOG:
 ################################################################################
 if not os.path.exists(DATA_FOLDER): os.mkdir(DATA_FOLDER)
 if not os.path.exists(LOCKS_FOLDER): os.mkdir(LOCKS_FOLDER)
+
+
+################################################################################
+def lreplace(pattern, sub, string):
+    return re.sub('^%s' % pattern, sub, string)
+
+
+################################################################################
+def rreplace(pattern, sub, string):
+    return re.sub('%s$' % pattern, sub, string)
 
 
 ################################################################################

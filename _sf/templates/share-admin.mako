@@ -38,12 +38,13 @@
     <div class="section-title">Share ${share.ID}</div>
     <% shareExpires = "Never" if share.duration==0 else h.formatTimestamp(share.duration+share.creation, "YYYY/MM/DD HH:mm")%>
     <% shareIDEncoded = h.urlEncode(share.ID)%>
+    <% files = ", ".join(share.files)%>
     <table>
         <thead>
         <tr>
             <th>ID</th>
             <th>Link</th>
-            <th>File</th>
+            <th>Files</th>
             <th>Expiration</th>
             <th>Password</th>
             <th># views</th>
@@ -55,7 +56,7 @@
         <tr>
             <td>${share.ID}</td>
             <td></td>
-            <td onclick="window.open('/${share.file}')"><a>${share.file}</a></td>
+            <td>${files}</td>
             <td>${shareExpires}</td>
             <td>${share.password}</td>
             <td>${len(share.views)}</td>
