@@ -247,7 +247,7 @@ class Server(Thread):
         if request.args.get("remove") is not None:
             if not self.ap.isEditAllowed(self.ip.getParent(path)): return self._makeTemplate("forbidden", path=path)
             if not self.ip.remove(path): alerts.append(["Can't delete item", "The item /%s can't be removed." % path])
-            else: return self._redirect(self.ip.getParent(path), queryArgs={"deleted": path})
+            else: return self._redirect("/%s" % self.ip.getParent(path), queryArgs={"deleted": path})
 
         if ip.isItemLeaf(path): return send_from_directory(h.DATA_FOLDER, path)
 

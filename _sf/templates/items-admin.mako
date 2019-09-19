@@ -153,7 +153,7 @@
                             <td onclick="location.href='${baseURL}/${urlEncodedPath}'">${h.formatTimestamp(item.lastModified, "YYYY/MM/DD HH:mm")}</td>
                             <td onclick="location.href='${baseURL}/${urlEncodedPath}'">${item.nbItems}</td>
                             %if isTmpFolder:
-                                <td onclick="location.href='$${baseURL}/{urlEncodedPath}'">${h.formatTimestamp(item.expires,"YYYY/MM/DD HH:mm")}</td>
+                                <td onclick="location.href='${baseURL}/${urlEncodedPath}'">${h.formatTimestamp(item.expires,"YYYY/MM/DD HH:mm")}</td>
                             %endif
                             <td class="actions">
                                 % if item.protected or not item.listingForbidden:
@@ -219,7 +219,7 @@
                                     <a data-toggle="tooltip" title="Create share" href="${rootURL}/create-share=${shareURLEncoded}" target="_shares"><i class="icon fas fa-share-alt-square"></i></a>
                                 % endif
                                 % if editAllowed:
-                                    <a data-toggle="tooltip" title="Remove" class="confirmation" href="$${baseURL}/{urlEncodedPath}?remove"><i class="icon fas fa-trash"></i></a>
+                                    <a data-toggle="tooltip" title="Remove" class="confirmation" href="${baseURL}/${urlEncodedPath}?remove"><i class="icon fas fa-trash"></i></a>
                                 % endif
                             </td>
                         </tr>
