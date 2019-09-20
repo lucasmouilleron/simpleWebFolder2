@@ -204,8 +204,16 @@ input[type=submit]:hover {
     opacity: 1;
 }
 
+input[type=submit].cancel {
+    opacity: 0.3;
+}
+
+input[type=submit].cancel:hover {
+    opacity: 1;
+}
+
 label {
-    margin:0 15px;
+    margin: 0 15px;
 }
 
 form.inline input {
@@ -243,15 +251,15 @@ a.disabled:hover {
 }
 
 td.actions a {
-    margin-right:3px;
+    margin-right: 3px;
 }
 
 .warning {
-    color:red;
+    color: red;
 }
 
 .readmore {
-    margin-top:5px;
+    margin-top: 5px;
 }
 
 strong {

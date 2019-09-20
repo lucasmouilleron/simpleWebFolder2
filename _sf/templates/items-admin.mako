@@ -238,7 +238,7 @@
 <div id="new-share" style="display:none;">
     <div class="section-title">Create new share</div>
     <div class="items"></div>
-    <input type="submit" class="reset" value="Reset"/>
+    <input type="submit" class="reset cancel" value="Reset"/>
     <input type="submit" class="create" value="Create share"/>
 
 </div>

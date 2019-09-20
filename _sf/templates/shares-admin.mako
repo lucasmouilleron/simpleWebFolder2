@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -76,7 +75,7 @@
             <th data-sort="string-ins">Password</th>
             <th data-sort="int" width="50"># views</th>
             <th data-sort="string-ins" width="130">Latest</th>
-            <th width="70">Actions</th>
+            <th width="100">Actions</th>
         </tr>
         </thead>
         <tbody>
@@ -86,6 +85,7 @@
                 <% evenClass = "even" if i % 2 == 1 else "odd"%>
                 <% shareExpires = "Never" if share.duration==0 else h.formatTimestamp(share.duration+share.creation, "YYYY/MM/DD HH:mm")%>
                 <% shareIDEncoded = h.urlEncode(share.ID)%>
+                <% shareFilesEncoded = h.encode("@@@".join(share.files))%>
                 <% files = ", ".join(share.files)%>
                 <tr class="${evenClass}">
                     <td onclick="window.open('${rootURL}/share=${shareIDEncoded}')">${share.ID}</td>
@@ -101,6 +101,7 @@
                     <td class="actions">
                         <a class="link copy-link" data-url="${rootURL}/share=${shareIDEncoded}" data-password="${share.password}" data-toggle="tooltip" title="Copy link"><i class="icon fas fa-link"></i></a>
                         <a data-toggle="tooltip" title="Details" href="${rootURL}/share=${shareIDEncoded}" target="_share_${shareIDEncoded}"><i class="icon fas fa-search"></i></a>
+                        <a data-toggle="tooltip" title="Duplicate" href="${rootURL}/create-share=${shareFilesEncoded}"><i class="icon fas fa-copy"></i></a>
                         <a data-toggle="tooltip" title="Remove" class="confirmation" href="${rootURL}/remove-share=${shareIDEncoded}"><i class="icon fas fa-trash"></i></a>
                     </td>
                 </tr>
