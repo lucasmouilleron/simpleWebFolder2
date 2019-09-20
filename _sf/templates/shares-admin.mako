@@ -1,4 +1,4 @@
-<% filesDisplay = ", ".join(shareAdded.files)%>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -43,6 +43,7 @@
     %endfor
 
     %if shareAdded is not None:
+        <% filesDisplay = ", ".join(shareAdded.files)%>
         <div class="alert">
             <h2>Share created</h2>
             <p>The share <i>${shareAdded.ID}</i> has been created for <i>${filesDisplay}</i>.<br/>
