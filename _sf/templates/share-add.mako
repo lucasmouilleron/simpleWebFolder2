@@ -57,12 +57,12 @@
         <input type="hidden" name="defaultShareID" value="${defaultShareID}"/>
         <input type="text" name="duration" placeholder="Duration in days" value="${duration}" spellcheck="false" autocorrect="off" autocapitalize="none"/>
         <input type="password" name="password-share-add" placeholder="Password" value="" autocomplete="new-password"/>
-        <input type="submit" name="create-share-cancel" class="cancel" value="Abort"/>
         % if needForce:
             <input type="submit" name="create-share-force-submit" value="Override share"/>
         %else:
             <input type="submit" name="create-share-submit" value="Create share"/>
         % endif
+        <input type="submit" name="create-share-cancel" class="cancel" value="Abort"/>
     </form>
 </div>
 

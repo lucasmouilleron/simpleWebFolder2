@@ -268,11 +268,13 @@ strong {
 
 #new-share {
     position: fixed;
-    bottom: 0;
-    left: 0;
+    top: 40px;
+    right: 0;
     width: 300px;
     background-color: #eee;
     padding: 15px 25px;
-    border-right: 3px solid #ccc;
+    border-left: 0px solid #ccc;
+    box-shadow: 1px 1px 20px #555;
     margin-bottom: 30px;
+    opacity: 1;
 }
