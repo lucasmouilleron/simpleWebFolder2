@@ -307,7 +307,6 @@ class Server(Thread):
         if not self.ap.isAdmin(request): return self._redirect("/admin")
         maxShares = 50
         filterShareID = request.form.get("filterShareID", "")
-        print(self.sp.listShares(filterShareID, maxShares=maxShares))
         return self._makeTemplate("shares-admin", shares=self.sp.listShares(filterShareID, maxShares=maxShares), alerts=alerts, maxShares=maxShares, filterShareID=filterShareID, shareAdded=shareAdded)
 
     ###################################################################################
