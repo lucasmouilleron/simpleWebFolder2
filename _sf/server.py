@@ -406,7 +406,7 @@ class Server(Thread):
                 readme = ip.getReadme(path)
             else: containers, leafs, readme = None, None, None
         if isLeaf:
-            asAttachement = len(s.files) == 1  # dity fix for single file share name download
+            asAttachement = len(s.files) == 1 and self.ip.isItemLeaf(s.files[0])  # dity fix for single file share name download
             return send_from_directory(h.DATA_FOLDER, path, as_attachment=asAttachement)
         else: return self._makeTemplate("share", displayPath=displayPath, shareBasePath=shareBasePath, subPath=subPath, share=s, containers=containers, leafs=leafs, alerts=[], readme=readme, indexFile=indexFile)
 
