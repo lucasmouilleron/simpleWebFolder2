@@ -344,7 +344,7 @@ class Server(Thread):
                         return self._routeShares(alerts, shareAdded=share)
                     else: alerts.append(["Can't create Share", "Share %s could not be created. Hint: %s" % (shareID, hint)])
                 else:
-                    alerts.append(["Can't create Share", "The Share ID %s is alread used for %s." % (shareID, paths)])
+                    alerts.append(["Can't create Share", "The Share ID %s is already used for %s." % (shareID, ", ".join(paths))])
                     needForce = True
         return self._makeTemplate("share-add", paths=paths, defaultShareID=defaultShareID, shareID=shareID, duration=duration, alerts=alerts, needForce=needForce, addShareIsContainer=addShareIsContainer)
 
@@ -406,7 +406,9 @@ class Server(Thread):
                 containers, leafs = self.ip.getItems(path, overrideListingForbidden=True, overrideNoShow=True)
                 readme = ip.getReadme(path)
             else: containers, leafs, readme = None, None, None
-        if isLeaf:  return send_from_directory(h.DATA_FOLDER, path)
+        if isLeaf:
+            asAttachement = len(s.files) == 1  # dity fix for single file share name download
+            return send_from_directory(h.DATA_FOLDER, path, as_attachment=asAttachement)
         else: return self._makeTemplate("share", displayPath=displayPath, shareBasePath=shareBasePath, subPath=subPath, share=s, containers=containers, leafs=leafs, alerts=[], readme=readme, indexFile=indexFile)
 
     ###################################################################################
