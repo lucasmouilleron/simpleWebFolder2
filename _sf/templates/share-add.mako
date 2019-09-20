@@ -1,4 +1,5 @@
 <% pathsDisplay = ", ".join(paths)%>
+<% containersDisplay = ", ".join(containers)%>
 
 <!DOCTYPE html>
 <html>
@@ -45,8 +46,8 @@
 
 <div class="block section">
     <div class="section-title">Create share</div>
-    %if addShareIsContainer:
-        <div class="warning">Warning: You are creating a share on a folder. All sub files and folders of <i>${pathsDisplay}</i> will be accessible from this share.</div>
+    %if len(containers)>0:
+        <div class="warning">Warning: You share contains one or more folder. <br/>All sub files and folders of <i>${containersDisplay}</i> will be accessible from this share.</div>
     %endif
 
 
@@ -72,7 +73,9 @@
         $("#shareID").focus();
         $('input[name="create-share-cancel"]').on("click", function (e) {
             e.preventDefault();
-            window.history.back();
+            console.log(window.history);
+            if (window.history.length === 1) window.close();
+            else window.history.back();
         })
     });
 </script>

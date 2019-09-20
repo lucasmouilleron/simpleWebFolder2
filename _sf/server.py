@@ -330,8 +330,7 @@ class Server(Thread):
         shareSubmit = request.form.get("create-share-submit", False)
         shareForceSubmit = request.form.get("create-share-force-submit", False)
         needForce = False
-        addShareIsContainer = False
-        for p in paths: addShareIsContainer = addShareIsContainer or self.ip.isItemContainer(p)
+        containers = [p for p in paths if self.ip.isItemContainer(p)]
         if shareSubmit or shareForceSubmit:
             if shareID == "": shareID = defaultShareID
             shareID = h.clean(shareID)
@@ -346,7 +345,7 @@ class Server(Thread):
                 else:
                     alerts.append(["Can't create Share", "The Share ID %s is already used for %s." % (shareID, ", ".join(paths))])
                     needForce = True
-        return self._makeTemplate("share-add", paths=paths, defaultShareID=defaultShareID, shareID=shareID, duration=duration, alerts=alerts, needForce=needForce, addShareIsContainer=addShareIsContainer)
+        return self._makeTemplate("share-add", paths=paths, defaultShareID=defaultShareID, shareID=shareID, duration=duration, alerts=alerts, needForce=needForce, containers=containers)
 
     ###################################################################################
     def _routeShare(self, shareIDAndPath):
