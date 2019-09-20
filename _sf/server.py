@@ -63,7 +63,7 @@ class Server(Thread):
         self._addRouteRaw("/share=<path:shareIDAndPath>", self._routeShare, ["GET", "POST"])
         self._addRouteRaw("/shares", self._routeShares, ["GET", "POST"])
         self._addRouteRaw("/remove-share=<shareID>", self._routeShareRemove, ["GET"])
-        self._addRouteRaw("/create-share=<path>", self._routeShareAdd, ["GET", "POST"])
+        self._addRouteRaw("/create-share=<paths>", self._routeShareAdd, ["GET", "POST"])
 
         self.tplLookup = TemplateLookup(directories=[h.makePath(h.ROOT_FOLDER, "templates")])
 
@@ -307,6 +307,7 @@ class Server(Thread):
         if not self.ap.isAdmin(request): return self._redirect("/admin")
         maxShares = 50
         filterShareID = request.form.get("filterShareID", "")
+        print(self.sp.listShares(filterShareID, maxShares=maxShares))
         return self._makeTemplate("shares-admin", shares=self.sp.listShares(filterShareID, maxShares=maxShares), alerts=alerts, maxShares=maxShares, filterShareID=filterShareID, shareAdded=shareAdded)
 
     ###################################################################################
@@ -316,12 +317,12 @@ class Server(Thread):
         return self._routeShares(alerts=[["Share removed", "The Share %s has been removed." % shareID]])
 
     ###################################################################################
-    def _routeShareAdd(self, path):
+    def _routeShareAdd(self, paths):
         if not self.ap.isAdmin(request): return self._redirect("/admin")
-        if self.ap.shareForbidden(path): return self._makeTemplate("forbidden", path=path)
+        if self.ap.shareForbidden(paths): return self._makeTemplate("forbidden", path=paths)
         alerts = []
-        path = h.decode(path)
-        paths = [path]  # todo multi
+        paths = h.decode(paths)
+        paths = paths.split("@@@")
         shareID = request.form.get("shareID", "")
         defaultShareID = request.form.get("defaultShareID", h.uniqueIDSmall())
         duration = request.form.get("duration", "")
@@ -330,7 +331,8 @@ class Server(Thread):
         shareSubmit = request.form.get("create-share-submit", False)
         shareForceSubmit = request.form.get("create-share-force-submit", False)
         needForce = False
-        addShareIsContainer = self.ip.isItemContainer(path)
+        addShareIsContainer = False
+        for p in paths: addShareIsContainer = addShareIsContainer or self.ip.isItemContainer(p)
         if shareSubmit or shareForceSubmit:
             if shareID == "": shareID = defaultShareID
             shareID = h.clean(shareID)
@@ -343,9 +345,9 @@ class Server(Thread):
                         return self._routeShares(alerts, shareAdded=share)
                     else: alerts.append(["Can't create Share", "Share %s could not be created. Hint: %s" % (shareID, hint)])
                 else:
-                    alerts.append(["Can't create Share", "The Share ID %s is alread used for %s." % (shareID, path)])
+                    alerts.append(["Can't create Share", "The Share ID %s is alread used for %s." % (shareID, paths)])
                     needForce = True
-        return self._makeTemplate("share-add", path=path, defaultShareID=defaultShareID, shareID=shareID, duration=duration, alerts=alerts, needForce=needForce, addShareIsContainer=addShareIsContainer)
+        return self._makeTemplate("share-add", paths=paths, defaultShareID=defaultShareID, shareID=shareID, duration=duration, alerts=alerts, needForce=needForce, addShareIsContainer=addShareIsContainer)
 
     ###################################################################################
     def _routeShare(self, shareIDAndPath):
@@ -373,8 +375,7 @@ class Server(Thread):
 
         if not isAdmin: self.sp.addView(s, h.makePath(*subPathBits), baseFile, request.remote_addr if request is not None else None, s.tag)
         if indexFile == -2: return self._makeTemplate("not-found", path="%s" % shareID)
-        if isAdmin and request.args.get("view") is None:
-            return self._makeTemplate("share-admin", shareID=shareID, share=s)
+        if isAdmin and request.args.get("view") is None: return self._makeTemplate("share-admin", shareID=shareID, share=s)
 
         if indexFile == -1: path, displayPath, shareBasePath = "", shareID, ""
         else:

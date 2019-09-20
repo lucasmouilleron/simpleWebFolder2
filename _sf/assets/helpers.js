@@ -14,3 +14,8 @@ function copyStringToClipboard(str) {
 function cleanStringForURL(string) {
     return string.replace(/[^a-zA-Z0-9-_]/g, '');
 }
+
+///////////////////////////////////////////////////////////////////////////////////
+function inList(item, items) {
+    return items.indexOf(item) >= 0;
+}

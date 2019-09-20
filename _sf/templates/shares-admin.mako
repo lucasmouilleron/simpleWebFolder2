@@ -1,3 +1,4 @@
+<% filesDisplay = ", ".join(shareAdded.files)%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -44,7 +45,7 @@
     %if shareAdded is not None:
         <div class="alert">
             <h2>Share created</h2>
-            <p>The share <i>${shareAdded.ID}</i> has been created for <i>${shareAdded.files}</i>.<br/>
+            <p>The share <i>${shareAdded.ID}</i> has been created for <i>${filesDisplay}</i>.<br/>
                 <a class="link copy-link" data-url="${rootURL}/share=${h.urlEncode(shareAdded.ID)}" data-password="${shareAdded.password}">Copy link</a>
             </p>
         </div>

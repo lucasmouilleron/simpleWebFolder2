@@ -257,3 +257,14 @@ td.actions a {
 strong {
     font-weight: bold;
 }
+
+#new-share {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 300px;
+    background-color: #eee;
+    padding: 15px 25px;
+    border-right: 3px solid #ccc;
+    margin-bottom: 30px;
+}

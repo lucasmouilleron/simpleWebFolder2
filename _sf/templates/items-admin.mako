@@ -163,7 +163,8 @@
                                 % endif
                                 % if h.SHARING and not isTmpFolder:
                                     %if not item.shareForbidden:
-                                        <a data-toggle="tooltip" title="Create share" href="${rootURL}/create-share=${shareURLEncoded}" target="_shares"><i class="icon fas fa-share-alt-square"></i></a>
+                                    ##                                         <a data-toggle="tooltip" title="Create share" href="${rootURL}/create-share=${shareURLEncoded}" target="_shares"><i class="icon fas fa-share-alt-square"></i></a>
+                                        <a data-toggle="tooltip" title="Add to share" data-item="${item.path}" href="#" class="add-to-share"><i class="icon fas fa-share-alt-square"></i></a>
                                     %else:
                                         <a data-toggle="tooltip" title="Can't share" class="link disabled"><i class="icon fas fa-share-alt-square"></i></a>
                                     % endif
@@ -216,7 +217,9 @@
                             <td class="actions">
                                 <a data-toggle="tooltip" title="Copy link" class="link copy-link" data-url="${itemURL}" data-password="${item.passwords[0] if len(item.passwords)>0 else ""}"><i class="icon fas fa-link"></i></a>
                                 % if h.SHARING and not isTmpFolder:
-                                    <a data-toggle="tooltip" title="Create share" href="${rootURL}/create-share=${shareURLEncoded}" target="_shares"><i class="icon fas fa-share-alt-square"></i></a>
+                                ##                                     <a data-toggle="tooltip" title="Create share" href="${rootURL}/create-share=${shareURLEncoded}" target="_shares"><i class="icon fas fa-share-alt-square"></i></a>
+                                    <a data-toggle="tooltip" title="Add to share" data-item="${item.path}" href="#" class="add-to-share"><i class="icon fas fa-share-alt-square"></i></a>
+
                                 % endif
                                 % if editAllowed:
                                     <a data-toggle="tooltip" title="Remove" class="confirmation" href="${baseURL}/${urlEncodedPath}?remove"><i class="icon fas fa-trash"></i></a>
@@ -231,6 +234,14 @@
     % endif
 
 <div class="footer">${h.NAME} - ${h.CREDITS}</div>
+
+<div id="new-share" style="display:none;">
+    <div class="section-title">Create new share</div>
+    <div class="items"></div>
+    <input type="submit" class="reset" value="Reset"/>
+    <input type="submit" class="create" value="Create share"/>
+
+</div>
 
 <script>
     $(document).ready(function () {
@@ -304,6 +315,35 @@
             copyStringToClipboard(copied);
             window.alert("Link " + copied + " to clipboard.");
         });
+
+        var items = Cookies.get("new-share-items");
+        if (items === undefined) items = [];
+        else items = JSON.parse(items);
+        $("#new-share .create").on("click", function () {
+            window.open("${rootURL}/create-share=" + btoa(items.join("@@@")), "_shares");
+        });
+        $("#new-share .reset").on("click", function () {
+            items = [];
+            Cookies.set("new-share-items", JSON.stringify(items));
+            $("#new-share").hide();
+        });
+        $(".add-to-share").on("click", function (e) {
+            e.preventDefault();
+            var item = $(this).attr("data-item");
+            if (!inList(item, items)) {
+                items.push(item);
+                Cookies.set("new-share-items", JSON.stringify(items));
+            }
+            if (items.length > 0) {
+                $("#new-share .items").html(items.join(", "));
+                $("#new-share").show();
+            }
+        });
+
+        if (items.length > 0) {
+            $("#new-share .items").html(items.join(", "));
+            $("#new-share").show();
+        }
 
     });
 </script>

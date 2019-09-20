@@ -1,3 +1,5 @@
+<% pathsDisplay = ", ".join(paths)%>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -9,7 +11,7 @@
     <link rel="stylesheet" href="${baseURL}/_sf_assets/tooltipster-theme.css">
     <link rel="stylesheet" href="${baseURL}/_sf_assets/style.css?ck=4">
     <link rel="icon" href="${baseURL}/_sf_assets/icon.png">
-    <title>${h.NAME} - Admin - Add share - ${path}</title>
+    <title>${h.NAME} - Admin - Add share - ${paths}</title>
 </head>
 
 <body class="admin">
@@ -40,15 +42,16 @@
     %endfor
 
 
+
 <div class="block section">
     <div class="section-title">Create share</div>
     %if addShareIsContainer:
-        <div class="warning">Warning: You are creating a share on a folder. All sub files and folders of <i>${path}</i> will be accessible from this share.</div>
+        <div class="warning">Warning: You are creating a share on a folder. All sub files and folders of <i>${pathsDisplay}</i> will be accessible from this share.</div>
     %endif
 
 
     <form method="post">
-        <input readonly type="text" placeholder="${path}"/>
+        <input readonly type="text" placeholder="${pathsDisplay}"/>
         <input type="text" id="shareID" name="shareID" placeholder="Share ID* (default: ${defaultShareID})" value="${shareID}" spellcheck="false" autocorrect="off" autocapitalize="none"/>
         <input type="hidden" name="defaultShareID" value="${defaultShareID}"/>
         <input type="text" name="duration" placeholder="Duration in days" value="${duration}" spellcheck="false" autocorrect="off" autocapitalize="none"/>
