@@ -43,7 +43,6 @@
         <thead>
         <tr>
             <th>ID</th>
-            <th>Link</th>
             <th>Files</th>
             <th>Expiration</th>
             <th>Password</th>
@@ -55,8 +54,13 @@
 
         <tr>
             <td>${share.ID}</td>
-            <td></td>
-            <td>${files}</td>
+            <td>
+                <ul>
+                    %for file in share.files:
+                        <li><a href="${file}" target="_files">${file}</a></li>
+                    %endfor
+                </ul>
+            </td>
             <td>${shareExpires}</td>
             <td>${share.password}</td>
             <td>${len(share.views)}</td>
