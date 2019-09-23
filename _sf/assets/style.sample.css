@@ -302,8 +302,12 @@ strong {
 }
 
 .share ul {
-    margin:0;
-    left:0;
-    padding:0;
+    margin: 0;
+    left: 0;
+    padding: 0;
     list-style: none;
+}
+
+.share ul a {
+    color: #777;
 }
