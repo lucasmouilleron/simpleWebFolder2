@@ -57,7 +57,7 @@
             <td>
                 <ul>
                     %for file in share.files:
-                        <li><a href="${file}" target="_files">${file}</a></li>
+                        <li><a href="${file}" target="${file}">${file}</a></li>
                     %endfor
                 </ul>
             </td>
