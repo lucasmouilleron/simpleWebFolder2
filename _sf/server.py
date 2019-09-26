@@ -365,8 +365,7 @@ class Server(Thread):
 
         baseFilesIndexes = {s.files[i].split("/")[-1]: i for i in range(len(s.files))}
         subPathBits = subPath.split("/")
-        # if len(s.files) == 1: baseFile, indexFile = None, 0
-        if len(s.files) == 1 and subPath == "": return self._redirect("/share=%s/%s" % (shareID, s.files[0].split("/")[-1]))
+        if not isAdmin and len(s.files) == 1 and subPath == "": return self._redirect("/share=%s/%s" % (shareID, s.files[0].split("/")[-1]))
         elif subPath == "": baseFile, indexFile = None, -1
         else:
             baseFile = subPathBits.pop(0)
