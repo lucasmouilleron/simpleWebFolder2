@@ -365,8 +365,8 @@ class Server(Thread):
 
         baseFilesIndexes = {s.files[i].split("/")[-1]: i for i in range(len(s.files))}
         subPathBits = subPath.split("/")
-        if len(s.files) == 1: baseFile, indexFile = None, 0
-        elif subPath == "": baseFile, indexFile = None, -1
+        # if len(s.files) == 1: baseFile, indexFile = None, 0
+        if subPath == "": baseFile, indexFile = None, -1
         else:
             baseFile = subPathBits.pop(0)
             indexFile = baseFilesIndexes.get(baseFile, -2)
@@ -406,8 +406,10 @@ class Server(Thread):
                 readme = ip.getReadme(path)
             else: containers, leafs, readme = None, None, None
         if isLeaf:
-            asAttachement = len(s.files) == 1 and self.ip.isItemLeaf(s.files[0])  # dity fix for single file share name download
-            return send_from_directory(h.DATA_FOLDER, path, as_attachment=asAttachement)
+            # asAttachement = len(s.files) == 1 and self.ip.isItemLeaf(s.files[0])  # dity fix for single file share name download
+            asAttachement = False
+            attachmentName = path.split("/")[-1]
+            return send_from_directory(h.DATA_FOLDER, path, attachment_filename=attachmentName, as_attachment=asAttachement)
         else: return self._makeTemplate("share", displayPath=displayPath, shareBasePath=shareBasePath, subPath=subPath, share=s, containers=containers, leafs=leafs, alerts=[], readme=readme, indexFile=indexFile)
 
     ###################################################################################
