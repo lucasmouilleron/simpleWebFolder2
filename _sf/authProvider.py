@@ -194,9 +194,14 @@ class authProvider():
         return (True, sorted(requiredPasswords), savedPassword, savedPassword in requiredPasswords, lowerProtectedPath, protectedFromParent)
 
     ###################################################################################
+    def isShareProtected(self, s: sp.share):
+        return s.password != ""
+
+    ###################################################################################
     def isShareAuthorized(self, s: sp.share, r: request):
         savedPassword = r.cookies.get("_sf_share_pass_%s" % s.ID, None)
-        return s.password == savedPassword, savedPassword
+        if s.password == "": return True, savedPassword
+        else: return s.password == savedPassword, savedPassword
 
     ###################################################################################
     def setSharePassword(self, shareID, password, r, response=None):

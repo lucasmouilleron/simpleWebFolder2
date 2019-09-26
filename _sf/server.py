@@ -366,12 +366,14 @@ class Server(Thread):
         baseFilesIndexes = {s.files[i].split("/")[-1]: i for i in range(len(s.files))}
         subPathBits = subPath.split("/")
         # if len(s.files) == 1: baseFile, indexFile = None, 0
-        if subPath == "": baseFile, indexFile = None, -1
+        if len(s.files) == 1 and subPath == "": return self._redirect("/share=%s/%s" % (shareID, s.files[0].split("/")[-1]))
+        elif subPath == "": baseFile, indexFile = None, -1
         else:
             baseFile = subPathBits.pop(0)
             indexFile = baseFilesIndexes.get(baseFile, -2)
 
-        if not isAdmin: self.sp.addView(s, h.makePath(*subPathBits), baseFile, request.remote_addr if request is not None else None, s.tag)
+        isAuthorized, savedPassword = self.ap.isShareAuthorized(s, request)
+        if not isAdmin: self.sp.addView(s, h.makePath(*subPathBits), baseFile, request.remote_addr if request is not None else None, s.tag, isAuthorized)
         if indexFile == -2: return self._makeTemplate("not-found", path="%s" % shareID)
         if isAdmin and request.args.get("view") is None: return self._makeTemplate("share-admin", shareID=shareID, share=s)
 
@@ -384,12 +386,9 @@ class Server(Thread):
             if baseFile is not None: displayPath = h.makePath(displayPath, baseFile)
             if subPath != "": displayPath = h.makePath(displayPath, *subPathBits)
 
-        sharePassword = s.password
-        isProtected = sharePassword != ""
-        isAuthorized, savedPassword = self.ap.isShareAuthorized(s, request)
-        if h.TRACKING and not isAdmin: self.tp.track(path, request, isProtected, isAuthorized, savedPassword, shareID, s.tag)
+        if h.TRACKING and not isAdmin: self.tp.track(path, request, ap.isShareProtected(s), isAuthorized, savedPassword, shareID, s.tag)
         if not ip.doesItemExists(path): return self._makeTemplate("not-found", path=displayPath)
-        if isProtected and not isAdmin and not isAuthorized: return self._makeTemplate("share-password", displayPath=displayPath, share=s)
+        if not isAdmin and not isAuthorized: return self._makeTemplate("share-password", displayPath=displayPath, share=s)
 
         if indexFile == -1:
             isLeaf, readme = False, None
@@ -405,11 +404,7 @@ class Server(Thread):
                 containers, leafs = self.ip.getItems(path, overrideListingForbidden=True, overrideNoShow=True)
                 readme = ip.getReadme(path)
             else: containers, leafs, readme = None, None, None
-        if isLeaf:
-            # asAttachement = len(s.files) == 1 and self.ip.isItemLeaf(s.files[0])  # dity fix for single file share name download
-            asAttachement = False
-            attachmentName = path.split("/")[-1]
-            return send_from_directory(h.DATA_FOLDER, path, attachment_filename=attachmentName, as_attachment=asAttachement)
+        if isLeaf: return send_from_directory(h.DATA_FOLDER, path)
         else: return self._makeTemplate("share", displayPath=displayPath, shareBasePath=shareBasePath, subPath=subPath, share=s, containers=containers, leafs=leafs, alerts=[], readme=readme, indexFile=indexFile)
 
     ###################################################################################

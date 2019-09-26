@@ -83,6 +83,7 @@
             <th data-sort="string-ins" width="120">Tag</th>
             <th data-sort="string-ins" width="150">Date</th>
             <th data-sort="string-ins">Item</th>
+            <th data-sort="string-ins">Authorized</th>
         </tr>
         </thead>
         <tbody>
@@ -95,6 +96,7 @@
                     <td>${view.get("tag","")}</td>
                     <td>${h.formatTimestamp(view["date"], "YYYY/MM/DD HH:mm")}</td>
                     <td>${view["item"]}</td>
+                    <td>${view.get("authorized","")}</td>
                 </tr>
                 <% i+=1 %>
             %endfor

@@ -51,7 +51,7 @@ class sharesProvider():
         except: return ip
 
     ###################################################################################
-    def _doAddView(self, s: share, subPath, baseFile, address, tag):
+    def _doAddView(self, s: share, subPath, baseFile, address, tag, isAuthorized):
         views = s.views
         view = {"date": h.now()}
         if address is not None:
@@ -61,8 +61,8 @@ class sharesProvider():
             view["ip"] = "unk"
             view["location"] = "unk"
         if tag is not None: view["tag"] = tag
-        if subPath is not None:
-            view["item"] = h.makePath(baseFile if baseFile is not None else "", subPath).rstrip("/")
+        if subPath is not None: view["item"] = h.makePath(baseFile if baseFile is not None else "", subPath).rstrip("/")
+        view["authorized"] = isAuthorized
         views.append(view)
         views = sorted(views, key=lambda v: v["date"])[::-1]
         s.views = views
@@ -142,8 +142,8 @@ class sharesProvider():
         return os.path.exists(h.makePath(self.sharesPath, shareID))
 
     ###################################################################################
-    def addView(self, s: share, subpath, baseFile, address, tag):
-        threading.Thread(target=self._doAddView, args=(s, subpath, baseFile, address, tag)).start()
+    def addView(self, s: share, subpath, baseFile, address, tag, isAuthorized):
+        threading.Thread(target=self._doAddView, args=(s, subpath, baseFile, address, tag, isAuthorized)).start()
 
     ###################################################################################
     def saveShare(self, s: share):
