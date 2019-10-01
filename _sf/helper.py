@@ -534,3 +534,10 @@ def getYearMonthDayFromTimestamp(timestamp, timezone=SERVER_TIMEZONE):
 def getURLParams(url):
     try: return dict(parse.parse_qsl(parse.urlsplit(url).query))
     except: return {}
+
+
+################################################################################
+def makeURL(url, queryParams):
+    if isinstance(queryParams, str) and queryParams != "": return "%s?%s" % (url, queryParams)
+    if isinstance(queryParams, dict): return "%s?%s" % (url, "&".join(["%s=%s" % (k, queryParams[k]) for k in queryParams]))
+    return url

@@ -18,6 +18,7 @@ import threading
 import time
 from threading import Lock
 import json
+from urllib.parse import urlparse
 
 
 ###################################################################################
@@ -350,12 +351,13 @@ class Server(Thread):
     ###################################################################################
     def _routeShare(self, shareIDAndPath):
         shareID = shareIDAndPath.split("/")[0]
+        query = str(request.query_string, "utf8")
         if not self.sp.shareExists(shareID): return self._makeTemplate("not-found", path=shareID)
 
         if request.form.get("password-submit", False):
             response = make_response()
             self.ap.setSharePassword(shareID, request.form.get("password-share", ""), request, response)
-            return self._redirect("/share=%s" % shareID, response)
+            return self._redirect(h.makeURL("/share=%s" % shareID, query), response)
 
         isAdmin = self.ap.isAdmin(request)
         subPath = h.cleanPath(os.path.normpath(shareIDAndPath.replace(shareID, ""))).lstrip(".")
@@ -365,7 +367,7 @@ class Server(Thread):
 
         baseFilesIndexes = {s.files[i].split("/")[-1]: i for i in range(len(s.files))}
         subPathBits = subPath.split("/")
-        if not isAdmin and len(s.files) == 1 and subPath == "": return self._redirect("/share=%s/%s" % (shareID, s.files[0].split("/")[-1]))
+        if not isAdmin and len(s.files) == 1 and subPath == "": return self._redirect(h.makeURL("/share=%s/%s" % (shareID, s.files[0].split("/")[-1]), query))
         elif subPath == "": baseFile, indexFile = None, -1
         else:
             baseFile = subPathBits.pop(0)
