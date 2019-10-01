@@ -406,7 +406,7 @@ class Server(Thread):
                 readme = ip.getReadme(path)
             else: containers, leafs, readme = None, None, None
         if isLeaf: return send_from_directory(h.DATA_FOLDER, path)
-        else: return self._makeTemplate("share", displayPath=displayPath, shareBasePath=shareBasePath, subPath=subPath, share=s, containers=containers, leafs=leafs, alerts=[], readme=readme, indexFile=indexFile)
+        else: return self._makeTemplate("share", displayPath=displayPath, shareBasePath=shareBasePath, subPath=subPath, share=s, containers=containers, leafs=leafs, alerts=[], readme=readme, indexFile=indexFile, query=query)
 
     ###################################################################################
     def _makeBaseNamspace(self):

@@ -25,7 +25,8 @@
 <div class="navigation section">
     <div class="parent" data-toggle="tooltip" title="Go to parent folder">
         %if subPath != "":
-            <a href="/share=${share.ID}/${subPath}/.."><i class="icon fas fa-long-arrow-alt-up"></i></a>
+            <% url = h.makeURL("/share=%s/%s/.."%(share.ID,subPath), query)%>
+            <a href="${url}"><i class="icon fas fa-long-arrow-alt-up"></i></a>
         %else:
             <a class="disabled"><i class="icon fas fa-long-arrow-alt-up"></i></a>
         % endif
@@ -64,7 +65,7 @@
                     <% i = 0 %>
                     % for item in containers:
                         <% evenClass = "even" if i % 2 == 1 else "odd" %>
-                        <% urlEncodedURL = h.urlEncode(h.cleanURL(item.path.replace(shareBasePath,"")).lstrip("/"))%>
+                        <% urlEncodedURL = h.makeURL(h.urlEncode(h.cleanURL(item.path.replace(shareBasePath,"")).lstrip("/")), query)%>
                         <tr onclick="location.href='/share=${share.ID}/${urlEncodedURL}'" class="${evenClass}">
                             <td><i class="icon fas fa-folder"></i></td>
                             <td>${item.name}</td>
@@ -96,7 +97,7 @@
                     % for item in leafs:
                         <% evenClass = "even" if i % 2 == 1 else "odd"%>
                         <% sizeMB = h.floatFormat(item.size/1048576,1)%>
-                        <% urlEncodedURL = h.urlEncode(h.cleanURL(item.path.replace(shareBasePath,"")).lstrip("/"))%>
+                        <% urlEncodedURL = h.makeURL(h.urlEncode(h.cleanURL(item.path.replace(shareBasePath,"")).lstrip("/")), query)%>
                         <tr onclick="window.open('/share=${share.ID}/${urlEncodedURL}')" class="${evenClass}">
                             <td><i class="icon ${h.EXTENSIONS_CLASSES.get(item.extension, h.EXTENSIONS_CLASSES["default"])}"></i></td>
                             <td>${item.name}</td>
