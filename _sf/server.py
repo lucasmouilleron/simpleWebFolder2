@@ -272,10 +272,12 @@ class Server(Thread):
 
         if request.form.get("add-leaf", False):
             if not editAllowed: return self._makeTemplate("forbidden", path=path)
-            file = request.files["file"]
-            result, hint = self.ip.addLeaf(path, file)
-            if not result: alerts.append(["Can't add file", "The file can't be added: %s." % hint])
-            else: alerts.append(["File added", "The file %s has been added." % hint])
+            if not "file" in request.files or request.files["file"].filename == "": alerts.append(["Can't add file", "The file is empty."])
+            else:
+                file = request.files["file"]
+                result, hint = self.ip.addLeaf(path, file)
+                if not result: alerts.append(["Can't add file", "The file can't be added: %s." % hint])
+                else: alerts.append(["File added", "The file %s has been added." % hint])
 
         item = self.ip.getItem(path, request)
         containers, leafs = ip.getItems(path, request, asAdmin=True)
