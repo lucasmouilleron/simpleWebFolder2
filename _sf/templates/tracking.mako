@@ -43,9 +43,9 @@
         </select>
         <label>Protected</label>
         <select name="protected">
+            <option ${"SELECTED" if protected == "all" else ""}>all</option>
             <option ${"SELECTED" if protected == "yes" else ""}>yes</option>
             <option ${"SELECTED" if protected == "no" else ""}>no</option>
-            <option ${"SELECTED" if protected == "all" else ""}>all</option>
         </select>
         <label></label><input type="text" name="password" value="${password}" placeholder="Password" style="width:200px;"/>
         <label></label><input type="text" id="item" name="item" value="${item}" placeholder="Item" style="width:200px;"/>

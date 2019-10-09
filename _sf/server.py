@@ -301,7 +301,7 @@ class Server(Thread):
     def _routeTrackingAdmin(self):
         if not h.TRACKING: return self._redirect("/admin")
         if not self.ap.isAdmin(request): return self._redirect("/admin")
-        maxItems, password, item, protected = request.form.get("maxItems", "500"), request.form.get("password", ""), request.form.get("item", ""), request.form.get("protected", "yes")
+        maxItems, password, item, protected = request.form.get("maxItems", "500"), request.form.get("password", ""), request.form.get("item", ""), request.form.get("protected", "all")
         return self._makeTemplate("tracking", trackings=self.tp.getTrackings(password if password != "" else None, item if item != "" else None, protected, h.parseInt(maxItems, None)), password=password, item=item, maxItems=maxItems, protected=protected)
 
     ###################################################################################
