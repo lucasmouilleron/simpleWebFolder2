@@ -426,6 +426,9 @@ def getFileModified(filePath):
     if not os.path.exists(filePath): return 0
     return os.path.getmtime(filePath)
 
+################################################################################
+def touchFile(filePath):
+    os.utime(filePath, None)
 
 ################################################################################
 def getLockShared(filePath, waitForUnlockInSecs=None):

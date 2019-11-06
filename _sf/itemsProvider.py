@@ -47,13 +47,13 @@ class item:
 class itemsProvider():
 
     ###################################################################################
-    def __init__(self, ap: ap.authProvider, basePath, maxZipSize=50e6, tmpFolder=None, tmpFolderDuratioInDaysn=7, user=None, hiddenItems=None):
+    def __init__(self, ap: ap.authProvider, basePath, maxZipSize=50e6, tmpFolder=None, tmpFolderDuratioInDays=7, user=None, hiddenItems=None):
         if hiddenItems is None: hiddenItems = []
         self.hiddenItems = set(hiddenItems)
         self.basePath = os.path.abspath(basePath)
         self.maxZipSize = maxZipSize
         self.tmpFolder = tmpFolder.lstrip("/")
-        self.tmpFolderDuration = tmpFolderDuratioInDaysn * 24 * 60 * 60
+        self.tmpFolderDuration = tmpFolderDuratioInDays * 24 * 60 * 60
         self.user = h.getUserID(user)
         self.ap = ap
         self.cleanTmpThread = None
@@ -208,8 +208,9 @@ class itemsProvider():
             filename = self.getPotentialLeafName(file)
             if self.isItemLeaf(h.makePath(path, filename)): return False, "Item already exists"
             if self.isItemContainer(h.makePath(path, filename)): return False, "Item already exists"
-
-            file.save(h.makePath(self.basePath, path, filename))
+            filePath = h.makePath(self.basePath, path, filename)
+            file.save(filePath)
+            h.touchFile(filePath)
             return True, filename
         except:
             le, lt = h.getLastExceptionAndTrace()
