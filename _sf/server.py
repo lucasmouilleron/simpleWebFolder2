@@ -280,6 +280,7 @@ class Server(Thread):
                 else: alerts.append(["File added", "The file %s has been added." % hint])
 
         item = self.ip.getItem(path, request)
+        if item is None: return self._makeTemplate("error", path=path, e="Can't get item")
         containers, leafs = ip.getItems(path, request, asAdmin=True)
         isTmpFolder = self.ip.tmpFolder == path
         readme = ip.getReadmeAdmin(path)
@@ -398,6 +399,7 @@ class Server(Thread):
             containers, leafs = [], []
             for file in s.files:
                 item = ip.getItem(file)
+                if item is None: continue
                 item.path = item.path.split("/")[-1]
                 if ip.isItemContainer(file): containers.append(item)
                 else: leafs.append(item)
