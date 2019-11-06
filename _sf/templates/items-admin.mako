@@ -216,7 +216,7 @@
                             %endif
                             <td class="actions">
                                 <a data-toggle="tooltip" title="Copy link" class="link copy-link" data-url="${itemURL}" data-password="${item.passwords[0] if len(item.passwords)>0 else ""}"><i class="icon fas fa-link"></i></a>
-                                % if h.SHARING and not isTmpFolder:
+                                % if h.SHARING:
                                 ##                                     <a data-toggle="tooltip" title="Create share" href="${rootURL}/create-share=${shareURLEncoded}" target="_shares"><i class="icon fas fa-share-alt-square"></i></a>
                                     <a data-toggle="tooltip" title="Add to share" data-item="${item.path}" href="#" class="add-to-share"><i class="icon fas fa-share-alt-square"></i></a>
 
