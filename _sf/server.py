@@ -481,14 +481,14 @@ h.displaySplash()
 ap = ap.authProvider(h.DATA_FOLDER, h.CONFIG.get("admin password", ""), h.FORBIDEN_ITEMS)
 h.logInfo("Auth provider built")
 
-tp = tp.trackingProvider(h.DATA_FOLDER, user=h.USER, locationEnabled=h.TRACKING_IP_GEOLOC, locationAPIKey=h.CONFIG.get("ip geoloc api key", ""))
-h.logInfo("Tracking provider built")
-
 sp = sp.sharesProvider(h.makePath(h.DATA_FOLDER, "_sf_shares"), user=h.USER, locationEnabled=h.TRACKING_IP_GEOLOC, locationAPIKey=h.CONFIG.get("ip geoloc api key", ""))
 h.logInfo("Shares provider built")
 
 ip = ip.itemsProvider(ap, h.DATA_FOLDER, tmpFolder=h.CONFIG.get("tmp folder", None), tmpFolderDuratioInDays=h.CONFIG.get("tmp folder duration in days", 30), user=h.USER, hiddenItems=h.HIDDEN_ITEMS)
 h.logInfo("Items provider built")
+
+tp = tp.trackingProvider(h.DATA_FOLDER, ip, user=h.USER, locationEnabled=h.TRACKING_IP_GEOLOC, locationAPIKey=h.CONFIG.get("ip geoloc api key", ""))
+h.logInfo("Tracking provider built")
 
 server = Server(ip, ap, sp, tp, h.PORT, h.SSL, h.CERTIFICATE_KEY_FILE, h.CERTIFICATE_CRT_FILE, h.FULLCHAIN_CRT_FILE, aliases=h.CONFIG.get("aliases", None), maxUploadSize=h.CONFIG.get("max upload size", 20e6))
 server.start()

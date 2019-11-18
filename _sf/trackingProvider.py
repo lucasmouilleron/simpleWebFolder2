@@ -8,6 +8,7 @@ import requests as rq
 import json
 import threading
 from threading import Thread, Lock
+import itemsProvider as ip
 
 
 ###################################################################################
@@ -31,7 +32,8 @@ class tracking:
 class trackingProvider():
 
     ###################################################################################
-    def __init__(self, basePath, maxSize=5e5, user=None, locationEnabled=False, locationAPIKey=""):
+    def __init__(self, basePath, ip: ip.itemsProvider, maxSize=5e5, user=None, locationEnabled=False, locationAPIKey=""):
+        self.ip = ip
         self.basePath = os.path.abspath(basePath)
         self.maxSize = maxSize
         self.user = h.getUserID(user)
@@ -133,6 +135,7 @@ class trackingProvider():
                     if protected == "no" and t.protected: continue
                 if password is not None and password.lower() not in t.password.lower(): continue
                 if item is not None and item.lower() not in t.path.lower(): continue
+                if self.ip.isHiddenForListings(t.path): continue
                 finalTrackings.append(t)
                 i += 1
                 if maxItems is not None and i >= maxItems: break
