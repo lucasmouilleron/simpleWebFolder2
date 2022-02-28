@@ -1,6 +1,6 @@
 # SimpleWebFolder
 
-![Screenshot](http://grabs.lucasmouilleron.com/Screenshot%202018-12-13%20at%2022.26.43.png)
+![Screenshot](http://grabs.lucasmouilleron.com/grab%202022-02-28%20at%2011.42.40.png)
 
 ## Features
 - List files and folders
