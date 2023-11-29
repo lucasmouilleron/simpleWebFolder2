@@ -3,7 +3,7 @@
 ###################################################################################
 import signal
 from threading import Thread
-from gevent.wsgi import WSGIServer
+from gevent.pywsgi import WSGIServer
 from flask import Flask, request, jsonify, send_from_directory, redirect, make_response, send_file, url_for, Response
 from flask_cors import CORS
 from mako.template import Template

@@ -1,10 +1,12 @@
 requests==2.21.0
 python-pushover==0.3
 coloredlogs==9.0
-Flask==1.0.2
-gevent==1.2.2
+Flask==2.0.3
 arrow==0.8.0
-flask-cors==3.0.6
 Mako==1.0.7
 markdown2==2.3.6
 portalocker==1.2.1
+# modified
+gevent==23.9.1
+werkzeug==2.2.3
+flask-cors==4.0.0
