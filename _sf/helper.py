@@ -216,7 +216,7 @@ def writeToCSV(data, filePath, csvSEP=CSV_SEP, append=False, debug=False, noEmpt
     fileSize = getFileSize(filePath)
     csvFile = open(filePath, mode, encoding="utf-8")
     isIterable = True
-    if len(data) > 0: isIterable = isinstance(data[0], collections.Iterable)
+    if len(data) > 0: isIterable = isinstance(data[0], collections.abc.Iterable)
     if len(headers) > 0 and (not append or fileSize == 0): csvFile.write(csvSEP.join(headers) + "\n")
     for i in range(len(data)):
         line = data[i]

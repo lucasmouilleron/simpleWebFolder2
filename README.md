@@ -16,7 +16,7 @@
 - Tracking: optional tracking
 
 ## Install
-- Pytohn 3
+- Pytohn 3.10.0
 - `pip install -r _sf/requirements.txt`
 - Copy `_sf/assets/style.sample.css` to `_sf/assets/style.css`
 - Copy `_sf/config/config.sample.json` to `_sf/config/config.json` 
