@@ -44,8 +44,8 @@ class Server(Thread):
         self.maxUploadSize = maxUploadSize
 
         self.firewallIPs = {}
-        self.firewallNbHits = 150
-        self.firewallWindowSize = 10
+        self.firewallNbHits = h.CONFIG.get("firewall nb hits", 150)
+        self.firewallWindowSize = h.CONFIG.get("firewall window size", 10)
         self.firewallLock = Lock()
 
         if self.maxUploadSize is not None: self.app.config["MAX_CONTENT_LENGTH"] = self.maxUploadSize
