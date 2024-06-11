@@ -73,6 +73,7 @@
     </table>
 </div>
 
+%if sharingViews:
 <div class="views section">
     <div class="section-title">Share ${share.ID} views</div>
     <table>
@@ -103,6 +104,7 @@
         </tbody>
     </table>
 </div>
+%endif
 
 
 <div class="footer">${h.NAME} - ${h.CREDITS}</div>

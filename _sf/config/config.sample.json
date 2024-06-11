@@ -14,6 +14,8 @@
   "tmp folder": "/tmp",
   "tmp folder duration in days": 5,
   "ip geoloc": false,
-  "ip geoloc api key":"todo",
-  "aliases": {}
+  "ip geoloc api key": "todo",
+  "aliases": {},
+  "firewall nb hits": 150,
+  "firewall window size": 10
 }

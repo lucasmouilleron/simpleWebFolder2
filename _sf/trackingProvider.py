@@ -10,7 +10,6 @@ import threading
 from threading import Thread, Lock
 import itemsProvider as ip
 
-
 ###################################################################################
 ###################################################################################
 ###################################################################################
@@ -24,7 +23,6 @@ class tracking:
         self.protected = protected
         self.location = location
         if self.location is None: self.location = self.ip
-
 
 ###################################################################################
 ###################################################################################
@@ -88,6 +86,8 @@ class trackingProvider():
 
     ###################################################################################
     def _getLocationFromIP(self, ip):
+        location = ip
+        if not self.locationEnabled: return location
         try:
             if ip in h.IP_LOCATIONS_DONE: return h.IP_LOCATIONS_DONE[ip]
             apiURL = "http://api.ipapi.com/%s?access_key=%s" % (ip, self.locationAPIKey)
@@ -97,9 +97,9 @@ class trackingProvider():
             country, region = result["country_code"], result["region_code"]
             if country is None: location = ip
             else: location = "%s, %s" % (country, region)
-            h.IP_LOCATIONS_DONE[ip] = location
             return location
-        except: return ip
+        except: return location
+        finally: h.IP_LOCATIONS_DONE[ip] = location
 
     ###################################################################################
     def _doTrack(self, path, address, isProtected, isAuthotirzed, passwordProvided, shareID, shareTag):
@@ -108,8 +108,7 @@ class trackingProvider():
             path = h.cleanPath(path)
             if shareID is not None: path = "%s - sid: %s" % (path, shareID)
             if shareTag is not None: path = "%s - stag: %s" % (path, shareTag)
-            if self.locationEnabled: location = self._getLocationFromIP(address)
-            else: location = address
+            location = self._getLocationFromIP(address)
             self.trackings.append(tracking(path, passwordProvided if passwordProvided is not None else "", isAuthotirzed, address, h.now(), isProtected, location))
             if len(self.trackings) > self.maxSize:
                 nbLines = len(self.trackings)
@@ -121,7 +120,8 @@ class trackingProvider():
 
     ###################################################################################
     def track(self, path, r, isProtected, isAuthotirzed, passwordProvided, shareID=None, shareTag=None):
-        threading.Thread(target=self._doTrack, args=(path, r.remote_addr, isProtected, isAuthotirzed, passwordProvided, shareID, shareTag)).start()
+        self._doTrack(path, r.remote_addr, isProtected, isAuthotirzed, passwordProvided, shareID, shareTag)
+        # threading.Thread(target=self._doTrack, args=(path, r.remote_addr, isProtected, isAuthotirzed, passwordProvided, shareID, shareTag)).start()
 
     ###################################################################################
     def getTrackings(self, password=None, item=None, protected=None, maxItems=None) -> List[tracking]:
@@ -141,7 +141,6 @@ class trackingProvider():
                 if maxItems is not None and i >= maxItems: break
             return finalTrackings
         finally: self.trackingsLock.release()
-
 
 ###################################################################################
 ###################################################################################

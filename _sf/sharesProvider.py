@@ -7,7 +7,6 @@ import requests as rq
 import json
 import threading
 
-
 ###################################################################################
 ###################################################################################
 ###################################################################################
@@ -21,22 +20,25 @@ class share:
         self.duration = duration
         self.tag = tag
 
-
 ###################################################################################
 ###################################################################################
 ###################################################################################
-class sharesProvider():
+class sharesProvider:
 
     ###################################################################################
-    def __init__(self, sharesPath, user=None, locationEnabled=False, locationAPIKey=""):
+    def __init__(self, sharesPath, user=None, locationEnabled=False, locationAPIKey="", viewsEnabled=True, maxViews=2000):
         self.user = h.getUserID(user)
         self.sharesPath = h.makeDirPath(os.path.abspath(sharesPath))
         if self.user is not None: h.changeFileOwner(self.sharesPath, self.user)
         self.locationEnabled = locationEnabled
         self.locationAPIKey = locationAPIKey
+        self.viewsEnabled = viewsEnabled
+        self.maxViews = maxViews
 
     ###################################################################################
     def _getLocationFromIP(self, ip):
+        location = ip
+        if not self.locationEnabled: return location
         try:
             if ip in h.IP_LOCATIONS_DONE: return h.IP_LOCATIONS_DONE[ip]
             apiURL = "http://api.ipapi.com/%s?access_key=%s" % (ip, self.locationAPIKey)
@@ -46,9 +48,9 @@ class sharesProvider():
             country, region = result["country_code"], result["region_code"]
             if country is None: location = ip
             else: location = "%s, %s" % (country, region)
-            h.IP_LOCATIONS_DONE[ip] = location
             return location
-        except: return ip
+        except: return location
+        finally: h.IP_LOCATIONS_DONE[ip] = location
 
     ###################################################################################
     def _doAddView(self, s: share, subPath, baseFile, address, tag, isAuthorized):
@@ -65,6 +67,11 @@ class sharesProvider():
         view["authorized"] = isAuthorized
         views.append(view)
         views = sorted(views, key=lambda v: v["date"])[::-1]
+        if len(views) > self.maxViews:
+            nbLines = len(views)
+            offset = int(nbLines - self.maxViews / 2)
+            if offset > 0: views = views[offset:nbLines]
+            h.logDebug("Trimed views", s.ID, nbLines, len(views))
         s.views = views
         self.saveShare(s)
 
@@ -113,11 +120,8 @@ class sharesProvider():
             s = share(shareJson["ID"], shareJson["creation"], files, shareJson.get("views", []), shareJson.get("password"), shareJson.get("duration", 0))
             if not asAdmin and s.duration > 0 and s.duration + s.creation < h.now(): rs, rh = None, "Share has expired"
             else: rs, rh = s, "ok"
-            h.releaseLock(lh)
-            lh = None
             if rs is None: return rs, rh
             if r is not None: rs.tag = h.getURLParams(r.url).get("t", None)
-
             return rs, rh
         except:
             le, lt = h.getLastExceptionAndTrace()
@@ -143,7 +147,9 @@ class sharesProvider():
 
     ###################################################################################
     def addView(self, s: share, subpath, baseFile, address, tag, isAuthorized):
-        threading.Thread(target=self._doAddView, args=(s, subpath, baseFile, address, tag, isAuthorized)).start()
+        if not self.viewsEnabled: return
+        self._doAddView(s, subpath, baseFile, address, tag, isAuthorized)
+        # threading.Thread(target=self._doAddView, args=(s, subpath, baseFile, address, tag, isAuthorized)).start()
 
     ###################################################################################
     def saveShare(self, s: share):
