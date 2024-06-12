@@ -3,7 +3,6 @@
 ###################################################################################
 import os
 import helper as h
-import requests as rq
 import json
 import threading
 
@@ -36,29 +35,12 @@ class sharesProvider:
         self.maxViews = maxViews
 
     ###################################################################################
-    def _getLocationFromIP(self, ip):
-        location = ip
-        if not self.locationEnabled: return location
-        try:
-            if ip in h.IP_LOCATIONS_DONE: return h.IP_LOCATIONS_DONE[ip]
-            apiURL = "http://api.ipapi.com/%s?access_key=%s" % (ip, self.locationAPIKey)
-            result = rq.get(apiURL, timeout=3)
-            result.encoding = "utf8"
-            result = json.loads(result.text)
-            country, region = result["country_code"], result["region_code"]
-            if country is None: location = ip
-            else: location = "%s, %s" % (country, region)
-            return location
-        except: return location
-        finally: h.IP_LOCATIONS_DONE[ip] = location
-
-    ###################################################################################
     def _doAddView(self, s: share, subPath, baseFile, address, tag, isAuthorized):
         views = s.views
         view = {"date": h.now()}
         if address is not None:
             view["ip"] = address
-            view["location"] = self._getLocationFromIP(address)
+            view["location"] = h.getLocationFromIP(address, self.locationAPIKey) if self.locationEnabled else address
         else:
             view["ip"] = "unk"
             view["location"] = "unk"

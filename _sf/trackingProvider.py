@@ -85,30 +85,13 @@ class trackingProvider():
         finally: self.trackingsLock.release()
 
     ###################################################################################
-    def _getLocationFromIP(self, ip):
-        location = ip
-        if not self.locationEnabled: return location
-        try:
-            if ip in h.IP_LOCATIONS_DONE: return h.IP_LOCATIONS_DONE[ip]
-            apiURL = "http://api.ipapi.com/%s?access_key=%s" % (ip, self.locationAPIKey)
-            result = rq.get(apiURL, timeout=3)
-            result.encoding = "utf8"
-            result = json.loads(result.text)
-            country, region = result["country_code"], result["region_code"]
-            if country is None: location = ip
-            else: location = "%s, %s" % (country, region)
-            return location
-        except: return location
-        finally: h.IP_LOCATIONS_DONE[ip] = location
-
-    ###################################################################################
     def _doTrack(self, path, address, isProtected, isAuthotirzed, passwordProvided, shareID, shareTag):
         try:
             self.trackingsLock.acquire()
             path = h.cleanPath(path)
             if shareID is not None: path = "%s - sid: %s" % (path, shareID)
             if shareTag is not None: path = "%s - stag: %s" % (path, shareTag)
-            location = self._getLocationFromIP(address)
+            location = h.getLocationFromIP(address, self.locationAPIKey) if self.locationEnabled else address
             self.trackings.append(tracking(path, passwordProvided if passwordProvided is not None else "", isAuthotirzed, address, h.now(), isProtected, location))
             if len(self.trackings) > self.maxSize:
                 nbLines = len(self.trackings)

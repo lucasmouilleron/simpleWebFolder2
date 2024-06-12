@@ -27,6 +27,7 @@ from urllib.parse import urlencode
 import shutil
 from collections import OrderedDict
 from urllib import parse
+import requests as rq
 import re
 
 ###################################################################################
@@ -544,3 +545,19 @@ def makeURL(url, queryParams):
     if isinstance(queryParams, str) and queryParams != "": return "%s?%s" % (url, queryParams)
     if isinstance(queryParams, dict): return "%s?%s" % (url, "&".join(["%s=%s" % (k, queryParams[k]) for k in queryParams]))
     return url
+
+###################################################################################
+def getLocationFromIP(ip, locationAPIKey):
+    location = ip
+    try:
+        if ip in IP_LOCATIONS_DONE: return IP_LOCATIONS_DONE[ip]
+        apiURL = "http://api.ipapi.com/%s?access_key=%s" % (ip, locationAPIKey)
+        result = rq.get(apiURL, timeout=3)
+        result.encoding = "utf8"
+        result = json.loads(result.text)
+        country, region = result["country_code"], result["region_code"]
+        if country is None: location = ip
+        else: location = "%s, %s" % (country, region)
+        return location
+    except: return location
+    finally: IP_LOCATIONS_DONE[ip] = location
