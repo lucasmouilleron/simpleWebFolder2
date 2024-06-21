@@ -25,7 +25,7 @@ class share:
 class sharesProvider:
 
     ###################################################################################
-    def __init__(self, sharesPath, user=None, locationEnabled=False, locationAPIKey="", viewsEnabled=True, maxViews=2000):
+    def __init__(self, sharesPath, user=None, locationEnabled=False, locationAPIKey="", viewsEnabled=True, maxViews=10000):
         self.user = h.getUserID(user)
         self.sharesPath = h.makeDirPath(os.path.abspath(sharesPath))
         if self.user is not None: h.changeFileOwner(self.sharesPath, self.user)
